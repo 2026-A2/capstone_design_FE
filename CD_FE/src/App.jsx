@@ -1,4 +1,4 @@
-import MainPage from './pages/Login.jsx'
+import Login from './pages/Login.jsx'
 
 function App() {
   return <Login />
