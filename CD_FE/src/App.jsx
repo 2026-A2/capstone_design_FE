@@ -1,9 +1,9 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import Login from './pages/Login.jsx'
 import Main from './pages/Main.jsx'
-import Interview from './pages/Interview.jsx'
-import Industry from './pages/Industry.jsx'
-import IndustryCustom from './pages/IndustryCustom.jsx'
+import Interview from './pages/interview/Interview.jsx'
+import Industry from './pages/interview/Industry.jsx'
+import IndustryCustom from './pages/interview/IndustryCustom.jsx'
 
 function App() {
   return (
