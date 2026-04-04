@@ -1,9 +1,14 @@
 import { useNavigate } from 'react-router-dom'
+import { useInterview } from '../../contexts/InterviewContext.jsx'
 
 function Industry() {
   const navigate = useNavigate()
+  const { setIndustry, setQuestionType } = useInterview()
+
   const handleIndustrySelect = (industry) => {
-    navigate('/interview/question-count', { state: { industry } })
+    setQuestionType('industry')
+    setIndustry(industry)
+    navigate('/interview/question-count')
   }
 
   return (

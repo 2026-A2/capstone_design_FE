@@ -1,15 +1,19 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useInterview } from '../../contexts/InterviewContext.jsx'
 
 function IndustryCustom() {
   const navigate = useNavigate()
-  const [industry, setIndustry] = useState('')
+  const { industry, setIndustry, setQuestionType } = useInterview()
+  const [inputIndustry, setInputIndustry] = useState(industry)
 
   const handleNext = () => {
-    if (!industry.trim()) {
+    if (!inputIndustry.trim()) {
       return
     }
-    navigate('/interview/question-count', { state: { industry: industry.trim() } })
+    setQuestionType('industry')
+    setIndustry(inputIndustry.trim())
+    navigate('/interview/question-count')
   }
 
   return (
@@ -18,8 +22,8 @@ function IndustryCustom() {
       <p className="text-gray-700">희망하는 산업을 직접 입력해주세요.</p>
       <input
         type="text"
-        value={industry}
-        onChange={(e) => setIndustry(e.target.value)}
+        value={inputIndustry}
+        onChange={(e) => setInputIndustry(e.target.value)}
         placeholder="예: 반도체, 바이오, 교육"
         className="w-full max-w-md px-4 py-2 rounded border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
@@ -28,7 +32,7 @@ function IndustryCustom() {
         type="button"
         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
         onClick={handleNext}
-        disabled={!industry.trim()}
+        disabled={!inputIndustry.trim()}
       >
         다음
       </button>

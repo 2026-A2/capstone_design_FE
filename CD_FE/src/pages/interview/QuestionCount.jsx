@@ -1,17 +1,14 @@
-import { useLocation } from 'react-router-dom'
-import { useState } from 'react'
+import { useInterview } from '../../contexts/InterviewContext.jsx'
 
 function QuestionCount() {
-  const location = useLocation()
-  const [questionCount, setQuestionCount] = useState('')
-  const industry = location.state?.industry ?? '미선택'
+  const { industry, questionCount, setQuestionCount } = useInterview()
 
   const isValid = Number(questionCount) >= 2 && Number(questionCount) <= 5
 
   return (
     <div className="h-screen flex flex-col items-center justify-center gap-4 bg-[#efefef] text-center px-6">
       <h1 className="text-2xl font-bold">질문 개수를 선택해주세요</h1>
-      <p className="text-gray-700">선택한 산업: {industry}</p>
+      <p className="text-gray-700">선택한 산업: {industry || '미선택'}</p>
       <p className="text-gray-700">질문 개수는 2개부터 5개까지 입력할 수 있습니다.</p>
 
       <input
