@@ -6,6 +6,7 @@ const InterviewContext = createContext(null)
 function InterviewProvider({ children }) {
   const [questionType, setQuestionType] = useState('')
   const [industry, setIndustry] = useState('')
+  const [resumeText, setResumeText] = useState('')
   const [questionCount, setQuestionCount] = useState('')
   const [questions, setQuestions] = useState([])
   const [loading, setLoading] = useState(false)
@@ -19,6 +20,7 @@ function InterviewProvider({ children }) {
       const response = await axios.post(`${import.meta.env.VITE_AI_BASE_URL}/api/interview/questions`, {
         questionType,
         industry,
+        resumeText,
         questionCount: Number(questionCount),
       })
 
@@ -36,6 +38,7 @@ function InterviewProvider({ children }) {
   const resetInterview = () => {
     setQuestionType('')
     setIndustry('')
+    setResumeText('')
     setQuestionCount('')
     setQuestions([])
     setLoading(false)
@@ -46,19 +49,21 @@ function InterviewProvider({ children }) {
     () => ({
       questionType,
       industry,
+      resumeText,
       questionCount,
       questions,
       loading,
       error,
       setQuestionType,
       setIndustry,
+      setResumeText,
       setQuestionCount,
       setQuestions,
       setError,
       requestInterviewQuestions,
       resetInterview,
     }),
-    [questionType, industry, questionCount, questions, loading, error],
+    [questionType, industry, resumeText, questionCount, questions, loading, error],
   )
 
   return <InterviewContext.Provider value={value}>{children}</InterviewContext.Provider>

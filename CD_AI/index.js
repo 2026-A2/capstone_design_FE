@@ -28,19 +28,34 @@ app.post("/api/chat", async (req, res) => {
 
 app.post("/api/interview/questions", async (req, res) => {
     try {
-        const { industry, questionType = "industry", questionCount } = req.body;
+        const { industry = "", resumeText = "", questionType = "industry", questionCount } = req.body;
         const normalizedCount = Number(questionCount);
+        const normalizedIndustry = String(industry).trim();
+        const normalizedResumeText = String(resumeText).trim();
 
-        if (!industry || !Number.isInteger(normalizedCount) || normalizedCount < 2 || normalizedCount > 5) {
-            return res.status(400).json({ error: "industry와 questionCount(2~5)가 필요합니다." });
+        if (!Number.isInteger(normalizedCount) || normalizedCount < 2 || normalizedCount > 5) {
+            return res.status(400).json({ error: "questionCount(2~5)가 필요합니다." });
         }
+
+        if (questionType === "industry" && !normalizedIndustry) {
+            return res.status(400).json({ error: "산업 기반 질문에는 industry가 필요합니다." });
+        }
+
+        if (questionType === "resume" && !normalizedResumeText) {
+            return res.status(400).json({ error: "자소서 기반 질문에는 resumeText가 필요합니다." });
+        }
+
+        const basisLine =
+            questionType === "resume"
+                ? `- 자소서 내용: ${normalizedResumeText}`
+                : `- 산업: ${normalizedIndustry}`;
 
         const prompt = `
 당신은 한국어 면접 질문 생성기입니다.
 아래 조건에 맞는 질문만 생성하세요.
 
 - 질문 유형: ${questionType}
-- 산업: ${industry}
+${basisLine}
 - 질문 개수: ${normalizedCount}
 
 반드시 JSON 배열 문자열로만 응답하세요.

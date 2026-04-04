@@ -12,6 +12,7 @@ function Interview() {
 
 	const handleResumeBased = () => {
 		setQuestionType('resume')
+		navigate('/interview/resume')
 	}
 
 	return (
