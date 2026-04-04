@@ -4,6 +4,7 @@ import Main from './pages/Main.jsx'
 import Interview from './pages/interview/Interview.jsx'
 import Industry from './pages/interview/Industry.jsx'
 import IndustryCustom from './pages/interview/IndustryCustom.jsx'
+import QuestionCount from './pages/interview/QuestionCount.jsx'
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
       <Route path="/interview" element={<Interview />} />
       <Route path="/industry" element={<Industry />} />
       <Route path="/industry/custom" element={<IndustryCustom />} />
+      <Route path="/interview/question-count" element={<QuestionCount />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
