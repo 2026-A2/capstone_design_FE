@@ -1,7 +1,7 @@
-import MainPage from './pages/MainPage.jsx'
+import MainPage from './pages/Login.jsx'
 
 function App() {
-  return <MainPage />
+  return <Login />
 }
 
 export default App
