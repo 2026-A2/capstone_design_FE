@@ -1,9 +1,24 @@
 import { useInterview } from '../../contexts/InterviewContext.jsx'
+import { useNavigate } from 'react-router-dom'
 
 function QuestionCount() {
-  const { industry, questionCount, setQuestionCount } = useInterview()
+  const navigate = useNavigate()
+  const { industry, questionCount, setQuestionCount, loading, error, requestInterviewQuestions } = useInterview()
 
   const isValid = Number(questionCount) >= 2 && Number(questionCount) <= 5
+
+  const handleNext = async () => {
+    if (!isValid || !industry) {
+      return
+    }
+
+    try {
+      await requestInterviewQuestions()
+      navigate('/interview/questions')
+    } catch {
+      // Error message is managed by context state.
+    }
+  }
 
   return (
     <div className="h-screen flex flex-col items-center justify-center gap-4 bg-[#efefef] text-center px-6">
@@ -25,12 +40,17 @@ function QuestionCount() {
         <p className="text-red-600">질문 개수는 2~5 사이로 입력해주세요.</p>
       )}
 
+      {!industry && <p className="text-red-600">먼저 산업을 선택해주세요.</p>}
+
+      {error && <p className="text-red-600">{error}</p>}
+
       <button
         type="button"
         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
-        disabled={!isValid}
+        disabled={!isValid || !industry || loading}
+        onClick={handleNext}
       >
-        다음
+        {loading ? '질문 생성 중...' : '다음'}
       </button>
     </div>
   )
