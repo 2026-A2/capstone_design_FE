@@ -1,0 +1,33 @@
+name: Deploy CD_AI to AWS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "CD_AI/**"
+      - ".github/workflows/deploy-ai.yml"
+      - "ecosystem.config.cjs"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_USER }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          port: ${{ secrets.AWS_PORT }}
+          script_stop: true
+          script: |
+            cd ${{ secrets.AWS_PROJECT_PATH }}
+            git config --global --add safe.directory ${{ secrets.AWS_PROJECT_PATH }}
+            git pull origin main
+            cd CD_AI
+            npm ci
+            cd ..
+            npx pm2 startOrRestart ecosystem.config.cjs --only cd-ai
+            npx pm2 save
