@@ -86,6 +86,24 @@ ${basisLine}
     }
 });
 
-app.listen(process.env.PORT || 3001, () => {
-    console.log("AI server running");
+const port = Number(process.env.PORT) || 3001;
+
+app.get("/", (req, res) => {
+    res.json({
+        message: "AI server is running",
+        healthcheck: "/health",
+    });
+});
+
+app.get("/health", (req, res) => {
+    res.status(200).json({
+        ok: true,
+        service: "cd-ai",
+        port,
+        timestamp: new Date().toISOString(),
+    });
+});
+
+app.listen(port, () => {
+    console.log(`AI server running on http://localhost:${port}`);
 });
