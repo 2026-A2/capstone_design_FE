@@ -7,6 +7,7 @@ import Industry from './pages/interview/Industry.jsx'
 import IndustryCustom from './pages/interview/IndustryCustom.jsx'
 import QuestionCount from './pages/interview/QuestionCount.jsx'
 import QuestionsResult from './pages/interview/QuestionsResult.jsx'
+import SetupCheck from './pages/interview/SetupCheck.jsx'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Route path="/" element={<Login />} />
       <Route path="/main" element={<Main />} />
       <Route path="/interview" element={<Interview />} />
+      <Route path="/interview/setup" element={<SetupCheck />} />
       <Route path="/interview/resume" element={<Resume />} />
       <Route path="/industry" element={<Industry />} />
       <Route path="/industry/custom" element={<IndustryCustom />} />

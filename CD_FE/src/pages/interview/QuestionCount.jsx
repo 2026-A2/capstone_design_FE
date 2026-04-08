@@ -29,7 +29,7 @@ function QuestionCount() {
 
     try {
       await requestInterviewQuestions()
-      navigate('/interview/questions')
+      navigate('/interview/setup')
     } catch {
       // Error message is managed by context state.
     }
