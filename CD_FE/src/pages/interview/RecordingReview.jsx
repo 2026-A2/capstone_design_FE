@@ -1,0 +1,104 @@
+import { useNavigate } from 'react-router-dom'
+import { useInterview } from '../../contexts/InterviewContext.jsx'
+
+function RecordingReview() {
+  const navigate = useNavigate()
+  const {
+    questions,
+    currentQuestionIndex,
+    questionRetryUsed,
+    questionRecordings,
+    setCurrentQuestionIndex,
+    setQuestionRecordings,
+    setQuestionRetryUsed,
+    resetInterview,
+  } = useInterview()
+
+  const hasQuestions = questions.length > 0
+  const isLastQuestion = currentQuestionIndex >= questions.length - 1
+  const retryUsed = questionRetryUsed[currentQuestionIndex]
+  const hasRecording = Boolean(questionRecordings[currentQuestionIndex])
+
+  const handleNextQuestion = () => {
+    if (isLastQuestion) {
+      resetInterview()
+      navigate('/main')
+      return
+    }
+
+    setCurrentQuestionIndex((prev) => prev + 1)
+    navigate('/interview/questions')
+  }
+
+  const handleRetry = () => {
+    if (retryUsed) {
+      return
+    }
+
+    setQuestionRecordings((prev) => {
+      const next = [...prev]
+      next[currentQuestionIndex] = null
+      return next
+    })
+    setQuestionRetryUsed((prev) => {
+      const next = [...prev]
+      next[currentQuestionIndex] = true
+      return next
+    })
+    navigate('/interview/questions')
+  }
+
+  if (!hasQuestions || !hasRecording) {
+    return (
+      <div className="min-h-screen bg-[#efefef] px-6 py-12">
+        <div className="mx-auto flex min-h-[70vh] w-full max-w-3xl flex-col items-center justify-center rounded-3xl bg-white p-8 text-center shadow-sm">
+          <h1 className="text-2xl font-bold text-gray-900">확인할 녹화가 없습니다</h1>
+          <p className="mt-3 text-gray-600">면접 화면으로 돌아가 다시 진행해주세요.</p>
+          <button
+            type="button"
+            onClick={() => navigate('/interview/questions')}
+            className="mt-6 rounded-xl bg-blue-500 px-6 py-3 font-semibold text-white transition hover:bg-blue-600"
+          >
+            면접 화면으로 이동
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-[#efefef] px-6 py-12">
+      <div className="mx-auto flex min-h-[70vh] w-full max-w-3xl flex-col items-center justify-center rounded-3xl bg-white p-8 text-center shadow-sm">
+        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-600">Recording Complete</p>
+        <h1 className="mt-3 text-3xl font-bold text-gray-900">녹화가 완료되었습니다.</h1>
+        <p className="mt-4 max-w-2xl text-lg leading-relaxed text-gray-700">
+          한번 더 녹화하면 직전의 영상은 폐기되며 복구할 수 없습니다.
+        </p>
+        <p className="mt-3 text-sm text-gray-500">
+          질문 {currentQuestionIndex + 1} / {questions.length}
+        </p>
+
+        <div className="mt-10 flex w-full max-w-md flex-col gap-3">
+          <button
+            type="button"
+            onClick={handleNextQuestion}
+            className="rounded-2xl bg-blue-500 px-6 py-4 text-lg font-semibold text-white transition hover:bg-blue-600"
+          >
+            다음 질문으로
+          </button>
+
+          <button
+            type="button"
+            onClick={handleRetry}
+            disabled={retryUsed}
+            className="rounded-2xl border border-gray-300 bg-white px-6 py-4 text-lg font-semibold text-gray-800 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400"
+          >
+            한번더
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default RecordingReview

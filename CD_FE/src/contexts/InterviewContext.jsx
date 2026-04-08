@@ -9,6 +9,9 @@ function InterviewProvider({ children }) {
   const [resumeText, setResumeText] = useState('')
   const [questionCount, setQuestionCount] = useState('')
   const [questions, setQuestions] = useState([])
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
+  const [questionRecordings, setQuestionRecordings] = useState([])
+  const [questionRetryUsed, setQuestionRetryUsed] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -26,6 +29,9 @@ function InterviewProvider({ children }) {
 
       const receivedQuestions = Array.isArray(response.data?.questions) ? response.data.questions : []
       setQuestions(receivedQuestions)
+      setCurrentQuestionIndex(0)
+      setQuestionRecordings(new Array(receivedQuestions.length).fill(null))
+      setQuestionRetryUsed(new Array(receivedQuestions.length).fill(false))
       return receivedQuestions
     } catch (requestError) {
       setError('질문 생성에 실패했습니다. 잠시 후 다시 시도해주세요.')
@@ -41,6 +47,9 @@ function InterviewProvider({ children }) {
     setResumeText('')
     setQuestionCount('')
     setQuestions([])
+    setCurrentQuestionIndex(0)
+    setQuestionRecordings([])
+    setQuestionRetryUsed([])
     setLoading(false)
     setError('')
   }
@@ -52,6 +61,9 @@ function InterviewProvider({ children }) {
       resumeText,
       questionCount,
       questions,
+      currentQuestionIndex,
+      questionRecordings,
+      questionRetryUsed,
       loading,
       error,
       setQuestionType,
@@ -59,11 +71,25 @@ function InterviewProvider({ children }) {
       setResumeText,
       setQuestionCount,
       setQuestions,
+      setCurrentQuestionIndex,
+      setQuestionRecordings,
+      setQuestionRetryUsed,
       setError,
       requestInterviewQuestions,
       resetInterview,
     }),
-    [questionType, industry, resumeText, questionCount, questions, loading, error],
+    [
+      questionType,
+      industry,
+      resumeText,
+      questionCount,
+      questions,
+      currentQuestionIndex,
+      questionRecordings,
+      questionRetryUsed,
+      loading,
+      error,
+    ],
   )
 
   return <InterviewContext.Provider value={value}>{children}</InterviewContext.Provider>
