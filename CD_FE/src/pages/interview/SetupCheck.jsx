@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useInterview } from '../../contexts/InterviewContext.jsx'
 
 function SetupCheck() {
+  const navigate = useNavigate()
   const { questions } = useInterview()
   const videoRef = useRef(null)
   const canvasRef = useRef(null)
@@ -136,6 +138,15 @@ function SetupCheck() {
                 className="rounded-xl bg-gray-900 px-4 py-3 font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-300"
               >
                 사진 찍기
+              </button>
+
+              <button
+                type="button"
+                onClick={() => navigate('/interview/preparation')}
+                disabled={!capturedImage}
+                className="rounded-xl border border-gray-300 bg-white px-4 py-3 font-semibold text-gray-800 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400"
+              >
+                다음
               </button>
             </div>
           </div>
