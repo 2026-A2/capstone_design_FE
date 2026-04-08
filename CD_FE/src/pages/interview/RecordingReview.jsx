@@ -11,7 +11,6 @@ function RecordingReview() {
     setCurrentQuestionIndex,
     setQuestionRecordings,
     setQuestionRetryUsed,
-    resetInterview,
   } = useInterview()
 
   const hasQuestions = questions.length > 0
@@ -21,8 +20,7 @@ function RecordingReview() {
 
   const handleNextQuestion = () => {
     if (isLastQuestion) {
-      resetInterview()
-      navigate('/main')
+      navigate('/interview/complete')
       return
     }
 

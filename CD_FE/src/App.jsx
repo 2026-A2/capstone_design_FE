@@ -10,6 +10,7 @@ import QuestionsResult from './pages/interview/QuestionsResult.jsx'
 import SetupCheck from './pages/interview/SetupCheck.jsx'
 import Preparation from './pages/interview/Preparation.jsx'
 import RecordingReview from './pages/interview/RecordingReview.jsx'
+import InterviewComplete from './pages/interview/InterviewComplete.jsx'
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
       <Route path="/interview/question-count" element={<QuestionCount />} />
       <Route path="/interview/questions" element={<QuestionsResult />} />
       <Route path="/interview/review" element={<RecordingReview />} />
+      <Route path="/interview/complete" element={<InterviewComplete />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
