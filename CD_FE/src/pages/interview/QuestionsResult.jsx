@@ -143,7 +143,7 @@ function QuestionsResult() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-          <section className="flex min-h-[560px] flex-col rounded-3xl bg-white p-8 shadow-sm">
+          <section className="flex min-h-140 flex-col rounded-3xl bg-white p-8 shadow-sm">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-gray-500">Current Question</p>
             <div className="mt-4 inline-flex w-fit rounded-full bg-red-50 px-4 py-2 text-sm font-semibold text-red-600">
               남은 시간 {minutes}:{seconds}
@@ -161,7 +161,7 @@ function QuestionsResult() {
             </button>
           </section>
 
-          <section className="flex min-h-[560px] flex-col rounded-3xl bg-white p-6 shadow-sm">
+          <section className="flex min-h-140 flex-col rounded-3xl bg-white p-6 shadow-sm">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-gray-500">Your Camera</p>
             <div className="mt-4 flex flex-1 items-center justify-center overflow-hidden rounded-3xl bg-gray-950">
               <video
