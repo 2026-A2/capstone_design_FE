@@ -3,7 +3,7 @@ name: Deploy CD_AI to AWS
 on:
   push:
     branches:
-      - main
+      - develop
     paths:
       - "CD_AI/**"
       - ".github/workflows/deploy-ai.yml"
