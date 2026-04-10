@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login.jsx';
 import Main from './pages/Main.jsx';
 import Interview from './pages/interview/Interview.jsx';
@@ -12,13 +12,29 @@ import Preparation from './pages/interview/Preparation.jsx';
 import RecordingReview from './pages/interview/RecordingReview.jsx';
 import InterviewComplete from './pages/interview/InterviewComplete.jsx';
 import ReportMainPage from './pages/report/ReportMainPage.jsx';
-
+import IndividualReportPage from './pages/report/IndividualReportPage';
+import IndividualReportDetailPage from './pages/report/IndividualReportDetailPage';
+import TotalGazeReportPage from './pages/report/components/TotalGazeReportPage';
+import TotalSpeechRatePage from './pages/report/components/TotalSpeechRatePage';
+import TotalFillerPage from './pages/report/components/TotalFillerPage';
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/main" element={<Main />} />
       <Route path="/report" element={<ReportMainPage />} />
+      <Route path="/report/individual" element={<IndividualReportPage />} />
+      <Route
+        path="/report/individual/detail"
+        element={<IndividualReportDetailPage />}
+      />
+      <Route path="/report/total" element={<TotalGazeReportPage />} />
+      <Route
+        path="/report/total/speech-rate"
+        element={<TotalSpeechRatePage />}
+      />
+      <Route path="/report/total/gaze" element={<TotalGazeReportPage />} />
+      <Route path="/report/total/filler" element={<TotalFillerPage />} />
       <Route path="/interview" element={<Interview />} />
       <Route path="/interview/setup" element={<SetupCheck />} />
       <Route path="/interview/preparation" element={<Preparation />} />
