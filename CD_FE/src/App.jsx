@@ -1,6 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login.jsx';
 import Main from './pages/Main.jsx';
+import SettingsPage from './pages/settings/SettingsPage.jsx';
+import UserInfoPage from './pages/settings/UserInfoPage.jsx';
+import DeleteAccountPage from './pages/settings/DeleteAccountPage.jsx';
 import Interview from './pages/interview/Interview.jsx';
 import Resume from './pages/interview/Resume.jsx';
 import Industry from './pages/interview/Industry.jsx';
@@ -17,11 +20,17 @@ import IndividualReportDetailPage from './pages/report/IndividualReportDetailPag
 import TotalGazeReportPage from './pages/report/components/TotalGazeReportPage';
 import TotalSpeechRatePage from './pages/report/components/TotalSpeechRatePage';
 import TotalFillerPage from './pages/report/components/TotalFillerPage';
+import TotalSilencePage from './pages/report/components/TotalSilencePage';
+import TotalVoiceVolumePage from './pages/report/components/TotalVoiceVolumePage';
+import SmileRatePage from './pages/report/components/SmileRatePage';
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/main" element={<Main />} />
+      <Route path="/settings" element={<SettingsPage />} />
+      <Route path="/settings/user" element={<UserInfoPage />} />
+      <Route path="/settings/delete" element={<DeleteAccountPage />} />
       <Route path="/report" element={<ReportMainPage />} />
       <Route path="/report/individual" element={<IndividualReportPage />} />
       <Route
@@ -35,6 +44,12 @@ function App() {
       />
       <Route path="/report/total/gaze" element={<TotalGazeReportPage />} />
       <Route path="/report/total/filler" element={<TotalFillerPage />} />
+      <Route path="/report/total/silence" element={<TotalSilencePage />} />
+      <Route
+        path="/report/total/voice-volume"
+        element={<TotalVoiceVolumePage />}
+      />
+      <Route path="/report/total/smile-rate" element={<SmileRatePage />} />
       <Route path="/interview" element={<Interview />} />
       <Route path="/interview/setup" element={<SetupCheck />} />
       <Route path="/interview/preparation" element={<Preparation />} />
