@@ -1,39 +1,114 @@
+.report-main-page {
+  min-height: 100vh;
+  background: #f3f6fb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
 .report-main-container {
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #f5f6f8; /* 살짝 회색 배경 */
+  width: 900px;
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 48px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
 }
 
-.report-box {
-  width: 700px;
-  height: 350px;
-  background-color: #ffffff; /* 카드 느낌 */
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 40px;
+.report-main-header {
+  margin-bottom: 36px;
 }
 
-.report-button {
-  width: 260px;
-  height: 55px;
-  background-color: #4a6cf7; /* 포인트 컬러 */
-  color: white;
-  border: none;
-  border-radius: 8px;
+.report-main-header h1 {
+  margin: 0 0 10px;
+  font-size: 28px;
+  color: #1e3a8a;
+}
+
+.report-main-header p {
+  margin: 0;
   font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  color: #64748b;
+  line-height: 1.6;
 }
 
-.report-button:hover {
-  background-color: #3b5be0;
-  transform: translateY(-2px);
+.report-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.report-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 32px 28px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.report-card:hover {
+  transform: translateY(-6px);
+  background: #eef4ff;
+  border-color: #5b6ff0;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.15);
+}
+
+.report-card-icon {
+  width: 56px;
+  height: 56px;
+  background: #e0e7ff;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  margin-bottom: 22px;
+}
+
+.report-card h2 {
+  margin: 0 0 12px;
+  font-size: 21px;
+  color: #1f2937;
+}
+
+.report-card p {
+  min-height: 52px;
+  margin: 0 0 24px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #64748b;
+}
+
+.report-card button {
+  width: 100%;
+  height: 46px;
+  border: none;
+  border-radius: 12px;
+  background: #5b6ff0;
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.report-card button:hover {
+  background: #4258d9;
+}
+
+.report-info-box {
+  margin-top: 30px;
+  background: #eff6ff;
+  border-left: 5px solid #5b6ff0;
+  border-radius: 14px;
+  padding: 18px 20px;
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.report-info-box strong {
+  color: #1e3a8a;
+  margin-right: 8px;
 }
