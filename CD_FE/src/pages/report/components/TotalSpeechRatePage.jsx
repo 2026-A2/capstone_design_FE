@@ -1,11 +1,18 @@
 import { useNavigate } from 'react-router-dom';
 import InterviewTrendChart from './InterviewTrendChart';
+import { speechRateTrend } from '../../../mockdata/report/trendMock';
 
 export default function TotalSpeechRatePage() {
   const navigate = useNavigate();
 
+  const savedSpeechRateData = JSON.parse(
+    localStorage.getItem('speechRateTrend'),
+  );
+
   const speechRateData =
-    JSON.parse(localStorage.getItem('speechRateTrend')) || [];
+    savedSpeechRateData && savedSpeechRateData.length > 0
+      ? savedSpeechRateData
+      : speechRateTrend;
 
   const currentStep = 2;
   const totalStep = 11;
@@ -43,7 +50,8 @@ export default function TotalSpeechRatePage() {
 
       <InterviewTrendChart
         data={speechRateData}
-        dataKey="speechRate"
+        xKey="session"
+        dataKey="value"
         yLabel="발화 속도(spm)"
         minValue={0}
         maxValue={400}

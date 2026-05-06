@@ -25,6 +25,11 @@ import TotalFillerPage from './pages/report/components/TotalFillerPage';
 import TotalSilencePage from './pages/report/components/TotalSilencePage';
 import TotalVoiceVolumePage from './pages/report/components/TotalVoiceVolumePage';
 import SmileRatePage from './pages/report/components/SmileRatePage';
+import TotalBlinkPage from './pages/report/components/TotalBlinkPage.jsx';
+import TotalEndingBlurPage from './pages/report/components/TotalEndingBlurPage.jsx';
+import TotalNodPage from './pages/report/components/TotalNodPage.jsx';
+import TotalShoulderTiltPage from './pages/report/components/TotalShoulderTiltPage.jsx';
+import TotalBodyShakePage from './pages/report/components/TotalBodyShakePage.jsx';
 function App() {
   return (
     <Routes>
@@ -57,6 +62,17 @@ function App() {
         element={<TotalVoiceVolumePage />}
       />
       <Route path="/report/total/smile-rate" element={<SmileRatePage />} />
+      <Route path="/report/total/blink" element={<TotalBlinkPage />} />
+      <Route
+        path="/report/total/ending-blur"
+        element={<TotalEndingBlurPage />}
+      />
+      <Route path="/report/total/nod" element={<TotalNodPage />} />
+      <Route
+        path="/report/total/shoulder-tilt"
+        element={<TotalShoulderTiltPage />}
+      />
+      <Route path="/report/total/body-shake" element={<TotalBodyShakePage />} />
       <Route path="/interview" element={<Interview />} />
       <Route path="/interview/setup" element={<SetupCheck />} />
       <Route path="/interview/preparation" element={<Preparation />} />

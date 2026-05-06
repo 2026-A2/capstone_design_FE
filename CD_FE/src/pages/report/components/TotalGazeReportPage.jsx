@@ -1,11 +1,18 @@
 import { useNavigate } from 'react-router-dom';
 import InterviewTrendChart from './InterviewTrendChart';
+import { eyeContactTrend } from '../../../mockdata/report/trendMock';
 
 export default function TotalGazeReportPage() {
   const navigate = useNavigate();
 
+  const savedEyeContactData = JSON.parse(
+    localStorage.getItem('eyeContactTrend'),
+  );
+
   const eyeContactData =
-    JSON.parse(localStorage.getItem('eyeContactTrend')) || [];
+    savedEyeContactData && savedEyeContactData.length > 0
+      ? savedEyeContactData
+      : eyeContactTrend;
 
   const currentStep = 1;
   const totalStep = 11;
@@ -40,15 +47,14 @@ export default function TotalGazeReportPage() {
           }}
         />
       </div>
-
       <InterviewTrendChart
         data={eyeContactData}
-        dataKey="eyeContact"
+        xKey="session"
+        dataKey="value"
         yLabel="카메라 응시율(%)"
         minValue={0}
         maxValue={100}
         standardValue={60}
-        standardLabel="권장 기준 60%"
       />
 
       <div style={styles.infoBox}>

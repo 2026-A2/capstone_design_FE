@@ -15,7 +15,7 @@ export default function TotalReportMenuPage() {
     { title: '말끝흐림', path: '/report/total/ending-blur' },
     { title: '고개끄떡임', path: '/report/total/nod' },
     { title: '어깨기울기', path: '/report/total/shoulder-tilt' },
-    { title: '몸통흔들림', path: '/report/total/body-sway' },
+    { title: '몸통흔들림', path: '/report/total/body-shake' },
   ];
 
   return (

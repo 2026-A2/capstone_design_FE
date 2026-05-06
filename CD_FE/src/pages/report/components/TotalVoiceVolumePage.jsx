@@ -1,11 +1,18 @@
 import { useNavigate } from 'react-router-dom';
 import InterviewTrendChart from './InterviewTrendChart';
+import { voiceVolumeTrend } from '../../../mockdata/report/trendMock';
 
 export default function TotalVoiceVolumePage() {
   const navigate = useNavigate();
 
+  const savedVoiceVolumeData = JSON.parse(
+    localStorage.getItem('voiceVolumeTrend'),
+  );
+
   const voiceVolumeData =
-    JSON.parse(localStorage.getItem('voiceVolumeTrend')) || [];
+    savedVoiceVolumeData && savedVoiceVolumeData.length > 0
+      ? savedVoiceVolumeData
+      : voiceVolumeTrend;
 
   const currentStep = 3;
   const totalStep = 11;
@@ -43,7 +50,8 @@ export default function TotalVoiceVolumePage() {
 
       <InterviewTrendChart
         data={voiceVolumeData}
-        dataKey="voiceVolume"
+        xKey="session"
+        dataKey="value"
         yLabel="음성 크기(dB)"
         minValue={0}
         maxValue={100}

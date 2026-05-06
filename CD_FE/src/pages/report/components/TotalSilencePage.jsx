@@ -10,11 +10,17 @@ import {
   ReferenceLine,
   Cell,
 } from 'recharts';
+import { silenceTrend } from '../../../mockdata/report/trendMock';
 
 export default function TotalSilencePage() {
   const navigate = useNavigate();
 
-  const silenceData = JSON.parse(localStorage.getItem('silenceTrend')) || [];
+  const savedSilenceData = JSON.parse(localStorage.getItem('silenceTrend'));
+
+  const silenceData =
+    savedSilenceData && savedSilenceData.length > 0
+      ? savedSilenceData
+      : silenceTrend;
 
   const currentStep = 4;
   const totalStep = 11;
@@ -59,7 +65,7 @@ export default function TotalSilencePage() {
             <CartesianGrid strokeDasharray="3 3" />
 
             <XAxis
-              dataKey="date"
+              dataKey="session"
               label={{
                 value: '날짜',
                 position: 'insideBottom',
@@ -89,13 +95,13 @@ export default function TotalSilencePage() {
               label="주의 기준 6회 초과"
             />
 
-            <Bar dataKey="silenceCount" barSize={42} radius={[8, 8, 0, 0]}>
+            <Bar dataKey="value" barSize={42} radius={[8, 8, 0, 0]}>
               {silenceData.map((entry, index) => {
                 let color = '#22c55e';
 
-                if (entry.silenceCount > 6) {
+                if (entry.value > 6) {
                   color = '#ef4444';
-                } else if (entry.silenceCount > 3) {
+                } else if (entry.value > 3) {
                   color = '#facc15';
                 }
 

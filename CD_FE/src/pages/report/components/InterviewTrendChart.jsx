@@ -21,6 +21,7 @@ export default function InterviewTrendChart({
   standardMin, // 범위 기준 (최소)
   standardMax, // 범위 기준 (최대)
 }) {
+  console.log('차트 props:', { data, xKey, dataKey });
   return (
     <div style={styles.chartBox}>
       <ResponsiveContainer width="100%" height={320}>

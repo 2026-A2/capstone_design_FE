@@ -10,19 +10,21 @@ import {
   ReferenceLine,
   Cell,
 } from 'recharts';
-import { fillerTrend } from '../../../mockdata/report/trendMock';
+import { endingBlurTrend } from '../../../mockdata/report/trendMock';
 
-export default function TotalFillerPage() {
+export default function TotalEndingBlurPage() {
   const navigate = useNavigate();
 
-  const savedFillerData = JSON.parse(localStorage.getItem('fillerTrend'));
+  const savedEndingBlurData = JSON.parse(
+    localStorage.getItem('endingBlurTrend'),
+  );
 
-  const fillerData =
-    savedFillerData && savedFillerData.length > 0
-      ? savedFillerData
-      : fillerTrend;
+  const endingBlurData =
+    savedEndingBlurData && savedEndingBlurData.length > 0
+      ? savedEndingBlurData
+      : endingBlurTrend;
 
-  const currentStep = 5;
+  const currentStep = 8;
   const totalStep = 11;
   const progressPercent = (currentStep / totalStep) * 100;
 
@@ -30,7 +32,9 @@ export default function TotalFillerPage() {
     <div style={styles.page}>
       <div style={styles.headerRow}>
         <div>
-          <div style={styles.title}>누적 리포트 보기 · 전체 분석 · 필러어</div>
+          <div style={styles.title}>
+            누적 리포트 보기 · 전체 분석 · 말끝 흐림
+          </div>
           <div style={styles.stepText}>
             {currentStep} / {totalStep} 단계
           </div>
@@ -57,7 +61,7 @@ export default function TotalFillerPage() {
       <div style={styles.chartBox}>
         <ResponsiveContainer width="100%" height={320}>
           <BarChart
-            data={fillerData}
+            data={endingBlurData}
             margin={{ top: 12, right: 20, left: 45, bottom: 16 }}
           >
             <CartesianGrid strokeDasharray="3 3" />
@@ -72,35 +76,34 @@ export default function TotalFillerPage() {
             />
 
             <YAxis
-              domain={[0, 10]}
+              domain={[0, 50]}
               label={{
-                value: '필러어 사용 횟수(회)',
+                value: '말끝 흐림 비율(%)',
                 angle: -90,
                 position: 'insideLeft',
               }}
             />
 
-            <Tooltip formatter={(value) => `${value}회`} />
+            <Tooltip formatter={(value) => `${value}%`} />
 
             <ReferenceLine
-              y={3}
+              y={25}
               strokeDasharray="5 5"
-              label="권장 기준 3회 이하"
+              label="주의 기준 25% 이상"
             />
-
             <ReferenceLine
-              y={6}
+              y={50}
               strokeDasharray="5 5"
-              label="주의 기준 6회 초과"
+              label="위험 기준 50% 초과"
             />
 
             <Bar dataKey="value" barSize={42} radius={[8, 8, 0, 0]}>
-              {fillerData.map((entry, index) => {
+              {endingBlurData.map((entry, index) => {
                 let color = '#22c55e';
 
-                if (entry.value > 6) {
+                if (entry.value > 50) {
                   color = '#ef4444';
-                } else if (entry.value > 3) {
+                } else if (entry.value >= 25) {
                   color = '#facc15';
                 }
 
@@ -114,9 +117,9 @@ export default function TotalFillerPage() {
       <div style={styles.infoBox}>
         <div style={styles.infoTitle}>분석 기준</div>
         <div style={styles.infoText}>
-          필러어는 “음”, “어”, “그”처럼 말 사이에 반복적으로 사용되는 표현을
-          의미합니다. 일반적으로 3회 이하는 안정적, 3회 초과는 주의, 6회 초과는
-          개선이 필요한 수준으로 볼 수 있습니다.
+          말끝 흐림은 문장 끝부분의 발음이나 음량이 약해지는 비율을 의미합니다.
+          일반적으로 20% 이하를 안정적인 수준으로 보고, 25% 이상은 주의가 필요한
+          상태로 볼 수 있습니다.
         </div>
       </div>
 
@@ -124,7 +127,7 @@ export default function TotalFillerPage() {
         <button
           type="button"
           style={styles.prevButton}
-          onClick={() => navigate('/report/total/silence')}
+          onClick={() => navigate('/report/total/blink')}
         >
           이전
         </button>
@@ -132,7 +135,7 @@ export default function TotalFillerPage() {
         <button
           type="button"
           style={styles.nextButton}
-          onClick={() => navigate('/report/total/smile-rate')}
+          onClick={() => navigate('/report/total/nod')}
         >
           다음
         </button>

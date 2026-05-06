@@ -2,22 +2,78 @@ export const individualReports = [
   {
     id: 1,
     title: '1회차 면접 리포트',
+
     eyeContact: '카메라 응시율 61%',
     speechSummary: '발화 속도 적정',
     expressionSummary: '표정 안정',
+
+    habitSummary: '고개 움직임이 약간 잦음',
+    postureSummary: '전반적으로 안정적인 자세',
+
+    detail: {
+      eyeContactRate: 61,
+      speechRate: 132,
+      voiceVolume: 64,
+      silenceCount: 2,
+      fillerCount: 3,
+      smileRate: 42,
+      blinkCount: 18,
+      endingBlurCount: 1,
+      nodCount: 5,
+      shoulderTilt: 4,
+      bodyShake: 3,
+    },
   },
+
   {
     id: 2,
     title: '2회차 면접 리포트',
+
     eyeContact: '카메라 응시율 68%',
     speechSummary: '발화 속도 양호',
     expressionSummary: '미소율 개선',
+
+    habitSummary: '불필요한 움직임 감소',
+    postureSummary: '자세가 이전보다 안정적',
+
+    detail: {
+      eyeContactRate: 68,
+      speechRate: 138,
+      voiceVolume: 66,
+      silenceCount: 1,
+      fillerCount: 2,
+      smileRate: 51,
+      blinkCount: 15,
+      endingBlurCount: 1,
+      nodCount: 6,
+      shoulderTilt: 3,
+      bodyShake: 2,
+    },
   },
+
   {
     id: 3,
     title: '3회차 면접 리포트',
+
     eyeContact: '카메라 응시율 74%',
     speechSummary: '발화 속도 안정',
     expressionSummary: '표정 자연스러움',
+
+    habitSummary: '고개 움직임이 자연스러움',
+    postureSummary: '바른 자세 유지',
+
+    detail: {
+      eyeContactRate: 74,
+      speechRate: 145,
+      voiceVolume: 67,
+      silenceCount: 1,
+      fillerCount: 1,
+      smileRate: 58,
+      blinkCount: 13,
+      endingBlurCount: 0,
+      nodCount: 7,
+      shoulderTilt: 2,
+      bodyShake: 1,
+    },
   },
 ];

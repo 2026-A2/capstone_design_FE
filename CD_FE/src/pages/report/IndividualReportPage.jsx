@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './IndividualReportPage.css';
+import { individualReports } from '../../mockdata/report/individualMock';
 
 export default function IndividualReportPage() {
   const navigate = useNavigate();
@@ -8,7 +9,8 @@ export default function IndividualReportPage() {
 
   useEffect(() => {
     const savedReports =
-      JSON.parse(localStorage.getItem('individualReports')) || [];
+      JSON.parse(localStorage.getItem('individualReports')) ||
+      individualReports;
 
     setReportList(savedReports);
   }, []);

@@ -1,28 +1,11 @@
 import { useNavigate } from 'react-router-dom';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  ReferenceLine,
-  Cell,
-} from 'recharts';
-import { fillerTrend } from '../../../mockdata/report/trendMock';
+import InterviewTrendChart from './InterviewTrendChart';
+import { blinkTrend } from '../../../mockdata/report/trendMock';
 
-export default function TotalFillerPage() {
+export default function TotalBlinkPage() {
   const navigate = useNavigate();
 
-  const savedFillerData = JSON.parse(localStorage.getItem('fillerTrend'));
-
-  const fillerData =
-    savedFillerData && savedFillerData.length > 0
-      ? savedFillerData
-      : fillerTrend;
-
-  const currentStep = 5;
+  const currentStep = 7;
   const totalStep = 11;
   const progressPercent = (currentStep / totalStep) * 100;
 
@@ -30,7 +13,10 @@ export default function TotalFillerPage() {
     <div style={styles.page}>
       <div style={styles.headerRow}>
         <div>
-          <div style={styles.title}>누적 리포트 보기 · 전체 분석 · 필러어</div>
+          <div style={styles.title}>
+            누적 리포트 보기 · 전체 분석 · 눈 깜빡임
+          </div>
+
           <div style={styles.stepText}>
             {currentStep} / {totalStep} 단계
           </div>
@@ -54,69 +40,25 @@ export default function TotalFillerPage() {
         />
       </div>
 
-      <div style={styles.chartBox}>
-        <ResponsiveContainer width="100%" height={320}>
-          <BarChart
-            data={fillerData}
-            margin={{ top: 12, right: 20, left: 45, bottom: 16 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-
-            <XAxis
-              dataKey="session"
-              label={{
-                value: '날짜',
-                position: 'insideBottom',
-                offset: -10,
-              }}
-            />
-
-            <YAxis
-              domain={[0, 10]}
-              label={{
-                value: '필러어 사용 횟수(회)',
-                angle: -90,
-                position: 'insideLeft',
-              }}
-            />
-
-            <Tooltip formatter={(value) => `${value}회`} />
-
-            <ReferenceLine
-              y={3}
-              strokeDasharray="5 5"
-              label="권장 기준 3회 이하"
-            />
-
-            <ReferenceLine
-              y={6}
-              strokeDasharray="5 5"
-              label="주의 기준 6회 초과"
-            />
-
-            <Bar dataKey="value" barSize={42} radius={[8, 8, 0, 0]}>
-              {fillerData.map((entry, index) => {
-                let color = '#22c55e';
-
-                if (entry.value > 6) {
-                  color = '#ef4444';
-                } else if (entry.value > 3) {
-                  color = '#facc15';
-                }
-
-                return <Cell key={`cell-${index}`} fill={color} />;
-              })}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+      <InterviewTrendChart
+        data={blinkTrend}
+        xKey="session"
+        dataKey="value"
+        yLabel="눈 깜빡임(회/분)"
+        minValue={0}
+        maxValue={30}
+        standardMin={15}
+        standardMax={20}
+      />
 
       <div style={styles.infoBox}>
         <div style={styles.infoTitle}>분석 기준</div>
+
         <div style={styles.infoText}>
-          필러어는 “음”, “어”, “그”처럼 말 사이에 반복적으로 사용되는 표현을
-          의미합니다. 일반적으로 3회 이하는 안정적, 3회 초과는 주의, 6회 초과는
-          개선이 필요한 수준으로 볼 수 있습니다.
+          눈 깜빡임은 면접 중 사용자의 긴장도와 집중 상태를 간접적으로 확인할 수
+          있는 비언어적 지표입니다. 일반적으로 분당 15~20회 정도를 자연스러운
+          범위로 보고, 이보다 지나치게 낮거나 높을 경우 긴장 또는 시선 처리
+          불안정의 신호로 해석할 수 있습니다.
         </div>
       </div>
 
@@ -124,7 +66,7 @@ export default function TotalFillerPage() {
         <button
           type="button"
           style={styles.prevButton}
-          onClick={() => navigate('/report/total/silence')}
+          onClick={() => navigate('/report/total/smile-rate')}
         >
           이전
         </button>
@@ -132,7 +74,7 @@ export default function TotalFillerPage() {
         <button
           type="button"
           style={styles.nextButton}
-          onClick={() => navigate('/report/total/smile-rate')}
+          onClick={() => navigate('/report/total/ending-blur')}
         >
           다음
         </button>
@@ -195,16 +137,6 @@ const styles = {
     backgroundColor: '#6366f1',
     borderRadius: '999px',
     transition: 'width 0.3s ease',
-  },
-
-  chartBox: {
-    width: '760px',
-    height: '360px',
-    backgroundColor: '#ffffff',
-    borderRadius: '16px',
-    padding: '20px',
-    boxSizing: 'border-box',
-    boxShadow: '0 6px 18px rgba(15, 23, 42, 0.08)',
   },
 
   infoBox: {

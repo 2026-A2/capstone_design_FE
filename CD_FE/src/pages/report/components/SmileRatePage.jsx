@@ -1,10 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import InterviewTrendChart from './InterviewTrendChart';
+import { smileTrend } from '../../../mockdata/report/trendMock';
 
 export default function TotalSmilePage() {
   const navigate = useNavigate();
+  const savedSmileData = JSON.parse(localStorage.getItem('smileTrend'));
 
-  const smileData = JSON.parse(localStorage.getItem('smileTrend')) || [];
+  const smileData =
+    savedSmileData && savedSmileData.length > 0 ? savedSmileData : smileTrend;
 
   const currentStep = 6;
   const totalStep = 11;
@@ -40,7 +43,8 @@ export default function TotalSmilePage() {
 
       <InterviewTrendChart
         data={smileData}
-        dataKey="smileRate"
+        xKey="session"
+        dataKey="value"
         yLabel="미소율(%)"
         minValue={0}
         maxValue={100}
