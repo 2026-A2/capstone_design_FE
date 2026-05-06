@@ -1,0 +1,167 @@
+.resume-manage-page {
+  min-height: 100vh;
+  background-color: #f3f7fd;
+  display: flex;
+  justify-content: center;
+  padding: 80px 24px;
+  box-sizing: border-box;
+}
+
+.resume-manage-container {
+  width: 720px;
+}
+
+.back-button {
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 14px;
+  background-color: #ffffff;
+  color: #1e3a8a;
+  font-size: 24px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(31, 41, 55, 0.08);
+  margin-bottom: 22px;
+}
+
+.resume-manage-container h1 {
+  font-size: 32px;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 10px;
+}
+
+.resume-subtitle {
+  font-size: 16px;
+  color: #6b7280;
+  margin-bottom: 32px;
+}
+
+.resume-card {
+  background-color: #ffffff;
+  border-radius: 22px;
+  padding: 32px;
+  box-shadow: 0 16px 36px rgba(31, 41, 55, 0.08);
+}
+
+.resume-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.resume-card-header h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 8px;
+}
+
+.resume-card-header p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.char-count {
+  font-size: 14px;
+  font-weight: 700;
+  color: #4f46e5;
+  white-space: nowrap;
+}
+
+.resume-textarea {
+  width: 100%;
+  height: 260px;
+  resize: none;
+  border: 1px solid #d1d5db;
+  border-radius: 16px;
+  padding: 18px;
+  box-sizing: border-box;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #111827;
+  outline: none;
+}
+
+.resume-textarea:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16);
+}
+
+.resume-button-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.delete-button,
+.save-button,
+.main-button {
+  border: none;
+  border-radius: 12px;
+  height: 48px;
+  padding: 0 24px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.delete-button {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.save-button {
+  background-color: #4f46e5;
+  color: #ffffff;
+}
+
+.main-button {
+  width: 100%;
+  height: 58px;
+  margin-top: 24px;
+  background-color: #6b7280;
+  color: #ffffff;
+}
+
+.delete-button:hover {
+  background-color: #fecaca;
+}
+
+.save-button:hover {
+  background-color: #4338ca;
+}
+
+.main-button:hover {
+  background-color: #4b5563;
+}
+
+body.dark-mode .resume-manage-page {
+  background-color: #111827;
+}
+
+body.dark-mode .back-button,
+body.dark-mode .resume-card {
+  background-color: #1f2937;
+}
+
+body.dark-mode .resume-manage-container h1,
+body.dark-mode .resume-card-header h2 {
+  color: #f9fafb;
+}
+
+body.dark-mode .resume-subtitle,
+body.dark-mode .resume-card-header p {
+  color: #d1d5db;
+}
+
+body.dark-mode .resume-textarea {
+  background-color: #111827;
+  color: #f9fafb;
+  border-color: #374151;
+}

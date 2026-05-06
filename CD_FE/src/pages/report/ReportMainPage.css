@@ -17,6 +17,9 @@
 }
 
 .report-main-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
   margin-bottom: 36px;
 }
 
@@ -111,4 +114,17 @@
 .report-info-box strong {
   color: #1e3a8a;
   margin-right: 8px;
+}
+.back-button {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #1e3a8a;
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+  flex-shrink: 0;
 }

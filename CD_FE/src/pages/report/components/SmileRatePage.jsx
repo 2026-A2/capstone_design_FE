@@ -6,9 +6,37 @@ export default function TotalSmilePage() {
 
   const smileData = JSON.parse(localStorage.getItem('smileTrend')) || [];
 
+  const currentStep = 6;
+  const totalStep = 11;
+  const progressPercent = (currentStep / totalStep) * 100;
+
   return (
     <div style={styles.page}>
-      <div style={styles.title}>누적 리포트 보기 · 전체 분석 · 미소율</div>
+      <div style={styles.headerRow}>
+        <div>
+          <div style={styles.title}>누적 리포트 보기 · 전체 분석 · 미소율</div>
+          <div style={styles.stepText}>
+            {currentStep} / {totalStep} 단계
+          </div>
+        </div>
+
+        <button
+          type="button"
+          style={styles.listButton}
+          onClick={() => navigate('/report/total')}
+        >
+          ← 전체 분석 목록으로
+        </button>
+      </div>
+
+      <div style={styles.progressBar}>
+        <div
+          style={{
+            ...styles.progressFill,
+            width: `${progressPercent}%`,
+          }}
+        />
+      </div>
 
       <InterviewTrendChart
         data={smileData}
@@ -39,9 +67,9 @@ export default function TotalSmilePage() {
         <button
           type="button"
           style={styles.nextButton}
-          onClick={() => navigate('/report/')}
+          onClick={() => navigate('/report/total/blink')}
         >
-          완료
+          다음
         </button>
       </div>
     </div>
@@ -55,12 +83,55 @@ const styles = {
     padding: '48px 40px 80px',
     boxSizing: 'border-box',
   },
+
+  headerRow: {
+    width: '760px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: '14px',
+  },
+
   title: {
     fontSize: '18px',
     fontWeight: '700',
     color: '#1e3a8a',
+    marginBottom: '8px',
+  },
+
+  stepText: {
+    fontSize: '14px',
+    fontWeight: '700',
+    color: '#6366f1',
+  },
+
+  listButton: {
+    border: 'none',
+    backgroundColor: 'transparent',
+    color: '#6b7280',
+    fontSize: '14px',
+    fontWeight: '700',
+    cursor: 'pointer',
+    padding: 0,
+    marginTop: '2px',
+  },
+
+  progressBar: {
+    width: '760px',
+    height: '10px',
+    backgroundColor: '#e5e7eb',
+    borderRadius: '999px',
+    overflow: 'hidden',
     marginBottom: '28px',
   },
+
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#6366f1',
+    borderRadius: '999px',
+    transition: 'width 0.3s ease',
+  },
+
   infoBox: {
     width: '760px',
     backgroundColor: '#fff',
@@ -69,22 +140,26 @@ const styles = {
     marginTop: '18px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
   },
+
   infoTitle: {
     fontSize: '15px',
     fontWeight: '700',
     marginBottom: '6px',
   },
+
   infoText: {
     fontSize: '14px',
     lineHeight: '1.5',
     color: '#374151',
   },
+
   buttonWrap: {
     width: '760px',
     display: 'flex',
     justifyContent: 'space-between',
     marginTop: '24px',
   },
+
   prevButton: {
     border: 'none',
     backgroundColor: '#6b7280',
@@ -95,6 +170,7 @@ const styles = {
     fontSize: '16px',
     fontWeight: '700',
   },
+
   nextButton: {
     border: 'none',
     backgroundColor: '#2563eb',

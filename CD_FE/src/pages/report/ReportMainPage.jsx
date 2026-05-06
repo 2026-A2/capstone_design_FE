@@ -8,6 +8,9 @@ export default function ReportPage() {
     <div className="report-main-page">
       <div className="report-main-container">
         <div className="report-main-header">
+          <button className="back-button" onClick={() => navigate('/main')}>
+            ←
+          </button>
           <div>
             <h1>누적 리포트 보기</h1>
             <p>

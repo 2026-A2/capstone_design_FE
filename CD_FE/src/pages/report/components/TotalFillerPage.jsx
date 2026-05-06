@@ -16,9 +16,37 @@ export default function TotalFillerPage() {
 
   const fillerData = JSON.parse(localStorage.getItem('fillerTrend')) || [];
 
+  const currentStep = 5;
+  const totalStep = 11;
+  const progressPercent = (currentStep / totalStep) * 100;
+
   return (
     <div style={styles.page}>
-      <div style={styles.title}>누적 리포트 보기 · 전체 분석 · 필러어</div>
+      <div style={styles.headerRow}>
+        <div>
+          <div style={styles.title}>누적 리포트 보기 · 전체 분석 · 필러어</div>
+          <div style={styles.stepText}>
+            {currentStep} / {totalStep} 단계
+          </div>
+        </div>
+
+        <button
+          type="button"
+          style={styles.listButton}
+          onClick={() => navigate('/report/total')}
+        >
+          ← 전체 분석 목록으로
+        </button>
+      </div>
+
+      <div style={styles.progressBar}>
+        <div
+          style={{
+            ...styles.progressFill,
+            width: `${progressPercent}%`,
+          }}
+        />
+      </div>
 
       <div style={styles.chartBox}>
         <ResponsiveContainer width="100%" height={320}>
@@ -62,12 +90,12 @@ export default function TotalFillerPage() {
 
             <Bar dataKey="fillerCount" barSize={42} radius={[8, 8, 0, 0]}>
               {fillerData.map((entry, index) => {
-                let color = '#22c55e'; // 3회 이하: 초록
+                let color = '#22c55e';
 
                 if (entry.fillerCount > 6) {
-                  color = '#ef4444'; // 6회 초과: 빨강
+                  color = '#ef4444';
                 } else if (entry.fillerCount > 3) {
-                  color = '#facc15'; // 3회 초과: 노랑
+                  color = '#facc15';
                 }
 
                 return <Cell key={`cell-${index}`} fill={color} />;
@@ -114,12 +142,55 @@ const styles = {
     padding: '48px 40px 80px',
     boxSizing: 'border-box',
   },
+
+  headerRow: {
+    width: '760px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: '14px',
+  },
+
   title: {
     fontSize: '18px',
     fontWeight: '700',
     color: '#1e3a8a',
+    marginBottom: '8px',
+  },
+
+  stepText: {
+    fontSize: '14px',
+    fontWeight: '700',
+    color: '#6366f1',
+  },
+
+  listButton: {
+    border: 'none',
+    backgroundColor: 'transparent',
+    color: '#6b7280',
+    fontSize: '14px',
+    fontWeight: '700',
+    cursor: 'pointer',
+    padding: 0,
+    marginTop: '2px',
+  },
+
+  progressBar: {
+    width: '760px',
+    height: '10px',
+    backgroundColor: '#e5e7eb',
+    borderRadius: '999px',
+    overflow: 'hidden',
     marginBottom: '28px',
   },
+
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#6366f1',
+    borderRadius: '999px',
+    transition: 'width 0.3s ease',
+  },
+
   chartBox: {
     width: '760px',
     height: '360px',
@@ -129,6 +200,7 @@ const styles = {
     boxSizing: 'border-box',
     boxShadow: '0 6px 18px rgba(15, 23, 42, 0.08)',
   },
+
   infoBox: {
     width: '760px',
     backgroundColor: '#fff',
@@ -137,22 +209,26 @@ const styles = {
     marginTop: '18px',
     boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
   },
+
   infoTitle: {
     fontSize: '15px',
     fontWeight: '700',
     marginBottom: '6px',
   },
+
   infoText: {
     fontSize: '14px',
     lineHeight: '1.5',
     color: '#374151',
   },
+
   buttonWrap: {
     width: '760px',
     display: 'flex',
     justifyContent: 'space-between',
     marginTop: '24px',
   },
+
   prevButton: {
     border: 'none',
     backgroundColor: '#6b7280',
@@ -163,6 +239,7 @@ const styles = {
     fontSize: '16px',
     fontWeight: '700',
   },
+
   nextButton: {
     border: 'none',
     backgroundColor: '#2563eb',
