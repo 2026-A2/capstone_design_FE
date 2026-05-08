@@ -168,7 +168,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: '14px',
+    margin: '0 auto 14px',
   },
 
   pageTitle: {
@@ -200,7 +200,7 @@ const styles = {
     height: '10px',
     backgroundColor: '#e5e7eb',
     borderRadius: '999px',
-    marginBottom: '28px',
+    margin: '0 auto 28px',
     overflow: 'hidden',
   },
 
@@ -217,6 +217,7 @@ const styles = {
     backgroundColor: '#fff',
     borderRadius: '18px',
     padding: '24px',
+    margin: '0 auto',
     boxShadow: '0 4px 16px rgba(15, 23, 42, 0.08)',
   },
 

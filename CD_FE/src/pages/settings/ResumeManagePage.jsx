@@ -10,6 +10,7 @@ export default function ResumeManagePage() {
   useEffect(() => {
     const savedResume = localStorage.getItem('resume') || '';
     setResume(savedResume);
+    window.scrollTo(0, 0);
   }, []);
 
   const handleSave = () => {

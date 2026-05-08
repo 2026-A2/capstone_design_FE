@@ -96,7 +96,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: '14px',
+    margin: '0 auto 14px',
   },
 
   title: {
@@ -129,7 +129,7 @@ const styles = {
     backgroundColor: '#e5e7eb',
     borderRadius: '999px',
     overflow: 'hidden',
-    marginBottom: '28px',
+    margin: '0 auto 28px',
   },
 
   progressFill: {
@@ -144,7 +144,7 @@ const styles = {
     backgroundColor: '#fff',
     padding: '18px 20px',
     borderRadius: '12px',
-    marginTop: '18px',
+    margin: '18px auto 0',
     boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
   },
 
@@ -164,7 +164,7 @@ const styles = {
     width: '760px',
     display: 'flex',
     justifyContent: 'space-between',
-    marginTop: '24px',
+    margin: '24px auto 0',
   },
 
   prevButton: {

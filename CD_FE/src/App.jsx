@@ -5,6 +5,7 @@ import SettingsPage from './pages/settings/SettingsPage.jsx';
 import UserInfoPage from './pages/settings/UserInfoPage.jsx';
 import DeleteAccountPage from './pages/settings/DeleteAccountPage.jsx';
 import ResumeManagePage from './pages/settings/ResumeManagePage.jsx';
+import AnalysisGuidePage from './pages/settings/AnalysisGuidePage.jsx';
 import Interview from './pages/interview/Interview.jsx';
 import Resume from './pages/interview/Resume.jsx';
 import Industry from './pages/interview/Industry.jsx';
@@ -39,6 +40,7 @@ function App() {
       <Route path="/settings/user-info" element={<UserInfoPage />} />
       <Route path="/settings/delete-account" element={<DeleteAccountPage />} />
       <Route path="/settings/resume" element={<ResumeManagePage />} />
+      <Route path="/settings/analysis-guide" element={<AnalysisGuidePage />} />
       <Route path="/report" element={<ReportMainPage />} />
       <Route path="/report/individual" element={<IndividualReportPage />} />
       <Route

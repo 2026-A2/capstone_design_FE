@@ -1,19 +1,23 @@
 .total-menu-page {
   min-height: 100vh;
-  background-color: #f3f7fd;
-  padding: 16px 12px;
+  background:
+    radial-gradient(circle at top left, rgba(99, 102, 241, 0.08), transparent 34%),
+    #f4f7fc;
+  padding: 18px 16px 28px;
   box-sizing: border-box;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
 }
 
 .total-menu-container {
-  width: 920px;
+  width: min(1040px, 100%);
   background-color: #ffffff;
-  border-radius: 20px;
-  padding: 24px;
+  border: 1px solid #dfe6f2;
+  border-radius: 22px;
+  padding: 26px 30px 28px;
   box-sizing: border-box;
-  box-shadow: 0 20px 45px rgba(30, 64, 175, 0.1);
+  box-shadow: 0 22px 50px rgba(27, 42, 89, 0.08);
 }
 
 .total-menu-back {
@@ -21,81 +25,151 @@
   background-color: transparent;
   color: #6b7280;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
+  padding: 0;
+}
+
+.total-menu-back:hover {
+  color: #1e2a5a;
 }
 
 .total-menu-container h1 {
-  font-size: 26px;
-  color: #1e3a8a;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 800;
+  color: #18235a;
   margin: 0 0 8px;
+  letter-spacing: 0;
 }
 
 .total-menu-desc {
+  max-width: 760px;
   font-size: 14px;
-  color: #64748b;
-  margin-bottom: 20px;
+  color: #62708a;
+  margin: 0 0 18px;
   line-height: 1.5;
 }
 
 .total-menu-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
 
 .total-menu-card {
-  height: 90px;
-  border: 1px solid #dbe3f0;
-  border-radius: 14px;
+  min-height: 92px;
+  border: 1px solid #d8e1ef;
+  border-radius: 16px;
   background-color: #f8fbff;
-  padding: 16px;
+  padding: 16px 18px;
   box-sizing: border-box;
   cursor: pointer;
-  transition: 0.2s;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease,
+    background-color 0.18s ease;
 }
 
 .total-menu-card:hover {
-  transform: translateY(-4px);
-  border-color: #6366f1;
-  background-color: #eef2ff;
-  box-shadow: 0 12px 24px rgba(99, 102, 241, 0.14);
+  transform: translateY(-5px);
+  border-color: #4f46e5;
+  background-color: #ffffff;
+  box-shadow: 0 16px 28px rgba(79, 70, 229, 0.16);
+}
+
+.total-menu-card:nth-child(3n + 2):hover {
+  border-color: #33408f;
+  box-shadow: 0 16px 28px rgba(51, 64, 143, 0.16);
+}
+
+.total-menu-card:nth-child(3n):hover {
+  border-color: #e87361;
+  box-shadow: 0 16px 28px rgba(232, 115, 97, 0.16);
 }
 
 .total-menu-number {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 999px;
-  background-color: #6366f1;
+  background-color: #6863e8;
   color: white;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 8px 18px rgba(104, 99, 232, 0.25);
+}
+
+.total-menu-card:nth-child(3n + 2) .total-menu-number {
+  background-color: #33408f;
+  box-shadow: 0 8px 18px rgba(51, 64, 143, 0.22);
+}
+
+.total-menu-card:nth-child(3n) .total-menu-number {
+  background-color: #e87361;
+  box-shadow: 0 8px 18px rgba(232, 115, 97, 0.2);
 }
 
 .total-menu-title {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 800;
   color: #111827;
+  line-height: 1.35;
 }
 
 .total-menu-start {
   width: 100%;
-  height: 44px;
-  margin-top: 18px;
+  height: 48px;
+  margin-top: 16px;
   border: none;
-  border-radius: 12px;
-  background-color: #4f46e5;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #5146df, #6457ea);
   color: white;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 800;
   cursor: pointer;
+  box-shadow: 0 14px 26px rgba(81, 70, 223, 0.2);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    filter 0.18s ease;
 }
 
 .total-menu-start:hover {
-  background-color: #4338ca;
+  transform: translateY(-2px);
+  filter: brightness(0.98);
+  box-shadow: 0 18px 32px rgba(81, 70, 223, 0.27);
+}
+
+@media (max-width: 900px) {
+  .total-menu-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .total-menu-page {
+    padding: 16px 12px 32px;
+  }
+
+  .total-menu-container {
+    padding: 24px 18px 26px;
+  }
+
+  .total-menu-container h1 {
+    font-size: 28px;
+  }
+
+  .total-menu-desc {
+    font-size: 14px;
+  }
+
+  .total-menu-grid {
+    grid-template-columns: 1fr;
+  }
 }

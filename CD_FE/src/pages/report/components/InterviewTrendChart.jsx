@@ -135,6 +135,7 @@ const styles = {
     backgroundColor: '#ffffff',
     borderRadius: '16px',
     padding: '20px',
+    margin: '0 auto',
     boxSizing: 'border-box',
     boxShadow: '0 6px 18px rgba(15, 23, 42, 0.08)',
   },
