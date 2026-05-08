@@ -72,11 +72,11 @@ export default function IndividualReportDetailPage() {
 
             <button
               className="detail-main-button"
-              onClick={() =>
-                navigate('/report/individual/detail/full', {
+              onClick={() => {
+                navigate(`/report/individual/detail/full/${report.id}`, {
                   state: report,
-                })
-              }
+                });
+              }}
             >
               상세 리포트 보기
             </button>

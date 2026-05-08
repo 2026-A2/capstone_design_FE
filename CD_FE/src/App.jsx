@@ -20,6 +20,7 @@ import InterviewComplete from './pages/interview/InterviewComplete.jsx';
 import ReportMainPage from './pages/report/ReportMainPage.jsx';
 import IndividualReportPage from './pages/report/IndividualReportPage';
 import IndividualReportDetailPage from './pages/report/IndividualReportDetailPage';
+import IndividualReportFullPage from './pages/report/IndividualReportFullPage';
 import TotalReportMenuPage from './pages/report/components/TotalReportMenuPage';
 import TotalGazeReportPage from './pages/report/components/TotalGazeReportPage';
 import TotalSpeechRatePage from './pages/report/components/TotalSpeechRatePage';
@@ -45,6 +46,10 @@ function App() {
 
       <Route path="/report" element={<ReportMainPage />} />
       <Route path="/report/individual" element={<IndividualReportPage />} />
+      <Route
+        path="/report/individual/detail/full/:id"
+        element={<IndividualReportFullPage />}
+      />
       <Route
         path="/report/individual/detail/:id"
         element={<IndividualReportDetailPage />}
