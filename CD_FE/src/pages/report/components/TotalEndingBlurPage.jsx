@@ -84,7 +84,9 @@ export default function TotalEndingBlurPage() {
               }}
             />
 
-            <Tooltip formatter={(value) => `${value}%`} />
+            <Tooltip
+              formatter={(value) => [`${value}%`, '말끝 흐림 비율']}
+            />
 
             <ReferenceLine
               y={25}

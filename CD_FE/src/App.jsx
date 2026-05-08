@@ -42,7 +42,7 @@ function App() {
       <Route path="/report" element={<ReportMainPage />} />
       <Route path="/report/individual" element={<IndividualReportPage />} />
       <Route
-        path="/report/individual/detail"
+        path="/report/individual/detail/:id"
         element={<IndividualReportDetailPage />}
       />
       <Route path="/report/total" element={<TotalReportMenuPage />} />

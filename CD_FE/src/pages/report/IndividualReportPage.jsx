@@ -8,11 +8,11 @@ export default function IndividualReportPage() {
   const [reportList, setReportList] = useState([]);
 
   useEffect(() => {
-    const savedReports =
-      JSON.parse(localStorage.getItem('individualReports')) ||
-      individualReports;
+    const savedReports = JSON.parse(
+      localStorage.getItem('individualReports') || 'null',
+    );
 
-    setReportList(savedReports);
+    setReportList(savedReports || individualReports);
   }, []);
 
   return (
@@ -44,7 +44,7 @@ export default function IndividualReportPage() {
                   key={report.id || index}
                   className="individual-report-card"
                   onClick={() =>
-                    navigate('/report/individual/detail', {
+                    navigate(`/report/individual/detail/${report.id}`, {
                       state: report,
                     })
                   }
@@ -62,12 +62,12 @@ export default function IndividualReportPage() {
                     </div>
                   </div>
 
-                  <div className="report-card-right">상세 보기 ›</div>
+                  <div className="report-card-right">상세 보기 →</div>
                 </div>
               ))
             ) : (
               <div className="empty-report-box">
-                <div className="empty-icon">📄</div>
+                <div className="empty-icon">!</div>
                 <h2>저장된 리포트가 없습니다</h2>
                 <p>
                   면접을 완료하면 이곳에서 개별 리포트를 확인할 수 있습니다.

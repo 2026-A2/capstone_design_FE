@@ -4,6 +4,7 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
+  Legend,
   Tooltip,
   ReferenceLine,
   ReferenceArea,
@@ -17,11 +18,22 @@ export default function InterviewTrendChart({
   yLabel,
   minValue = 0,
   maxValue = 100,
-  standardValue, // 단일 기준
-  standardMin, // 범위 기준 (최소)
-  standardMax, // 범위 기준 (최대)
+  standardValue,
+  standardMin,
+  standardMax,
+  overSpeedValue,
+  highlightAboveValue,
+  highlightAboveColor = '#e8ecfa',
+  lines,
 }) {
-  console.log('차트 props:', { data, xKey, dataKey });
+  const chartLines = lines || [
+    {
+      dataKey,
+      stroke: '#2563eb',
+      name: yLabel,
+    },
+  ];
+
   return (
     <div style={styles.chartBox}>
       <ResponsiveContainer width="100%" height={320}>
@@ -50,8 +62,17 @@ export default function InterviewTrendChart({
           />
 
           <Tooltip />
+          {lines && <Legend verticalAlign="top" align="right" height={28} />}
 
-          {/* 🔹 단일 기준선 */}
+          {highlightAboveValue !== undefined && (
+            <ReferenceArea
+              y1={highlightAboveValue}
+              y2={maxValue}
+              fill={highlightAboveColor}
+              fillOpacity={1}
+            />
+          )}
+
           {standardValue !== undefined && (
             <ReferenceLine
               y={standardValue}
@@ -60,7 +81,6 @@ export default function InterviewTrendChart({
             />
           )}
 
-          {/* 🔹 범위 기준 */}
           {standardMin !== undefined && standardMax !== undefined && (
             <>
               <ReferenceArea
@@ -74,14 +94,34 @@ export default function InterviewTrendChart({
             </>
           )}
 
-          <Line
-            type="monotone"
-            dataKey={dataKey}
-            stroke="#2563eb"
-            strokeWidth={3}
-            dot={{ r: 5 }}
-            activeDot={{ r: 7 }}
-          />
+          {overSpeedValue !== undefined && (
+            <ReferenceLine
+              y={overSpeedValue}
+              stroke="#ef4444"
+              strokeDasharray="5 5"
+              strokeWidth={2}
+              label={{
+                value: `과속 기준 ${overSpeedValue} SPM`,
+                position: 'insideTopLeft',
+                fill: '#ef4444',
+                fontSize: 12,
+                fontWeight: 700,
+              }}
+            />
+          )}
+
+          {chartLines.map((line) => (
+            <Line
+              key={line.dataKey}
+              type="monotone"
+              dataKey={line.dataKey}
+              name={line.name}
+              stroke={line.stroke}
+              strokeWidth={3}
+              dot={{ r: 5 }}
+              activeDot={{ r: 7 }}
+            />
+          ))}
         </LineChart>
       </ResponsiveContainer>
     </div>

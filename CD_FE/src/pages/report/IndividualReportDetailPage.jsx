@@ -1,24 +1,27 @@
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import './IndividualReportDetailPage.css';
+import { individualReports } from '../../mockdata/report/individualMock';
 
 export default function IndividualReportDetailPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { id } = useParams();
 
-  const report = location.state || {
-    title: '레포트 정보 없음',
-    eyeContact: '-',
-    speechSummary: '-',
-    expressionSummary: '-',
-    habitSummary: '-',
-    postureSummary: '-',
-  };
+  const report = location.state ||
+    individualReports.find((item) => String(item.id) === id) || {
+      title: '리포트 정보 없음',
+      eyeContact: '-',
+      speechSummary: '-',
+      expressionSummary: '-',
+      habitSummary: '-',
+      postureSummary: '-',
+    };
 
   const detailItems = [
-    { label: '시선처리', value: report.eyeContact || '-', icon: '👀' },
+    { label: '시선 처리', value: report.eyeContact || '-', icon: '👀' },
     { label: '발화', value: report.speechSummary || '-', icon: '🎙️' },
-    { label: '표정', value: report.expressionSummary || '-', icon: '😊' },
-    { label: '버릇', value: report.habitSummary || '-', icon: '🔁' },
+    { label: '표정', value: report.expressionSummary || '-', icon: '🙂' },
+    { label: '습관', value: report.habitSummary || '-', icon: '📌' },
     { label: '자세', value: report.postureSummary || '-', icon: '🧍' },
   ];
 

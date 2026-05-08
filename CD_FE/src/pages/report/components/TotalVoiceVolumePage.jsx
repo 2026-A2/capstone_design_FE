@@ -8,11 +8,17 @@ export default function TotalVoiceVolumePage() {
   const savedVoiceVolumeData = JSON.parse(
     localStorage.getItem('voiceVolumeTrend'),
   );
+  const hasVoiceVolumeRangeData =
+    savedVoiceVolumeData &&
+    savedVoiceVolumeData.length > 0 &&
+    savedVoiceVolumeData.every(
+      (item) =>
+        item.maxVoiceVolume !== undefined && item.minVoiceVolume !== undefined,
+    );
 
-  const voiceVolumeData =
-    savedVoiceVolumeData && savedVoiceVolumeData.length > 0
-      ? savedVoiceVolumeData
-      : voiceVolumeTrend;
+  const voiceVolumeData = hasVoiceVolumeRangeData
+    ? savedVoiceVolumeData
+    : voiceVolumeTrend;
 
   const currentStep = 3;
   const totalStep = 11;
@@ -51,7 +57,19 @@ export default function TotalVoiceVolumePage() {
       <InterviewTrendChart
         data={voiceVolumeData}
         xKey="session"
-        dataKey="value"
+        dataKey="maxVoiceVolume"
+        lines={[
+          {
+            dataKey: 'maxVoiceVolume',
+            name: '최대 음성 크기',
+            stroke: '#2563eb',
+          },
+          {
+            dataKey: 'minVoiceVolume',
+            name: '최소 음성 크기',
+            stroke: '#1d4ed8',
+          },
+        ]}
         yLabel="음성 크기(dB)"
         minValue={0}
         maxValue={100}
@@ -62,8 +80,7 @@ export default function TotalVoiceVolumePage() {
       <div style={styles.infoBox}>
         <div style={styles.infoTitle}>분석 기준</div>
         <div style={styles.infoText}>
-          음성 크기는 면접 중 사용자의 평균 목소리 크기를 의미합니다. 일반적으로
-          50~70dB 범위를 권장 기준으로 볼 수 있습니다.
+          일반적으로 음성크기는 50~70dB 범위를 권장 기준으로 볼 수 있습니다.
         </div>
       </div>
 

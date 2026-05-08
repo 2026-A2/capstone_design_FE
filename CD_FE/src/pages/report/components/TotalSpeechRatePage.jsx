@@ -57,6 +57,7 @@ export default function TotalSpeechRatePage() {
         maxValue={400}
         standardMin={200}
         standardMax={260}
+        overSpeedValue={300}
       />
 
       <div style={styles.infoBox}>

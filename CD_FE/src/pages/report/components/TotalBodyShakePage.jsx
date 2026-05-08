@@ -26,9 +26,9 @@ export default function TotalBodyShakePage() {
   const progressPercent = (currentStep / totalStep) * 100;
 
   const getBarColor = (value) => {
-    if (value >= 3) return '#c95f57';
-    if (value >= 2) return '#d9ad4f';
-    return '#83bd8b';
+    if (value >= 3) return '#ef4444';
+    if (value >= 2) return '#facc15';
+    return '#22c55e';
   };
 
   return (
@@ -87,7 +87,7 @@ export default function TotalBodyShakePage() {
               }}
             />
 
-            <Tooltip formatter={(value) => `${value}회`} />
+            <Tooltip formatter={(value) => [`${value}회`, '이탈횟수']} />
 
             <ReferenceLine
               y={1}

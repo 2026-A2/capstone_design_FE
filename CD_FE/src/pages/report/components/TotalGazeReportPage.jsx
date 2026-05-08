@@ -55,6 +55,7 @@ export default function TotalGazeReportPage() {
         minValue={0}
         maxValue={100}
         standardValue={60}
+        highlightAboveValue={60}
       />
 
       <div style={styles.infoBox}>

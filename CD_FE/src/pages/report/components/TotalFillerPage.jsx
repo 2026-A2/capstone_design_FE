@@ -80,7 +80,9 @@ export default function TotalFillerPage() {
               }}
             />
 
-            <Tooltip formatter={(value) => `${value}회`} />
+            <Tooltip
+              formatter={(value) => [`${value}회`, '필러어 사용 횟수']}
+            />
 
             <ReferenceLine
               y={3}

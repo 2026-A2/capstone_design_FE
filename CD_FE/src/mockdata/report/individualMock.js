@@ -2,14 +2,11 @@ export const individualReports = [
   {
     id: 1,
     title: '1회차 면접 리포트',
-
     eyeContact: '카메라 응시율 61%',
     speechSummary: '발화 속도 적정',
     expressionSummary: '표정 안정',
-
-    habitSummary: '고개 움직임이 약간 잦음',
+    habitSummary: '고개 움직임이 약간 있음',
     postureSummary: '전반적으로 안정적인 자세',
-
     detail: {
       eyeContactRate: 61,
       speechRate: 132,
@@ -24,18 +21,14 @@ export const individualReports = [
       bodyShake: 3,
     },
   },
-
   {
     id: 2,
     title: '2회차 면접 리포트',
-
     eyeContact: '카메라 응시율 68%',
     speechSummary: '발화 속도 양호',
     expressionSummary: '미소율 개선',
-
-    habitSummary: '불필요한 움직임 감소',
-    postureSummary: '자세가 이전보다 안정적',
-
+    habitSummary: '불안정한 움직임 감소',
+    postureSummary: '자세가 이전보다 안정됨',
     detail: {
       eyeContactRate: 68,
       speechRate: 138,
@@ -50,18 +43,14 @@ export const individualReports = [
       bodyShake: 2,
     },
   },
-
   {
     id: 3,
     title: '3회차 면접 리포트',
-
     eyeContact: '카메라 응시율 74%',
     speechSummary: '발화 속도 안정',
     expressionSummary: '표정 자연스러움',
-
     habitSummary: '고개 움직임이 자연스러움',
     postureSummary: '바른 자세 유지',
-
     detail: {
       eyeContactRate: 74,
       speechRate: 145,
