@@ -77,7 +77,7 @@ export default function IndividualReportFullPage() {
       key: 'smileRate',
       unit: '%',
       icon: '😊',
-      recommendedText: '50% 이상 권장',
+      recommendedText: '50% 이상 권장, 면접시작·마무리2회권장',
     },
     {
       label: '눈 깜빡임',

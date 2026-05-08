@@ -78,8 +78,8 @@
 .detail-report-top {
   background: linear-gradient(135deg, #6266e8, #8588f5);
   border-radius: 20px;
-  padding: 28px 32px;
-  margin-bottom: 26px;
+  padding: 20px 28px;
+  margin-bottom: 34px;
   color: #ffffff;
 }
 
@@ -91,10 +91,18 @@
   opacity: 0.9;
 }
 
+.detail-report-label {
+  display: inline-block;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
 .detail-report-top h2 {
   margin: 0;
-  font-size: 27px;
-  line-height: 1.25;
+  font-size: 22px;
+  line-height: 1.2;
   font-weight: 800;
 }
 
@@ -108,11 +116,11 @@
   display: flex;
   gap: 20px;
   align-items: center;
-  min-height: 116px;
+  min-height: 132px;
   background: #f9fbff;
   border: 1px solid #dfe6f2;
   border-radius: 20px;
-  padding: 22px 24px;
+  padding: 26px 28px;
   box-sizing: border-box;
 }
 
@@ -135,17 +143,17 @@
 
 .detail-score-card strong {
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   color: #111827;
-  font-size: 20px;
+  font-size: 22px;
   line-height: 1.2;
 }
 
 .detail-score-card p {
   margin: 0;
   color: #65728a;
-  font-size: 16px;
-  line-height: 1.55;
+  font-size: 17px;
+  line-height: 1.6;
 }
 
 .detail-button-wrap {

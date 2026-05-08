@@ -26,12 +26,14 @@ export default function ReportPage() {
             onClick={() => navigate('/report/individual')}
           >
             <div className="report-card-icon">📄</div>
-            <h2>개별 리포트 보기</h2>
-            <p>
-              면접 회차별 상세 결과를 확인하고 각 항목별 피드백을 볼 수
-              있습니다.
-            </p>
-            <button>확인하기</button>
+            <h2>개별 리포트</h2>
+            <p>특정 면접 회차의 상세 결과를 한눈에 확인합니다.</p>
+            <ul className="report-feature-list blue">
+              <li>한 회차의 5개 카테고리 요약</li>
+              <li>11개 세부 항목별 권장 범위와 사용자 값</li>
+              <li>회차별 출처ㆍ정성 코멘트</li>
+            </ul>
+            <button>회차 선택하러 가기</button>
           </div>
 
           <div
@@ -39,18 +41,22 @@ export default function ReportPage() {
             onClick={() => navigate('/report/total')}
           >
             <div className="report-card-icon">📊</div>
-            <h2>전체 분석 보기</h2>
-            <p>
-              여러 면접 결과를 비교하여 시선, 발화, 표정 변화 추이를 확인합니다.
-            </p>
-            <button>분석 보기</button>
+            <h2>누적 리포트</h2>
+            <p>여러 회차에 걸친 변화 추이를 그래프로 비교합니다.</p>
+
+            <ul className="report-feature-list orange">
+              <li>11개 분석 항목의 회차별 변화</li>
+              <li>권장 범위 밴드ㆍ임계값 점선 표시</li>
+              <li>발전ㆍ정체ㆍ후퇴 구간 한눈에 파악</li>
+            </ul>
+            <button>전체 추이 분석</button>
           </div>
         </div>
 
         <div className="report-info-box">
           <strong>TIP</strong>
           <span>
-            개별 리포트는 한 회차의 상세 분석, 전체 분석은 누적 데이터를
+            개별 리포트는 한 회차의 상세 분석, 누적 리포트는 누적 데이터를
             기반으로 한 변화 추이 확인에 적합합니다.
           </span>
         </div>

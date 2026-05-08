@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './IndividualReportPage.css';
 import { individualReports } from '../../mockdata/report/individualMock';
@@ -7,6 +7,9 @@ export default function IndividualReportPage() {
   const navigate = useNavigate();
   const [reportList, setReportList] = useState([]);
 
+  const [selectedType, setSelectedType] = useState('all');
+  const [searchText, setSearchText] = useState('');
+
   useEffect(() => {
     const savedReports = JSON.parse(
       localStorage.getItem('individualReports') || 'null',
@@ -14,6 +17,30 @@ export default function IndividualReportPage() {
 
     setReportList(savedReports || individualReports);
   }, []);
+
+  const filteredReports = useMemo(() => {
+    const keyword = searchText.trim().toLowerCase();
+
+    return reportList.filter((report, index) => {
+      const reportType = report.type || 'resume';
+
+      const typeMatched = selectedType === 'all' || reportType === selectedType;
+
+      const title = report.title || `${index + 1}회차 면접`;
+      const date = report.date || '';
+      const summary = `${report.eyeContact || ''} ${report.speechSummary || ''} ${
+        report.expressionSummary || ''
+      } ${report.keyword || ''} ${report.keywords || ''}`;
+
+      const searchMatched =
+        keyword === '' ||
+        title.toLowerCase().includes(keyword) ||
+        date.toLowerCase().includes(keyword) ||
+        summary.toLowerCase().includes(keyword);
+
+      return typeMatched && searchMatched;
+    });
+  }, [reportList, selectedType, searchText]);
 
   return (
     <div className="individual-report-page">
@@ -33,13 +60,42 @@ export default function IndividualReportPage() {
         </div>
 
         <div className="individual-report-box">
-          <div className="individual-report-notice">
-            열람하고 싶은 리포트를 선택하세요.
+          <div className="individual-filter-area">
+            <input
+              className="individual-search-input"
+              type="text"
+              placeholder="회차명 · 날짜 · 키워드로 검색"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
+
+            <div className="individual-filter-buttons">
+              <button
+                className={selectedType === 'all' ? 'active' : ''}
+                onClick={() => setSelectedType('all')}
+              >
+                전체
+              </button>
+
+              <button
+                className={selectedType === 'resume' ? 'active' : ''}
+                onClick={() => setSelectedType('resume')}
+              >
+                자소서 기반 면접
+              </button>
+
+              <button
+                className={selectedType === 'industry' ? 'active' : ''}
+                onClick={() => setSelectedType('industry')}
+              >
+                산업 기반 면접
+              </button>
+            </div>
           </div>
 
           <div className="individual-report-list">
-            {reportList.length > 0 ? (
-              reportList.map((report, index) => (
+            {filteredReports.length > 0 ? (
+              filteredReports.map((report, index) => (
                 <div
                   key={report.id || index}
                   className="individual-report-card"
@@ -59,19 +115,21 @@ export default function IndividualReportPage() {
                         {report.speechSummary || '-'} ·{' '}
                         {report.expressionSummary || '-'}
                       </p>
+
+                      {report.date && (
+                        <div className="report-date">{report.date}</div>
+                      )}
                     </div>
                   </div>
 
-                  <div className="report-card-right">상세 보기 →</div>
+                  <div className="report-card-right">요약 보기 →</div>
                 </div>
               ))
             ) : (
               <div className="empty-report-box">
                 <div className="empty-icon">!</div>
-                <h2>저장된 리포트가 없습니다</h2>
-                <p>
-                  면접을 완료하면 이곳에서 개별 리포트를 확인할 수 있습니다.
-                </p>
+                <h2>검색 결과가 없습니다</h2>
+                <p>필터나 검색어를 다시 확인해 주세요.</p>
               </div>
             )}
           </div>

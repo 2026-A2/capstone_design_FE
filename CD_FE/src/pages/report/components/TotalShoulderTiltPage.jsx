@@ -11,9 +11,13 @@ export default function TotalShoulderTiltPage() {
   const totalStep = 11;
   const progressPercent = (currentStep / totalStep) * 100;
 
+  const chartBoxStyle = {
+    ...styles.chartBox,
+    gridTemplateColumns: `repeat(${data.length}, 130px)`,
+  };
+
   return (
     <div style={styles.page}>
-      {/* 상단 헤더 */}
       <div style={styles.topHeader}>
         <div>
           <div style={styles.pageTitle}>
@@ -33,7 +37,6 @@ export default function TotalShoulderTiltPage() {
         </button>
       </div>
 
-      {/* 진행바 */}
       <div style={styles.progressBar}>
         <div
           style={{
@@ -43,7 +46,6 @@ export default function TotalShoulderTiltPage() {
         />
       </div>
 
-      {/* 기존 원형 그래프 카드 */}
       <div style={styles.card}>
         <div style={styles.header}>
           <div>
@@ -52,14 +54,14 @@ export default function TotalShoulderTiltPage() {
           </div>
         </div>
 
-        <div style={styles.chartBox}>
+        <div style={chartBoxStyle}>
           <div style={styles.line} />
 
           {data.map((item, index) => {
             const status = getStatus(item.value);
 
             return (
-              <div key={item.session} style={styles.item}>
+              <div key={`${item.session}-${index}`} style={styles.item}>
                 <div
                   style={{
                     ...styles.statusBadge,
@@ -162,7 +164,6 @@ const styles = {
     boxSizing: 'border-box',
   },
 
-  /* 추가된 상단 */
   topHeader: {
     width: '760px',
     display: 'flex',
@@ -211,7 +212,6 @@ const styles = {
     transition: 'width 0.3s ease',
   },
 
-  /* 기존 카드 */
   card: {
     width: '860px',
     backgroundColor: '#fff',
@@ -245,10 +245,12 @@ const styles = {
     backgroundColor: '#f8fafc',
     borderRadius: '14px',
     display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
     alignItems: 'center',
+    gap: '24px',
     padding: '26px 28px',
     boxSizing: 'border-box',
+    overflowX: 'auto',
+    overflowY: 'hidden',
   },
 
   line: {
@@ -258,6 +260,7 @@ const styles = {
     right: '70px',
     height: '2px',
     backgroundColor: '#dbe3ef',
+    minWidth: '520px',
   },
 
   item: {
@@ -301,6 +304,7 @@ const styles = {
     fontSize: '12px',
     color: '#f59e0b',
     fontWeight: '700',
+    whiteSpace: 'nowrap',
   },
 
   legend: {
@@ -316,6 +320,7 @@ const styles = {
     marginTop: '22px',
     fontSize: '14px',
     color: '#475569',
+    lineHeight: 1.6,
   },
 
   buttonWrap: {

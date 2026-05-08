@@ -37,7 +37,7 @@ export default function IndividualReportDetailPage() {
           </button>
 
           <div>
-            <h1>개별 리포트 상세</h1>
+            <h1>개별 리포트 요약</h1>
             <p>선택한 면접 회차의 주요 분석 결과를 확인하세요.</p>
           </div>
         </div>

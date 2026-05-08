@@ -1,7 +1,7 @@
 .report-main-page {
   min-height: 100vh;
   background: #f5f7fc;
-  padding: 28px 18px 40px;
+  padding: 14px 18px 40px;
   box-sizing: border-box;
 }
 
@@ -18,7 +18,7 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  margin-bottom: 42px;
+  margin-bottom: 24px;
 }
 
 .report-main-header h1 {
@@ -45,13 +45,15 @@
   background: #ffffff;
   border: 1px solid #dfe5f0;
   border-radius: 18px 18px 0 0;
-  padding: 90px 44px 22px;
+  padding: 42px 44px 22px;
   box-sizing: border-box;
   box-shadow: 0 16px 34px rgba(30, 41, 59, 0.06);
 }
 
 .report-card {
-  min-height: 280px;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
   background: #ffffff;
   border: 1px solid #33408f;
   border-radius: 18px;
@@ -115,6 +117,7 @@
 }
 
 .report-card button {
+  margin-top: auto;
   width: 100%;
   height: 54px;
   border: none;
@@ -193,4 +196,59 @@
   .report-info-box {
     padding: 0 20px 20px;
   }
+}
+.report-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.report-card p {
+  min-height: auto;
+  margin: 0 0 14px;
+
+  font-size: 14px;
+  line-height: 1.7;
+  color: #667085;
+}
+
+.report-feature-list {
+  list-style: none;
+  padding: 0;
+
+  /* 기존 56px -> 20px로 축소 */
+  margin: 28px 0 28px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.report-feature-list li {
+  position: relative;
+  padding-left: 18px;
+
+  font-size: 15px;
+  line-height: 1.5;
+  color: #65708a;
+}
+
+.report-feature-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  top: -1px;
+
+  font-size: 18px;
+  font-weight: 900;
+}
+
+/* 개별 리포트 점 색 */
+.report-feature-list.blue li::before {
+  color: #3f46a5;
+}
+
+/* 누적 리포트 점 색 */
+.report-feature-list.orange li::before {
+  color: #df7662;
 }

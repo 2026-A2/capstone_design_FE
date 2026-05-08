@@ -65,40 +65,47 @@
   color: #66708a;
 }
 
-/* Main Content */
 .full-report-main {
   background: #ffffff;
   border: 1px solid #e1e7f2;
   border-radius: 26px;
-  padding: 32px;
-  box-sizing: border-box;
-  box-shadow: 0 22px 50px rgba(27, 42, 89, 0.08);
+
+  /* 전체 여백 약간 축소 */
+  padding: 26px;
 }
 
-/* Score Header */
 .score-header-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: linear-gradient(135deg, #6266e8, #8588f5);
   border-radius: 20px;
-  padding: 32px;
-  margin-bottom: 32px;
+
+  /* 기존보다 줄임 */
+  padding: 20px 28px;
+
+  margin-bottom: 28px;
   color: #ffffff;
 }
 
 .score-info h2 {
   margin: 0;
-  font-size: 27px;
-  line-height: 1.25;
+
+  /* 제목 크기 축소 */
+  font-size: 22px;
+
+  line-height: 1.2;
   font-weight: 800;
 }
 
 .score-label {
   display: inline-block;
-  margin-bottom: 14px;
-  font-size: 15px;
-  font-weight: 800;
+
+  /* 여백 축소 */
+  margin-bottom: 8px;
+
+  font-size: 14px;
+  font-weight: 700;
   opacity: 0.9;
 }
 
