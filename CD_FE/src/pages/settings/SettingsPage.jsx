@@ -19,23 +19,6 @@ export default function SettingsPage() {
     navigate('/');
   };
 
-  const handleResetReports = () => {
-    const confirmed = window.confirm(
-      '저장된 리포트 데이터를 초기화하시겠습니까?',
-    );
-
-    if (!confirmed) return;
-
-    localStorage.removeItem('individualReports');
-    localStorage.removeItem('speechRateTrend');
-    localStorage.removeItem('voiceVolumeTrend');
-    localStorage.removeItem('silenceTrend');
-    localStorage.removeItem('fillerTrend');
-    localStorage.removeItem('smileTrend');
-
-    alert('리포트 데이터가 초기화되었습니다.');
-  };
-
   return (
     <div className="settings-page">
       <div className="settings-container">
@@ -125,11 +108,13 @@ export default function SettingsPage() {
           <div className="settings-card">
             <button
               className="settings-item danger"
-              onClick={handleResetReports}
+              onClick={() => navigate('/settings/report-reset')}
             >
               <span>
                 리포트 초기화
-                <small>저장된 면접 리포트 데이터를 삭제합니다.</small>
+                <small>
+                  저장된 면접 리포트와 누적 그래프 데이터를 관리합니다.
+                </small>
               </span>
               <span className="arrow">›</span>
             </button>

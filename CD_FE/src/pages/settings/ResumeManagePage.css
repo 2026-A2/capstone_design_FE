@@ -1,167 +1,156 @@
 .resume-manage-page {
   min-height: 100vh;
   background-color: #f3f7fd;
-  display: flex;
-  justify-content: center;
-  padding: 80px 24px;
+  padding: 48px 40px 80px;
   box-sizing: border-box;
 }
 
 .resume-manage-container {
-  width: 720px;
-}
-
-.back-button {
-  width: 48px;
-  height: 48px;
-  border: none;
-  border-radius: 14px;
-  background-color: #ffffff;
-  color: #1e3a8a;
-  font-size: 24px;
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: 0 10px 24px rgba(31, 41, 55, 0.08);
-  margin-bottom: 22px;
-}
-
-.resume-manage-container h1 {
-  font-size: 32px;
-  font-weight: 800;
-  color: #111827;
-  margin-bottom: 10px;
-}
-
-.resume-subtitle {
-  font-size: 16px;
-  color: #6b7280;
-  margin-bottom: 32px;
-}
-
-.resume-card {
+  max-width: 780px;
+  margin: 0 auto;
   background-color: #ffffff;
   border-radius: 22px;
   padding: 32px;
-  box-shadow: 0 16px 36px rgba(31, 41, 55, 0.08);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+}
+
+.back-button {
+  border: none;
+  background: transparent;
+  font-size: 26px;
+  font-weight: 700;
+  color: #1e3a8a;
+  cursor: pointer;
+  margin-bottom: 18px;
+  padding: 0;
+}
+
+.back-button:hover {
+  color: #2563eb;
+}
+
+.resume-manage-container h1 {
+  margin: 0 0 10px;
+  font-size: 28px;
+  font-weight: 800;
+  color: #1e3a8a;
+}
+
+.resume-subtitle {
+  margin: 0 0 24px;
+  line-height: 1.7;
+  font-size: 15px;
+  color: #64748b;
+}
+
+.resume-card {
+  margin-top: 28px;
+  padding: 22px;
+  border: 1px solid #dbeafe;
+  border-radius: 18px;
+  background-color: #f8fbff;
+}
+
+.resume-card h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #1e3a8a;
 }
 
 .resume-card-header {
   display: flex;
   justify-content: space-between;
-  gap: 20px;
   align-items: flex-start;
-  margin-bottom: 20px;
-}
-
-.resume-card-header h2 {
-  font-size: 22px;
-  font-weight: 800;
-  color: #111827;
-  margin: 0 0 8px;
+  margin-bottom: 18px;
 }
 
 .resume-card-header p {
-  font-size: 14px;
-  color: #6b7280;
   margin: 0;
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.6;
 }
 
 .char-count {
   font-size: 14px;
-  font-weight: 700;
-  color: #4f46e5;
-  white-space: nowrap;
+  color: #64748b;
+  font-weight: 600;
 }
 
 .resume-textarea {
   width: 100%;
-  height: 260px;
-  resize: none;
-  border: 1px solid #d1d5db;
-  border-radius: 16px;
-  padding: 18px;
+  min-height: 180px;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 15px;
+  font-family: inherit;
+  color: #334155;
+  resize: vertical;
   box-sizing: border-box;
-  font-size: 16px;
-  line-height: 1.6;
-  color: #111827;
-  outline: none;
+}
+
+.resume-textarea::placeholder {
+  color: #cbd5e1;
 }
 
 .resume-textarea:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16);
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .resume-button-row {
   display: flex;
-  justify-content: flex-end;
-  gap: 12px;
+  gap: 10px;
   margin-top: 20px;
+  justify-content: flex-end;
 }
 
 .delete-button,
-.save-button,
-.main-button {
+.save-button {
   border: none;
-  border-radius: 12px;
-  height: 48px;
-  padding: 0 24px;
-  font-size: 16px;
+  padding: 11px 24px;
+  border-radius: 10px;
+  font-size: 14px;
   font-weight: 800;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .delete-button {
-  background-color: #fee2e2;
-  color: #dc2626;
-}
-
-.save-button {
-  background-color: #4f46e5;
-  color: #ffffff;
-}
-
-.main-button {
-  width: 100%;
-  height: 58px;
-  margin-top: 24px;
-  background-color: #6b7280;
+  background-color: #ef4444;
   color: #ffffff;
 }
 
 .delete-button:hover {
-  background-color: #fecaca;
+  background-color: #dc2626;
+}
+
+.save-button {
+  background-color: #2563eb;
+  color: #ffffff;
 }
 
 .save-button:hover {
-  background-color: #4338ca;
+  background-color: #1d4ed8;
+}
+
+.main-button {
+  width: 100%;
+  margin-top: 24px;
+  padding: 13px 18px;
+  border: none;
+  background-color: #6b7280;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .main-button:hover {
   background-color: #4b5563;
-}
-
-body.dark-mode .resume-manage-page {
-  background-color: #111827;
-}
-
-body.dark-mode .back-button,
-body.dark-mode .resume-card {
-  background-color: #1f2937;
-}
-
-body.dark-mode .resume-manage-container h1,
-body.dark-mode .resume-card-header h2 {
-  color: #f9fafb;
-}
-
-body.dark-mode .resume-subtitle,
-body.dark-mode .resume-card-header p {
-  color: #d1d5db;
-}
-
-body.dark-mode .resume-textarea {
-  background-color: #111827;
-  color: #f9fafb;
-  border-color: #374151;
 }
