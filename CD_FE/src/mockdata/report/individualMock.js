@@ -36,7 +36,7 @@ export const individualReports = [
       speechRate: 138,
       voiceVolume: 66,
       silenceCount: 1,
-      fillerCount: 2,
+      fillerCount: 4,
       smileRate: 51,
       blinkCount: 15,
       endingBlurCount: 1,

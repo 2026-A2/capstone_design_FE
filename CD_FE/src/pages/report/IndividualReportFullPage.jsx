@@ -16,6 +16,68 @@ export default function IndividualReportFullPage() {
       detail: {},
     };
 
+  // 각 항목의 상태를 판단하는 함수
+  const getItemStatus = (key, value) => {
+    if (value === undefined || value === null) return 'neutral';
+
+    switch (key) {
+      case 'eyeContactRate':
+        return value >= 60 ? 'good' : 'bad';
+      case 'speechRate':
+        return value >= 200 && value <= 260 ? 'good' : 'bad';
+      case 'silenceCount':
+        if (value <= 3) return 'good';
+        if (value <= 6) return 'warning';
+        return 'bad';
+      case 'fillerCount':
+        if (value <= 3) return 'good';
+        if (value <= 6) return 'warning';
+        return 'bad';
+      case 'voiceVolume':
+        return value >= 50 && value <= 70 ? 'good' : 'bad';
+      case 'smileRate':
+        return value >= 50 ? 'good' : 'bad';
+      case 'blinkCount':
+        return value >= 15 && value <= 20 ? 'good' : 'bad';
+      case 'endingBlurCount':
+        return value <= 25 ? 'good' : 'bad';
+      case 'nodCount':
+        return value >= 80 && value <= 100 ? 'good' : 'bad';
+      case 'shoulderTilt':
+        return value >= 80 && value <= 100 ? 'good' : 'bad';
+      case 'bodyShake':
+        return value <= 1 ? 'good' : 'bad';
+      default:
+        return 'neutral';
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'good':
+        return '#4CAF50'; // 초록색
+      case 'warning':
+        return '#FFC107'; // 노란색
+      case 'bad':
+        return '#F44336'; // 빨간색
+      default:
+        return '#e0e0e0'; // 회색
+    }
+  };
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'good':
+        return '적정';
+      case 'warning':
+        return '주의';
+      case 'bad':
+        return '체크 필요';
+      default:
+        return '';
+    }
+  };
+
   // individualReportsDetail에서 상세 정보를 추출하는 함수
   const getDetailFromMockData = (label) => {
     const detailReport = individualReportsDetail.find(
@@ -119,9 +181,12 @@ export default function IndividualReportFullPage() {
   // 각 항목에 대해 detail 값과 상세정보를 합쳐서 analysisItems 생성
   const analysisItems = itemDefinitions.map((def) => {
     const detailInfo = getDetailFromMockData(def.label);
+    const value = report.detail?.[def.key];
+    const status = getItemStatus(def.key, value);
     return {
       ...def,
-      value: report.detail?.[def.key],
+      value,
+      status,
       description: detailInfo.description,
       detailContent: detailInfo.detail,
     };
@@ -174,6 +239,10 @@ export default function IndividualReportFullPage() {
                     <div
                       className="analysis-header"
                       onClick={() => toggleItemExpand(itemIndex)}
+                      style={{
+                        borderLeftColor: getStatusColor(item.status),
+                        backgroundColor: `${getStatusColor(item.status)}15`,
+                      }}
                     >
                       <div className="analysis-left">
                         <span className="analysis-icon">{item.icon}</span>
@@ -184,6 +253,16 @@ export default function IndividualReportFullPage() {
                       </div>
 
                       <div className="analysis-right">
+                        <div
+                          className="status-badge"
+                          style={{
+                            backgroundColor: getStatusColor(item.status),
+                          }}
+                        >
+                          <span className="status-text">
+                            {getStatusLabel(item.status)}
+                          </span>
+                        </div>
                         <div className="value-display">
                           <span className="value-number">
                             {item.value !== undefined ? item.value : '-'}
