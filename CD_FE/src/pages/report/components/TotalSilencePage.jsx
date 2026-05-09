@@ -94,7 +94,7 @@ export default function TotalSilencePage() {
               }}
             />
 
-            <Tooltip formatter={(value) => `${value}회`} />
+            <Tooltip formatter={(value) => [`${value}회`, '침묵 구간']} />
 
             <ReferenceLine
               y={3}
