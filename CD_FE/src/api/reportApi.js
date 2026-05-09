@@ -1,3 +1,5 @@
+import axiosInstance from './axiosInstance';
+
 import { individualReports } from '../mockdata/report/individualMock';
 import { individualReportsDetail } from '../mockdata/report/individualmockdetail';
 
@@ -15,29 +17,52 @@ import {
   bodyShakeTrend,
 } from '../mockdata/report/trendMock';
 
+const USE_MOCK = true;
+
 export const getIndividualReports = async () => {
-  return individualReports;
+  if (USE_MOCK) {
+    return individualReports;
+  }
+
+  const response = await axiosInstance.get('/reports');
+  return response.data;
 };
+
 export const getIndividualReportSummary = async (id) => {
-  return individualReports.find((report) => report.id === Number(id));
+  if (USE_MOCK) {
+    return individualReports.find((report) => report.id === Number(id));
+  }
+
+  const response = await axiosInstance.get(`/reports/${id}/summary`);
+  return response.data;
 };
 
 export const getIndividualReportDetail = async (id) => {
-  return individualReportsDetail.find((report) => report.id === Number(id));
+  if (USE_MOCK) {
+    return individualReportsDetail.find((report) => report.id === Number(id));
+  }
+
+  const response = await axiosInstance.get(`/reports/${id}`);
+  return response.data;
 };
 
 export const getReportTrends = async () => {
-  return {
-    speechRateTrend,
-    voiceVolumeTrend,
-    silenceTrend,
-    fillerTrend,
-    smileTrend,
-    eyeContactTrend,
-    blinkTrend,
-    endingBlurTrend,
-    nodTrend,
-    shoulderTiltTrend,
-    bodyShakeTrend,
-  };
+  if (USE_MOCK) {
+    return {
+      speechRateTrend,
+      voiceVolumeTrend,
+      silenceTrend,
+      fillerTrend,
+      smileTrend,
+      eyeContactTrend,
+      blinkTrend,
+      endingBlurTrend,
+      nodTrend,
+      shoulderTiltTrend,
+      bodyShakeTrend,
+    };
+  }
+
+  const response = await axiosInstance.get('/reports/trends');
+  return response.data;
 };
