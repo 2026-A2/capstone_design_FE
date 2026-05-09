@@ -35,7 +35,7 @@ const analysisGuides = [
   },
   {
     title: '미소율',
-    standard: '시작 10초와 종료 10초 구간에서 미소 권장',
+    standard: '50%이상 권장, 시작 10초와 종료 10초 구간에서 미소 권장',
     description: '면접 중 미소가 얼마나 자연스럽게 나타나는지 분석합니다.',
   },
   {
