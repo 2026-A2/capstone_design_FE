@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   BarChart,
@@ -10,18 +11,28 @@ import {
   ReferenceLine,
   Cell,
 } from 'recharts';
-import { fillerTrend } from '../../../mockdata/report/trendMock';
+
+import { getReportTrends } from '../../../api/reportApi';
 
 export default function TotalFillerPage() {
   const navigate = useNavigate();
+  const [fillerData, setFillerData] = useState([]);
 
-  const savedFillerData = JSON.parse(localStorage.getItem('fillerTrend'));
+  useEffect(() => {
+    const fetchData = async () => {
+      const savedFillerData = JSON.parse(localStorage.getItem('fillerTrend'));
 
-  const fillerData =
-    savedFillerData && savedFillerData.length > 0
-      ? savedFillerData
-      : fillerTrend;
+      if (savedFillerData && savedFillerData.length > 0) {
+        setFillerData(savedFillerData);
+        return;
+      }
 
+      const trends = await getReportTrends();
+      setFillerData(trends.fillerTrend);
+    };
+
+    fetchData();
+  }, []);
   const currentStep = 5;
   const totalStep = 11;
   const progressPercent = (currentStep / totalStep) * 100;

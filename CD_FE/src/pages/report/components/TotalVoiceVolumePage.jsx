@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import InterviewTrendChart from './InterviewTrendChart';
-import { voiceVolumeTrend } from '../../../mockdata/report/trendMock';
+import { useEffect, useState } from 'react';
+import { getReportTrends } from '../../../api/reportApi';
 
 export default function TotalVoiceVolumePage() {
   const navigate = useNavigate();
@@ -8,17 +9,23 @@ export default function TotalVoiceVolumePage() {
   const savedVoiceVolumeData = JSON.parse(
     localStorage.getItem('voiceVolumeTrend'),
   );
-  const hasVoiceVolumeRangeData =
-    savedVoiceVolumeData &&
-    savedVoiceVolumeData.length > 0 &&
-    savedVoiceVolumeData.every(
-      (item) =>
-        item.maxVoiceVolume !== undefined && item.minVoiceVolume !== undefined,
-    );
+  const [fillerData, setFillerData] = useState([]);
 
-  const voiceVolumeData = hasVoiceVolumeRangeData
-    ? savedVoiceVolumeData
-    : voiceVolumeTrend;
+  useEffect(() => {
+    const fetchData = async () => {
+      const savedData = JSON.parse(localStorage.getItem('fillerTrend'));
+
+      if (savedData && savedData.length > 0) {
+        setFillerData(savedData);
+        return;
+      }
+
+      const trends = await getReportTrends();
+      setFillerData(trends.fillerTrend);
+    };
+
+    fetchData();
+  }, []);
 
   const currentStep = 3;
   const totalStep = 11;

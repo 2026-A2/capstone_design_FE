@@ -10,19 +10,29 @@ import {
   ReferenceLine,
   Cell,
 } from 'recharts';
-import { endingBlurTrend } from '../../../mockdata/report/trendMock';
+import { useEffect, useState } from 'react';
+import { getReportTrends } from '../../../api/reportApi';
 
 export default function TotalEndingBlurPage() {
   const navigate = useNavigate();
 
-  const savedEndingBlurData = JSON.parse(
-    localStorage.getItem('endingBlurTrend'),
-  );
+  const [endingBlurData, setEndingBlurData] = useState([]);
 
-  const endingBlurData =
-    savedEndingBlurData && savedEndingBlurData.length > 0
-      ? savedEndingBlurData
-      : endingBlurTrend;
+  useEffect(() => {
+    const fetchData = async () => {
+      const savedData = JSON.parse(localStorage.getItem('endingBlurTrend'));
+
+      if (savedData && savedData.length > 0) {
+        setEndingBlurData(savedData);
+        return;
+      }
+
+      const trends = await getReportTrends();
+      setEndingBlurData(trends.endingBlurTrend);
+    };
+
+    fetchData();
+  }, []);
 
   const currentStep = 8;
   const totalStep = 11;
@@ -84,9 +94,7 @@ export default function TotalEndingBlurPage() {
               }}
             />
 
-            <Tooltip
-              formatter={(value) => [`${value}%`, '말끝 흐림 비율']}
-            />
+            <Tooltip formatter={(value) => [`${value}%`, '말끝 흐림 비율']} />
 
             <ReferenceLine
               y={25}

@@ -10,17 +10,29 @@ import {
   ReferenceLine,
   Cell,
 } from 'recharts';
-import { silenceTrend } from '../../../mockdata/report/trendMock';
+import { useEffect, useState } from 'react';
+import { getReportTrends } from '../../../api/reportApi';
 
 export default function TotalSilencePage() {
   const navigate = useNavigate();
 
-  const savedSilenceData = JSON.parse(localStorage.getItem('silenceTrend'));
+  const [silenceData, setSilenceData] = useState([]);
 
-  const silenceData =
-    savedSilenceData && savedSilenceData.length > 0
-      ? savedSilenceData
-      : silenceTrend;
+  useEffect(() => {
+    const fetchData = async () => {
+      const savedData = JSON.parse(localStorage.getItem('silenceTrend'));
+
+      if (savedData && savedData.length > 0) {
+        setSilenceData(savedData);
+        return;
+      }
+
+      const trends = await getReportTrends();
+      setSilenceData(trends.silenceTrend);
+    };
+
+    fetchData();
+  }, []);
 
   const currentStep = 4;
   const totalStep = 11;

@@ -1,19 +1,28 @@
 import { useNavigate } from 'react-router-dom';
 import InterviewTrendChart from './InterviewTrendChart';
-import { speechRateTrend } from '../../../mockdata/report/trendMock';
+import { useEffect, useState } from 'react';
+import { getReportTrends } from '../../../api/reportApi';
 
 export default function TotalSpeechRatePage() {
   const navigate = useNavigate();
 
-  const savedSpeechRateData = JSON.parse(
-    localStorage.getItem('speechRateTrend'),
-  );
+  const [speechRateData, setSpeechRateData] = useState([]);
 
-  const speechRateData =
-    savedSpeechRateData && savedSpeechRateData.length > 0
-      ? savedSpeechRateData
-      : speechRateTrend;
+  useEffect(() => {
+    const fetchData = async () => {
+      const savedData = JSON.parse(localStorage.getItem('speechRateTrend'));
 
+      if (savedData && savedData.length > 0) {
+        setSpeechRateData(savedData);
+        return;
+      }
+
+      const trends = await getReportTrends();
+      setSpeechRateData(trends.speechRateTrend);
+    };
+
+    fetchData();
+  }, []);
   const currentStep = 2;
   const totalStep = 11;
   const progressPercent = (currentStep / totalStep) * 100;

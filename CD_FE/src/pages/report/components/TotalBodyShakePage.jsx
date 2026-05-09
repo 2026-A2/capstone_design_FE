@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   BarChart,
@@ -10,16 +11,27 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
+import { getReportTrends } from '../../../api/reportApi';
 
 export default function TotalBodyShakePage() {
   const navigate = useNavigate();
+  const [bodyShakeData, setBodyShakeData] = useState([]);
 
-  const bodyShakeData = JSON.parse(localStorage.getItem('bodyShakeTrend')) || [
-    { session: 1, value: 0 },
-    { session: 2, value: 2 },
-    { session: 3, value: 1 },
-    { session: 4, value: 3 },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      const savedData = JSON.parse(localStorage.getItem('bodyShakeTrend'));
+
+      if (savedData && savedData.length > 0) {
+        setBodyShakeData(savedData);
+        return;
+      }
+
+      const trends = await getReportTrends();
+      setBodyShakeData(trends.bodyShakeTrend);
+    };
+
+    fetchData();
+  }, []);
 
   const currentStep = 11;
   const totalStep = 11;

@@ -1,13 +1,27 @@
 import { useNavigate } from 'react-router-dom';
 import InterviewTrendChart from './InterviewTrendChart';
-import { smileTrend } from '../../../mockdata/report/trendMock';
+import { useEffect, useState } from 'react';
+import { getReportTrends } from '../../../api/reportApi';
 
 export default function TotalSmilePage() {
   const navigate = useNavigate();
-  const savedSmileData = JSON.parse(localStorage.getItem('smileTrend'));
+  const [smileData, setSmileData] = useState([]);
 
-  const smileData =
-    savedSmileData && savedSmileData.length > 0 ? savedSmileData : smileTrend;
+  useEffect(() => {
+    const fetchData = async () => {
+      const savedData = JSON.parse(localStorage.getItem('smileTrend'));
+
+      if (savedData && savedData.length > 0) {
+        setSmileData(savedData);
+        return;
+      }
+
+      const trends = await getReportTrends();
+      setSmileData(trends.smileTrend);
+    };
+
+    fetchData();
+  }, []);
 
   const currentStep = 6;
   const totalStep = 11;

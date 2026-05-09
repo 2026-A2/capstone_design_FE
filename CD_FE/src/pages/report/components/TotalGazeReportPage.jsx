@@ -1,18 +1,30 @@
 import { useNavigate } from 'react-router-dom';
 import InterviewTrendChart from './InterviewTrendChart';
-import { eyeContactTrend } from '../../../mockdata/report/trendMock';
+import { useEffect, useState } from 'react';
+import { getReportTrends } from '../../../api/reportApi';
 
 export default function TotalGazeReportPage() {
   const navigate = useNavigate();
 
-  const savedEyeContactData = JSON.parse(
-    localStorage.getItem('eyeContactTrend'),
-  );
+  const [eyeContactData, setEyeContactData] = useState([]);
 
-  const eyeContactData =
-    savedEyeContactData && savedEyeContactData.length > 0
-      ? savedEyeContactData
-      : eyeContactTrend;
+  useEffect(() => {
+    const fetchData = async () => {
+      const savedEyeContactData = JSON.parse(
+        localStorage.getItem('eyeContactTrend'),
+      );
+
+      if (savedEyeContactData && savedEyeContactData.length > 0) {
+        setEyeContactData(savedEyeContactData);
+        return;
+      }
+
+      const trends = await getReportTrends();
+      setEyeContactData(trends.eyeContactTrend);
+    };
+
+    fetchData();
+  }, []);
 
   const currentStep = 1;
   const totalStep = 11;

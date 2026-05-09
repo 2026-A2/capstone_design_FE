@@ -1,9 +1,27 @@
 import { useNavigate } from 'react-router-dom';
 import InterviewTrendChart from './InterviewTrendChart';
-import { blinkTrend } from '../../../mockdata/report/trendMock';
+import { useEffect, useState } from 'react';
+import { getReportTrends } from '../../../api/reportApi';
 
 export default function TotalBlinkPage() {
   const navigate = useNavigate();
+  const [blinkData, setBlinkData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const savedData = JSON.parse(localStorage.getItem('blinkTrend'));
+
+      if (savedData && savedData.length > 0) {
+        setBlinkData(savedData);
+        return;
+      }
+
+      const trends = await getReportTrends();
+      setBlinkData(trends.blinkTrend);
+    };
+
+    fetchData();
+  }, []);
 
   const currentStep = 7;
   const totalStep = 11;

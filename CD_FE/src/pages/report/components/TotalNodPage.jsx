@@ -1,13 +1,29 @@
 import { useNavigate } from 'react-router-dom';
 import InterviewTrendChart from './InterviewTrendChart';
-import { nodTrend } from '../../../mockdata/report/trendMock';
+import { useEffect, useState } from 'react';
+import { getReportTrends } from '../../../api/reportApi';
 
 export default function TotalNodPage() {
   const navigate = useNavigate();
 
-  const savedNodData = JSON.parse(localStorage.getItem('nodTrend'));
-  const nodData =
-    savedNodData && savedNodData.length > 0 ? savedNodData : nodTrend;
+  const [nodData, setNodData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const savedData = JSON.parse(localStorage.getItem('nodTrend'));
+
+      if (savedData && savedData.length > 0) {
+        setNodData(savedData);
+        return;
+      }
+
+      const trends = await getReportTrends();
+      setNodData(trends.nodTrend);
+    };
+
+    fetchData();
+  }, []);
+
   const chartData = nodData.map((item) => ({
     date: item.session,
     value: item.value,

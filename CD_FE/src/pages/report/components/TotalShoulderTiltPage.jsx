@@ -1,11 +1,27 @@
 import { useNavigate } from 'react-router-dom';
-import { shoulderTiltTrend } from '../../../mockdata/report/trendMock';
+import { useEffect, useState } from 'react';
+import { getReportTrends } from '../../../api/reportApi';
 
 export default function TotalShoulderTiltPage() {
   const navigate = useNavigate();
 
-  const data =
-    JSON.parse(localStorage.getItem('shoulderTiltTrend')) || shoulderTiltTrend;
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const savedData = JSON.parse(localStorage.getItem('shoulderTiltTrend'));
+
+      if (savedData && savedData.length > 0) {
+        setData(savedData);
+        return;
+      }
+
+      const trends = await getReportTrends();
+      setData(trends.shoulderTiltTrend);
+    };
+
+    fetchData();
+  }, []);
 
   const currentStep = 10;
   const totalStep = 11;

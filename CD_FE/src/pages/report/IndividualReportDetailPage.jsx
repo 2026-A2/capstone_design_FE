@@ -1,21 +1,46 @@
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import './IndividualReportDetailPage.css';
-import { individualReports } from '../../mockdata/report/individualMock';
+import { useEffect, useState } from 'react';
+import { getIndividualReports } from '../../api/reportApi';
 
 export default function IndividualReportDetailPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
 
-  const report = location.state ||
-    individualReports.find((item) => String(item.id) === id) || {
-      title: '리포트 정보 없음',
-      eyeContact: '-',
-      speechSummary: '-',
-      expressionSummary: '-',
-      habitSummary: '-',
-      postureSummary: '-',
+  const [report, setReport] = useState(null);
+
+  useEffect(() => {
+    const fetchReport = async () => {
+      // 이전 페이지에서 state로 넘겨받은 report가 있으면 그걸 먼저 사용
+      if (location.state) {
+        setReport(location.state);
+        return;
+      }
+
+      // state가 없으면 mock/api에서 id로 찾아오기
+      const reports = await getIndividualReports();
+      const selectedReport = reports.find((item) => String(item.id) === id);
+
+      setReport(
+        selectedReport || {
+          id,
+          title: '리포트 정보 없음',
+          eyeContact: '-',
+          speechSummary: '-',
+          expressionSummary: '-',
+          habitSummary: '-',
+          postureSummary: '-',
+        },
+      );
     };
+
+    fetchReport();
+  }, [id, location.state]);
+
+  if (!report) {
+    return <div>로딩 중...</div>;
+  }
 
   const detailItems = [
     { label: '시선 처리', value: report.eyeContact || '-', icon: '👀' },

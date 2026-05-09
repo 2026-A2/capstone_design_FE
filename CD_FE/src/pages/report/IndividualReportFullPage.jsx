@@ -1,22 +1,44 @@
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './IndividualReportFullPage.css';
-import { individualReports } from '../../mockdata/report/individualMock';
-import { individualReportsDetail } from '../../mockdata/report/individualmockdetail';
+import {
+  getIndividualReportSummary,
+  getIndividualReportDetail,
+} from '../../api/reportApi';
 
 export default function IndividualReportFullPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
-  const [expandedItems, setExpandedItems] = useState({});
 
-  const report = location.state ||
-    individualReports.find((item) => String(item.id) === id) || {
-      title: '리포트 정보 없음',
-      detail: {},
+  const [expandedItems, setExpandedItems] = useState({});
+  const [report, setReport] = useState(null);
+  const [detailReport, setDetailReport] = useState(null);
+
+  useEffect(() => {
+    const fetchReport = async () => {
+      const summaryData =
+        location.state || (await getIndividualReportSummary(id));
+      const detailData = await getIndividualReportDetail(id);
+
+      setReport(
+        summaryData || {
+          id,
+          title: '리포트 정보 없음',
+          detail: {},
+        },
+      );
+
+      setDetailReport(detailData || null);
     };
 
-  // 각 항목의 상태를 판단하는 함수
+    fetchReport();
+  }, [id, location.state]);
+
+  if (!report) {
+    return <div>로딩 중...</div>;
+  }
+
   const getItemStatus = (key, value) => {
     if (value === undefined || value === null) return 'neutral';
 
@@ -55,13 +77,13 @@ export default function IndividualReportFullPage() {
   const getStatusColor = (status) => {
     switch (status) {
       case 'good':
-        return '#4CAF50'; // 초록색
+        return '#4CAF50';
       case 'warning':
-        return '#FFC107'; // 노란색
+        return '#FFC107';
       case 'bad':
-        return '#F44336'; // 빨간색
+        return '#F44336';
       default:
-        return '#e0e0e0'; // 회색
+        return '#e0e0e0';
     }
   };
 
@@ -78,15 +100,12 @@ export default function IndividualReportFullPage() {
     }
   };
 
-  // individualReportsDetail에서 상세 정보를 추출하는 함수
-  const getDetailFromMockData = (label) => {
-    const detailReport = individualReportsDetail.find(
-      (r) => String(r.id) === String(report.id),
-    );
+  const getDetailFromData = (label) => {
     if (!detailReport) return { description: '', detail: '' };
 
     for (const category of detailReport.categories) {
       const item = category.items.find((i) => i.label === label);
+
       if (item) {
         return {
           description: item.description,
@@ -94,10 +113,10 @@ export default function IndividualReportFullPage() {
         };
       }
     }
+
     return { description: '', detail: '' };
   };
 
-  // 권장값과 함께 분석 항목 정의
   const itemDefinitions = [
     {
       label: '카메라 응시율',
@@ -178,11 +197,11 @@ export default function IndividualReportFullPage() {
     },
   ];
 
-  // 각 항목에 대해 detail 값과 상세정보를 합쳐서 analysisItems 생성
   const analysisItems = itemDefinitions.map((def) => {
-    const detailInfo = getDetailFromMockData(def.label);
+    const detailInfo = getDetailFromData(def.label);
     const value = report.detail?.[def.key];
     const status = getItemStatus(def.key, value);
+
     return {
       ...def,
       value,
@@ -202,7 +221,6 @@ export default function IndividualReportFullPage() {
   return (
     <div className="full-report-page">
       <div className="full-report-container">
-        {/* Header */}
         <div className="full-report-header">
           <button
             className="full-back-button"
@@ -217,9 +235,7 @@ export default function IndividualReportFullPage() {
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="full-report-main">
-          {/* Header Section */}
           <div className="score-header-section">
             <div className="score-info">
               <span className="score-label">Interview Report</span>
@@ -227,15 +243,15 @@ export default function IndividualReportFullPage() {
             </div>
           </div>
 
-          {/* Analysis Items */}
           <div className="analysis-container">
             <h3 className="analysis-title">분석 결과 요약</h3>
+
             <div className="analysis-items">
               {analysisItems.map((item, itemIndex) => {
                 const isExpanded = expandedItems[itemIndex];
+
                 return (
                   <div key={itemIndex} className="analysis-card">
-                    {/* Card Header */}
                     <div
                       className="analysis-header"
                       onClick={() => toggleItemExpand(itemIndex)}
@@ -246,6 +262,7 @@ export default function IndividualReportFullPage() {
                     >
                       <div className="analysis-left">
                         <span className="analysis-icon">{item.icon}</span>
+
                         <div className="analysis-info">
                           <h4>{item.label}</h4>
                           <p>{item.description}</p>
@@ -263,25 +280,27 @@ export default function IndividualReportFullPage() {
                             {getStatusLabel(item.status)}
                           </span>
                         </div>
+
                         <div className="value-display">
                           <span className="value-number">
                             {item.value !== undefined ? item.value : '-'}
                           </span>
                           <span className="value-unit">{item.unit}</span>
                         </div>
+
                         <button className="expand-btn">
                           {isExpanded ? '▼' : '▶'}
                         </button>
                       </div>
                     </div>
 
-                    {/* Expandable Content */}
                     {isExpanded && (
                       <div className="analysis-detail">
                         <div className="detail-section">
                           <h5>권장 기준</h5>
                           <p>{item.recommendedText}</p>
                         </div>
+
                         <div className="detail-section">
                           <h5>상세 분석</h5>
                           <p>
@@ -296,7 +315,6 @@ export default function IndividualReportFullPage() {
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="full-report-actions">
             <button
               className="action-btn back-btn"
@@ -304,6 +322,7 @@ export default function IndividualReportFullPage() {
             >
               뒤로가기
             </button>
+
             <button
               className="action-btn download-btn"
               onClick={() =>
