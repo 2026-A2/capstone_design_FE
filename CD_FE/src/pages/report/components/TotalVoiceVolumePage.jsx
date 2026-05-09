@@ -6,22 +6,19 @@ import { getReportTrends } from '../../../api/reportApi';
 export default function TotalVoiceVolumePage() {
   const navigate = useNavigate();
 
-  const savedVoiceVolumeData = JSON.parse(
-    localStorage.getItem('voiceVolumeTrend'),
-  );
-  const [fillerData, setFillerData] = useState([]);
+  const [voiceVolumeData, setVoiceVolumeData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const savedData = JSON.parse(localStorage.getItem('fillerTrend'));
+      const savedData = JSON.parse(localStorage.getItem('voiceVolumeTrend'));
 
       if (savedData && savedData.length > 0) {
-        setFillerData(savedData);
+        setVoiceVolumeData(savedData);
         return;
       }
 
       const trends = await getReportTrends();
-      setFillerData(trends.fillerTrend);
+      setVoiceVolumeData(trends.voiceVolumeTrend || []);
     };
 
     fetchData();

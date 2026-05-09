@@ -59,7 +59,7 @@ export default function TotalBlinkPage() {
       </div>
 
       <InterviewTrendChart
-        data={blinkTrend}
+        data={blinkData}
         xKey="session"
         dataKey="value"
         yLabel="눈 깜빡임(회/분)"
