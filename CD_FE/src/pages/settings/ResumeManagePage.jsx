@@ -1,20 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useInterview } from '../../contexts/InterviewContext';
 import './ResumeManagePage.css';
 
 export default function ResumeManagePage() {
   const navigate = useNavigate();
-
+  const { resumeText: contextResumeText, setResumeText } = useInterview();
   const [resume, setResume] = useState('');
 
   useEffect(() => {
-    const savedResume = localStorage.getItem('resume') || '';
-    setResume(savedResume);
+    // 초기 로드: InterviewContext에서 값을 가져와서 로컬 state에 설정
+    setResume(contextResumeText);
     window.scrollTo(0, 0);
-  }, []);
+  }, [contextResumeText]);
 
   const handleSave = () => {
-    localStorage.setItem('resume', resume);
+    // 저장 버튼 클릭 시에만 InterviewContext에 저장
+    setResumeText(resume);
     alert('자소서가 저장되었습니다.');
   };
 
@@ -22,8 +24,8 @@ export default function ResumeManagePage() {
     const confirmed = window.confirm('저장된 자소서를 삭제하시겠습니까?');
     if (!confirmed) return;
 
-    localStorage.removeItem('resume');
     setResume('');
+    setResumeText('');
     alert('자소서가 삭제되었습니다.');
   };
 
