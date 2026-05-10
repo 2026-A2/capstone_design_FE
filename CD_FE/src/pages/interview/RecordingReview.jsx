@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useInterview } from '../../contexts/InterviewContext.jsx'
 
@@ -16,7 +17,23 @@ function RecordingReview() {
   const hasQuestions = questions.length > 0
   const isLastQuestion = currentQuestionIndex >= questions.length - 1
   const retryUsed = questionRetryUsed[currentQuestionIndex]
-  const hasRecording = Boolean(questionRecordings[currentQuestionIndex])
+  const currentRecording = questionRecordings[currentQuestionIndex]
+  const hasRecording = Boolean(currentRecording)
+  const recordingUrl = useMemo(() => {
+    if (!currentRecording) {
+      return ''
+    }
+
+    return URL.createObjectURL(currentRecording)
+  }, [currentRecording])
+
+  useEffect(() => {
+    return () => {
+      if (recordingUrl) {
+        URL.revokeObjectURL(recordingUrl)
+      }
+    }
+  }, [recordingUrl])
 
   const handleNextQuestion = () => {
     if (isLastQuestion) {
@@ -75,6 +92,14 @@ function RecordingReview() {
         <p className="mt-3 text-sm text-gray-500">
           질문 {currentQuestionIndex + 1} / {questions.length}
         </p>
+
+        {recordingUrl && (
+          <video
+            src={recordingUrl}
+            controls
+            className="mt-8 aspect-video w-full max-w-2xl rounded-3xl bg-gray-950 object-contain"
+          />
+        )}
 
         <div className="mt-10 flex w-full max-w-md flex-col gap-3">
           <button

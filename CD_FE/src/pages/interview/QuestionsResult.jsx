@@ -1,8 +1,33 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useInterview } from '../../contexts/InterviewContext.jsx'
 
 const ANSWER_SECONDS = 180
+const WEBM_MIME_TYPES = [
+  'video/webm;codecs=vp9,opus',
+  'video/webm;codecs=vp8,opus',
+  'video/webm',
+]
+
+const getSupportedWebmMimeType = () => {
+  if (typeof MediaRecorder === 'undefined') {
+    return ''
+  }
+
+  return WEBM_MIME_TYPES.find((mimeType) =>
+    MediaRecorder.isTypeSupported(mimeType),
+  ) || ''
+}
+
+const createRecordingFile = (chunks, mimeType, questionIndex) => {
+  const type = mimeType || 'video/webm'
+  const blob = new Blob(chunks, { type })
+
+  return new File([blob], `interview-question-${questionIndex + 1}.webm`, {
+    type,
+    lastModified: Date.now(),
+  })
+}
 
 function QuestionsResult() {
   const navigate = useNavigate()
@@ -21,7 +46,10 @@ function QuestionsResult() {
   const pendingTransitionRef = useRef(null)
   const [cameraState, setCameraState] = useState('loading')
   const [cameraError, setCameraError] = useState('')
-  const [secondsLeft, setSecondsLeft] = useState(ANSWER_SECONDS)
+  const [timer, setTimer] = useState({
+    questionIndex: 0,
+    secondsLeft: ANSWER_SECONDS,
+  })
   const [recordingState, setRecordingState] = useState('idle')
 
   const hasQuestions = questions.length > 0
@@ -29,10 +57,14 @@ function QuestionsResult() {
   const currentQuestion = hasQuestions ? questions[currentQuestionIndex] : ''
   const retryUsed = questionRetryUsed[currentQuestionIndex] ?? false
   const isTimerRunning = cameraState === 'ready' && recordingState === 'recording'
+  const secondsLeft =
+    timer.questionIndex === currentQuestionIndex
+      ? timer.secondsLeft
+      : ANSWER_SECONDS
   const minutes = String(Math.floor(secondsLeft / 60)).padStart(2, '0')
   const seconds = String(secondsLeft % 60).padStart(2, '0')
 
-  const moveToNextStep = () => {
+  const moveToNextStep = useCallback(() => {
     if (pendingTransitionRef.current === 'review') {
       pendingTransitionRef.current = null
       navigate('/interview/review')
@@ -50,9 +82,14 @@ function QuestionsResult() {
         navigate('/interview/questions')
       }
     }
-  }
+  }, [
+    isLastQuestion,
+    navigate,
+    resetInterview,
+    setCurrentQuestionIndex,
+  ])
 
-  const stopRecording = () => {
+  const stopRecording = useCallback(() => {
     const recorder = recorderRef.current
 
     if (!recorder || recorder.state === 'inactive') {
@@ -62,14 +99,22 @@ function QuestionsResult() {
 
     recorder.stop()
     recorderRef.current = null
-  }
+  }, [moveToNextStep])
 
-  const startRecording = () => {
+  const startRecording = useCallback(() => {
     const stream = streamRef.current
 
     if (!stream || typeof MediaRecorder === 'undefined') {
       setRecordingState('unsupported')
       setCameraError('이 브라우저에서는 녹화 기능을 지원하지 않습니다.')
+      return
+    }
+
+    const mimeType = getSupportedWebmMimeType()
+
+    if (!mimeType) {
+      setRecordingState('unsupported')
+      setCameraError('이 브라우저에서는 webm 녹화 형식을 지원하지 않습니다.')
       return
     }
 
@@ -79,7 +124,7 @@ function QuestionsResult() {
 
     recordedChunksRef.current = []
 
-    const recorder = new MediaRecorder(stream)
+    const recorder = new MediaRecorder(stream, { mimeType })
 
     recorder.ondataavailable = (event) => {
       if (event.data.size > 0) {
@@ -92,13 +137,15 @@ function QuestionsResult() {
     }
 
     recorder.onstop = () => {
-      const recordedBlob = new Blob(recordedChunksRef.current, {
-        type: recorder.mimeType || 'video/webm',
-      })
+      const recordedFile = createRecordingFile(
+        recordedChunksRef.current,
+        recorder.mimeType || mimeType,
+        currentQuestionIndex,
+      )
 
       setQuestionRecordings((prev) => {
         const next = [...prev]
-        next[currentQuestionIndex] = recordedBlob
+        next[currentQuestionIndex] = recordedFile
         return next
       })
       recordedChunksRef.current = []
@@ -112,8 +159,8 @@ function QuestionsResult() {
     }
 
     recorderRef.current = recorder
-    recorder.start()
-  }
+    recorder.start(1000)
+  }, [currentQuestionIndex, moveToNextStep, setQuestionRecordings])
 
   useEffect(() => {
     if (!hasQuestions) {
@@ -170,25 +217,29 @@ function QuestionsResult() {
   }, [hasQuestions])
 
   useEffect(() => {
-    if (!hasQuestions) {
-      return undefined
-    }
-
-    setSecondsLeft(ANSWER_SECONDS)
-    return undefined
-  }, [currentQuestionIndex, hasQuestions])
-
-  useEffect(() => {
     if (!hasQuestions || cameraState !== 'ready') {
       return undefined
     }
 
-    startRecording()
+    const startTimerId = window.setTimeout(() => {
+      setTimer({
+        questionIndex: currentQuestionIndex,
+        secondsLeft: ANSWER_SECONDS,
+      })
+      startRecording()
+    }, 0)
 
     return () => {
+      window.clearTimeout(startTimerId)
       stopRecording()
     }
-  }, [cameraState, currentQuestionIndex, hasQuestions])
+  }, [
+    cameraState,
+    currentQuestionIndex,
+    hasQuestions,
+    startRecording,
+    stopRecording,
+  ])
 
   useEffect(() => {
     if (!hasQuestions) {
@@ -206,13 +257,32 @@ function QuestionsResult() {
     }
 
     const timerId = window.setTimeout(() => {
-      setSecondsLeft((prev) => prev - 1)
+      setTimer((prev) => {
+        if (prev.questionIndex !== currentQuestionIndex) {
+          return {
+            questionIndex: currentQuestionIndex,
+            secondsLeft: ANSWER_SECONDS - 1,
+          }
+        }
+
+        return {
+          questionIndex: currentQuestionIndex,
+          secondsLeft: prev.secondsLeft - 1,
+        }
+      })
     }, 1000)
 
     return () => {
       window.clearTimeout(timerId)
     }
-  }, [hasQuestions, isTimerRunning, retryUsed, secondsLeft])
+  }, [
+    currentQuestionIndex,
+    hasQuestions,
+    isTimerRunning,
+    retryUsed,
+    secondsLeft,
+    stopRecording,
+  ])
 
   const handleAdvanceQuestion = () => {
     pendingTransitionRef.current = retryUsed ? 'next' : 'review'
