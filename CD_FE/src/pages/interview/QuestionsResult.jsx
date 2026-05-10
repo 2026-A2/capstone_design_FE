@@ -3,6 +3,15 @@ import { useNavigate } from 'react-router-dom'
 import { useInterview } from '../../contexts/InterviewContext.jsx'
 
 const ANSWER_SECONDS = 180
+const RECORDING_VIDEO_CONSTRAINTS = {
+  width: { ideal: 640 },
+  height: { ideal: 360 },
+  frameRate: { ideal: 24, max: 24 },
+}
+const RECORDER_OPTIONS = {
+  videoBitsPerSecond: 700_000,
+  audioBitsPerSecond: 64_000,
+}
 const WEBM_MIME_TYPES = [
   'video/webm;codecs=vp9,opus',
   'video/webm;codecs=vp8,opus',
@@ -124,7 +133,10 @@ function QuestionsResult() {
 
     recordedChunksRef.current = []
 
-    const recorder = new MediaRecorder(stream, { mimeType })
+    const recorder = new MediaRecorder(stream, {
+      mimeType,
+      ...RECORDER_OPTIONS,
+    })
 
     recorder.ondataavailable = (event) => {
       if (event.data.size > 0) {
@@ -142,6 +154,12 @@ function QuestionsResult() {
         recorder.mimeType || mimeType,
         currentQuestionIndex,
       )
+
+      console.info('[interview recording:created]', {
+        questionIndex: currentQuestionIndex,
+        type: recordedFile.type,
+        sizeMb: Number((recordedFile.size / 1024 / 1024).toFixed(2)),
+      })
 
       setQuestionRecordings((prev) => {
         const next = [...prev]
@@ -172,7 +190,7 @@ function QuestionsResult() {
     const startCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
+          video: RECORDING_VIDEO_CONSTRAINTS,
           audio: true,
         })
 
