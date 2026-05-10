@@ -17,6 +17,9 @@ const interviewApi = axios.create({
 const getAnalyzeUrl = ({ interviewId, order }) =>
   `${INTERVIEW_UPLOAD_PATH}${interviewId}/${order}/`;
 
+const getFinalizeUrl = (interviewId) =>
+  `${INTERVIEW_SESSION_PATH}${interviewId}/finalize/`;
+
 const logUploadSuccess = ({ interviewId, order, url, questionText, response }) => {
   console.info('[interview upload:success]', {
     interviewId,
@@ -56,6 +59,25 @@ const logSessionFailure = ({ url, payload, error }) => {
     status: error.response?.status,
     data: error.response?.data,
     headers: error.response?.headers,
+    message: error.message,
+  });
+};
+
+const logFinalizeSuccess = ({ interviewId, url, response }) => {
+  console.info('[interview report:success]', {
+    interviewId,
+    url,
+    status: response.status,
+    data: response.data,
+  });
+};
+
+const logFinalizeFailure = ({ interviewId, url, error }) => {
+  console.error('[interview report:failure]', {
+    interviewId,
+    url,
+    status: error.response?.status,
+    data: error.response?.data,
     message: error.message,
   });
 };
@@ -145,4 +167,20 @@ export const uploadInterviewQuestionRecording = async ({
     order,
     questionText,
   });
+};
+
+export const getInterviewFinalReport = async (interviewId) => {
+  const url = getFinalizeUrl(interviewId);
+
+  try {
+    const response = await interviewApi.get(url);
+
+    logFinalizeSuccess({ interviewId, url, response });
+
+    return response.data;
+  } catch (error) {
+    logFinalizeFailure({ interviewId, url, error });
+
+    throw error;
+  }
 };

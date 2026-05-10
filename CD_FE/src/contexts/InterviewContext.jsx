@@ -10,6 +10,7 @@ function InterviewProvider({ children }) {
   const [resumeText, setResumeTextState] = useState('');
   const [questionCount, setQuestionCount] = useState('');
   const [interviewSession, setInterviewSession] = useState(null);
+  const [finalReport, setFinalReport] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [questionRecordings, setQuestionRecordings] = useState([]);
@@ -104,6 +105,7 @@ function InterviewProvider({ children }) {
     setResumeText('');
     setQuestionCount('');
     setInterviewSession(null);
+    setFinalReport(null);
     setQuestions([]);
     setCurrentQuestionIndex(0);
     setQuestionRecordings([]);
@@ -119,6 +121,7 @@ function InterviewProvider({ children }) {
       resumeText,
       questionCount,
       interviewSession,
+      finalReport,
       questions,
       currentQuestionIndex,
       questionRecordings,
@@ -130,6 +133,7 @@ function InterviewProvider({ children }) {
       setResumeText,
       setQuestionCount,
       setInterviewSession,
+      setFinalReport,
       setQuestions,
       setCurrentQuestionIndex,
       setQuestionRecordings,
@@ -145,6 +149,7 @@ function InterviewProvider({ children }) {
       resumeText,
       questionCount,
       interviewSession,
+      finalReport,
       questions,
       currentQuestionIndex,
       questionRecordings,
