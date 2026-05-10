@@ -34,7 +34,6 @@ function QuestionsResult() {
   const {
     questions,
     currentQuestionIndex,
-    questionRetryUsed,
     setCurrentQuestionIndex,
     setQuestionRecordings,
     resetInterview,
@@ -54,8 +53,9 @@ function QuestionsResult() {
 
   const hasQuestions = questions.length > 0
   const isLastQuestion = currentQuestionIndex >= questions.length - 1
-  const currentQuestion = hasQuestions ? questions[currentQuestionIndex] : ''
-  const retryUsed = questionRetryUsed[currentQuestionIndex] ?? false
+  const currentQuestion = hasQuestions ? questions[currentQuestionIndex] : null
+  const currentQuestionText =
+    currentQuestion?.question_text || currentQuestion || ''
   const isTimerRunning = cameraState === 'ready' && recordingState === 'recording'
   const secondsLeft =
     timer.questionIndex === currentQuestionIndex
@@ -251,7 +251,7 @@ function QuestionsResult() {
     }
 
     if (secondsLeft <= 0) {
-      pendingTransitionRef.current = retryUsed ? 'next' : 'review'
+      pendingTransitionRef.current = 'review'
       stopRecording()
       return undefined
     }
@@ -279,13 +279,12 @@ function QuestionsResult() {
     currentQuestionIndex,
     hasQuestions,
     isTimerRunning,
-    retryUsed,
     secondsLeft,
     stopRecording,
   ])
 
   const handleAdvanceQuestion = () => {
-    pendingTransitionRef.current = retryUsed ? 'next' : 'review'
+    pendingTransitionRef.current = 'review'
     stopRecording()
   }
 
@@ -327,7 +326,7 @@ function QuestionsResult() {
               {isTimerRunning ? `남은 시간 ${minutes}:${seconds}` : '카메라 연결 후 카운트다운이 시작됩니다'}
             </div>
             <div className="mt-6 flex flex-1 items-center justify-center rounded-3xl bg-gray-50 px-8 py-10 text-left">
-              <p className="text-3xl font-bold leading-relaxed text-gray-900">{currentQuestion}</p>
+              <p className="text-3xl font-bold leading-relaxed text-gray-900">{currentQuestionText}</p>
             </div>
 
             <button
@@ -335,7 +334,7 @@ function QuestionsResult() {
               onClick={handleAdvanceQuestion}
               className="mt-6 rounded-2xl bg-blue-500 px-6 py-4 text-lg font-semibold text-white transition hover:bg-blue-600"
             >
-              {retryUsed ? (isLastQuestion ? '면접 종료' : '다음 질문으로') : '답변하기'}
+              답변 완료
             </button>
           </section>
 

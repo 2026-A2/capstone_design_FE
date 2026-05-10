@@ -1,5 +1,6 @@
 import { createContext, useContext, useMemo, useState, useEffect } from 'react';
 import axios from 'axios';
+import { createInterviewSession } from '../api/interviewRecordingApi';
 
 const InterviewContext = createContext(null);
 
@@ -8,6 +9,7 @@ function InterviewProvider({ children }) {
   const [industry, setIndustry] = useState('');
   const [resumeText, setResumeTextState] = useState('');
   const [questionCount, setQuestionCount] = useState('');
+  const [interviewSession, setInterviewSession] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [questionRecordings, setQuestionRecordings] = useState([]);
@@ -43,8 +45,14 @@ function InterviewProvider({ children }) {
       );
 
       const receivedQuestions = Array.isArray(response.data?.questions)
-        ? response.data.questions
+        ? response.data.questions.map((question, index) => ({
+            id: index,
+            order: index + 1,
+            question_text: question,
+            status: 'pending',
+          }))
         : [];
+
       setQuestions(receivedQuestions);
       setCurrentQuestionIndex(0);
       setQuestionRecordings(new Array(receivedQuestions.length).fill(null));
@@ -58,11 +66,44 @@ function InterviewProvider({ children }) {
     }
   };
 
+  const requestInterviewSession = async (sessionQuestions = questions) => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const session = await createInterviewSession({
+        questionType,
+        questions: sessionQuestions,
+      });
+      const sessionQuestionsResponse =
+        session.questions || session.question_list || session.data?.questions;
+
+      if (Array.isArray(sessionQuestionsResponse)) {
+        setQuestions((prev) =>
+          prev.map((question, index) => ({
+            ...question,
+            id: sessionQuestionsResponse[index]?.id ?? question.id,
+            status: sessionQuestionsResponse[index]?.status ?? question.status,
+          })),
+        );
+      }
+
+      setInterviewSession(session);
+      return session;
+    } catch (requestError) {
+      setError('면접 세션 생성에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      throw requestError;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const resetInterview = () => {
     setQuestionType('');
     setIndustry('');
     setResumeText('');
     setQuestionCount('');
+    setInterviewSession(null);
     setQuestions([]);
     setCurrentQuestionIndex(0);
     setQuestionRecordings([]);
@@ -77,6 +118,7 @@ function InterviewProvider({ children }) {
       industry,
       resumeText,
       questionCount,
+      interviewSession,
       questions,
       currentQuestionIndex,
       questionRecordings,
@@ -87,11 +129,13 @@ function InterviewProvider({ children }) {
       setIndustry,
       setResumeText,
       setQuestionCount,
+      setInterviewSession,
       setQuestions,
       setCurrentQuestionIndex,
       setQuestionRecordings,
       setQuestionRetryUsed,
       setError,
+      requestInterviewSession,
       requestInterviewQuestions,
       resetInterview,
     }),
@@ -100,6 +144,7 @@ function InterviewProvider({ children }) {
       industry,
       resumeText,
       questionCount,
+      interviewSession,
       questions,
       currentQuestionIndex,
       questionRecordings,

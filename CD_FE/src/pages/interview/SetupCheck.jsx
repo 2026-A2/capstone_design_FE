@@ -4,7 +4,12 @@ import { useInterview } from '../../contexts/InterviewContext.jsx'
 
 function SetupCheck() {
   const navigate = useNavigate()
-  const { questions } = useInterview()
+  const {
+    questions,
+    loading,
+    requestInterviewQuestions,
+    requestInterviewSession,
+  } = useInterview()
   const videoRef = useRef(null)
   const canvasRef = useRef(null)
   const streamRef = useRef(null)
@@ -80,6 +85,23 @@ function SetupCheck() {
     setErrorMessage('')
   }
 
+  const handleNext = async () => {
+    if (!capturedImage || loading) {
+      return
+    }
+
+    setErrorMessage('')
+
+    try {
+      const generatedQuestions = await requestInterviewQuestions()
+      await requestInterviewSession(generatedQuestions)
+      stopStream()
+      navigate('/interview/preparation')
+    } catch {
+      setErrorMessage('면접 질문 생성 또는 세션 생성에 실패했습니다. 서버 연결 상태를 확인해주세요.')
+    }
+  }
+
   useEffect(() => {
     return () => {
       stopStream()
@@ -142,11 +164,11 @@ function SetupCheck() {
 
               <button
                 type="button"
-                onClick={() => navigate('/interview/preparation')}
-                disabled={!capturedImage}
+                onClick={handleNext}
+                disabled={!capturedImage || loading}
                 className="rounded-xl border border-gray-300 bg-white px-4 py-3 font-semibold text-gray-800 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400"
               >
-                다음
+                {loading ? '면접 준비 중...' : '다음'}
               </button>
             </div>
           </div>

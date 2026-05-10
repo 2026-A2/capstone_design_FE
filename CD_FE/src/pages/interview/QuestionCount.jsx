@@ -11,7 +11,6 @@ function QuestionCount() {
     setQuestionCount,
     loading,
     error,
-    requestInterviewQuestions,
   } = useInterview()
 
   const isValid = Number(questionCount) >= 2 && Number(questionCount) <= 5
@@ -28,7 +27,6 @@ function QuestionCount() {
     }
 
     try {
-      await requestInterviewQuestions()
       navigate('/interview/setup')
     } catch {
       // Error message is managed by context state.
@@ -81,7 +79,7 @@ function QuestionCount() {
         disabled={!isValid || !hasValidBasis || loading}
         onClick={handleNext}
       >
-        {loading ? '질문 생성 중...' : '다음'}
+        다음
       </button>
     </div>
   )

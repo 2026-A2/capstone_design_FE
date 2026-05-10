@@ -1,11 +1,13 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { uploadInterviewQuestionRecording } from '../../api/interviewRecordingApi'
 import { useInterview } from '../../contexts/InterviewContext.jsx'
 
 function RecordingReview() {
   const navigate = useNavigate()
   const {
     questions,
+    interviewSession,
     currentQuestionIndex,
     questionRetryUsed,
     questionRecordings,
@@ -13,9 +15,15 @@ function RecordingReview() {
     setQuestionRecordings,
     setQuestionRetryUsed,
   } = useInterview()
+  const [uploadState, setUploadState] = useState('idle')
+  const [uploadError, setUploadError] = useState('')
 
   const hasQuestions = questions.length > 0
   const isLastQuestion = currentQuestionIndex >= questions.length - 1
+  const currentQuestion = questions[currentQuestionIndex]
+  const currentQuestionOrder = currentQuestionIndex + 1
+  const currentQuestionText =
+    currentQuestion?.question_text || currentQuestion?.question || currentQuestion || ''
   const retryUsed = questionRetryUsed[currentQuestionIndex]
   const currentRecording = questionRecordings[currentQuestionIndex]
   const hasRecording = Boolean(currentRecording)
@@ -35,7 +43,35 @@ function RecordingReview() {
     }
   }, [recordingUrl])
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
+    if (uploadState === 'uploading') {
+      return
+    }
+
+    if (!interviewSession?.id) {
+      setUploadState('error')
+      setUploadError('면접 세션 정보가 없습니다. 카메라 설정 단계부터 다시 진행해주세요.')
+      return
+    }
+
+    setUploadState('uploading')
+    setUploadError('')
+
+    try {
+      await uploadInterviewQuestionRecording({
+        recording: currentRecording,
+        interviewId: interviewSession?.id,
+        order: currentQuestionOrder,
+        questionText: currentQuestionText,
+      })
+
+      setUploadState('success')
+    } catch {
+      setUploadState('error')
+      setUploadError('녹화 영상 업로드에 실패했습니다. 백엔드 API 연결 상태를 확인해주세요.')
+      return
+    }
+
     if (isLastQuestion) {
       navigate('/interview/complete')
       return
@@ -92,6 +128,11 @@ function RecordingReview() {
         <p className="mt-3 text-sm text-gray-500">
           질문 {currentQuestionIndex + 1} / {questions.length}
         </p>
+        {uploadError && (
+          <p className="mt-4 text-sm font-semibold text-red-600">
+            {uploadError}
+          </p>
+        )}
 
         {recordingUrl && (
           <video
@@ -105,9 +146,14 @@ function RecordingReview() {
           <button
             type="button"
             onClick={handleNextQuestion}
-            className="rounded-2xl bg-blue-500 px-6 py-4 text-lg font-semibold text-white transition hover:bg-blue-600"
+            disabled={uploadState === 'uploading'}
+            className="rounded-2xl bg-blue-500 px-6 py-4 text-lg font-semibold text-white transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-300"
           >
-            다음 질문으로
+            {uploadState === 'uploading'
+              ? '녹화 업로드 중...'
+              : isLastQuestion
+                ? '면접 완료'
+                : '다음 질문으로'}
           </button>
 
           <button

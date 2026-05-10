@@ -5,119 +5,144 @@ const INTERVIEW_API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
   'http://localhost:8000';
 const INTERVIEW_UPLOAD_PATH =
-  import.meta.env.VITE_INTERVIEW_UPLOAD_PATH || '/api/interviews/';
-const DEFAULT_STATUS = 'recorded';
+  import.meta.env.VITE_INTERVIEW_UPLOAD_PATH || '/behavior/analyze/';
+const INTERVIEW_SESSION_PATH =
+  import.meta.env.VITE_INTERVIEW_SESSION_PATH || '/interview/';
 
 const interviewApi = axios.create({
   baseURL: INTERVIEW_API_BASE_URL,
   timeout: 180000,
 });
 
-const getInterviewTitle = ({ questionType, jobGroup, createdAt }) => {
-  const typeLabel = questionType === 'resume' ? '자소서 기반' : '산업 기반';
-  const targetLabel = jobGroup ? ` - ${jobGroup}` : '';
-  const dateLabel = new Intl.DateTimeFormat('ko-KR', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(createdAt);
+const getAnalyzeUrl = ({ interviewId, order }) =>
+  `${INTERVIEW_UPLOAD_PATH}${interviewId}/${order}/`;
 
-  return `${typeLabel} 면접${targetLabel} (${dateLabel})`;
+const logUploadSuccess = ({ interviewId, order, url, questionText, response }) => {
+  console.info('[interview upload:success]', {
+    interviewId,
+    order,
+    url,
+    status: response.status,
+    questionText,
+    data: response.data,
+  });
 };
 
-export const createInterviewMetadata = ({
-  questionType,
-  resumeText,
-  industry,
-  recording,
-  title,
-  status = DEFAULT_STATUS,
-  createdAt = new Date(),
-}) => {
-  const interviewType = questionType || 'unknown';
-  const jobGroup = interviewType === 'industry' ? industry : '';
-  const videoPath = recording?.name || '';
+const logUploadFailure = ({ interviewId, order, url, questionText, error }) => {
+  console.error('[interview upload:failure]', {
+    interviewId,
+    order,
+    url,
+    questionText,
+    status: error.response?.status,
+    data: error.response?.data,
+    message: error.message,
+  });
+};
 
-  return {
-    title:
-      title ||
-      getInterviewTitle({
-        questionType: interviewType,
-        jobGroup,
-        createdAt,
-      }),
-    interview_type: interviewType,
-    cover_letter: interviewType === 'resume' ? resumeText || '' : '',
-    job_group: jobGroup,
-    video_path: videoPath,
-    status,
-    created_at: createdAt.toISOString(),
+const logSessionSuccess = ({ url, payload, response }) => {
+  console.info('[interview session:success]', {
+    url,
+    status: response.status,
+    payload,
+    data: response.data,
+  });
+};
+
+const logSessionFailure = ({ url, payload, error }) => {
+  console.error('[interview session:failure]', {
+    url,
+    payload,
+    status: error.response?.status,
+    data: error.response?.data,
+    headers: error.response?.headers,
+    message: error.message,
+  });
+};
+
+const getApiInterviewType = (questionType) =>
+  questionType === 'resume' ? 'RESUME' : 'JOB';
+
+export const createInterviewSession = async ({
+  questionType,
+  questions,
+}) => {
+  const payload = {
+    interview_type: getApiInterviewType(questionType),
+    questions: questions.map((question) =>
+      typeof question === 'string' ? question : question.question_text,
+    ),
   };
+
+  try {
+    const response = await interviewApi.post(INTERVIEW_SESSION_PATH, payload);
+
+    logSessionSuccess({
+      url: INTERVIEW_SESSION_PATH,
+      payload,
+      response,
+    });
+
+    return {
+      ...response.data,
+      id: response.data?.id || response.data?.interview_id,
+    };
+  } catch (error) {
+    logSessionFailure({
+      url: INTERVIEW_SESSION_PATH,
+      payload,
+      error,
+    });
+
+    throw error;
+  }
 };
 
 export const buildInterviewVideoFormData = ({
   recording,
-  metadata,
+  questionText,
 }) => {
   const formData = new FormData();
-  const filename = recording?.name || metadata.video_path || 'interview.webm';
+  const filename = recording?.name || 'interview.webm';
 
-  formData.append('video', recording, filename);
-
-  Object.entries(metadata).forEach(([key, value]) => {
-    formData.append(key, value ?? '');
-  });
-
-  formData.append('metadata', JSON.stringify(metadata));
+  formData.append('video_file', recording, filename);
+  formData.append('question_text', questionText || '');
 
   return formData;
 };
 
-export const buildInterviewUploadRequests = ({
-  questionRecordings,
-  questionType,
-  resumeText,
-  industry,
+export const uploadInterviewVideo = async ({
+  recording,
+  interviewId,
+  order,
+  questionText,
 }) => {
-  return questionRecordings
-    .map((recording, index) => {
-      if (!recording) {
-        return null;
-      }
+  const formData = buildInterviewVideoFormData({ recording, questionText });
+  const url = getAnalyzeUrl({ interviewId, order });
 
-      const metadata = createInterviewMetadata({
-        questionType,
-        resumeText,
-        industry,
-        recording,
-        title: `면접 ${index + 1}번 질문 녹화`,
-      });
+  try {
+    const response = await interviewApi.post(url, formData);
 
-      return {
-        metadata,
-        formData: buildInterviewVideoFormData({
-          recording,
-          metadata,
-        }),
-      };
-    })
-    .filter(Boolean);
+    logUploadSuccess({ interviewId, order, url, questionText, response });
+
+    return response.data;
+  } catch (error) {
+    logUploadFailure({ interviewId, order, url, questionText, error });
+
+    throw error;
+  }
 };
 
-export const uploadInterviewVideo = async ({ recording, metadata }) => {
-  const formData = buildInterviewVideoFormData({ recording, metadata });
-  const response = await interviewApi.post(INTERVIEW_UPLOAD_PATH, formData);
-
-  return response.data;
-};
-
-export const uploadInterviewVideos = async (payload) => {
-  const uploadRequests = buildInterviewUploadRequests(payload);
-
-  return Promise.all(
-    uploadRequests.map(({ formData }) =>
-      interviewApi
-        .post(INTERVIEW_UPLOAD_PATH, formData)
-        .then((response) => response.data),
-    ),
-  );
+export const uploadInterviewQuestionRecording = async ({
+  recording,
+  interviewId,
+  order,
+  questionText,
+}) => {
+  return uploadInterviewVideo({
+    recording,
+    interviewId,
+    order,
+    questionText,
+  });
 };
