@@ -1,14 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import InterviewTrendChart from './components/InterviewTrendChart';
 import { getTrendResult } from './utils/reportStorage';
 
 export default function TotalReportPage() {
-  const [cameraData, setCameraData] = useState([]);
-
-  useEffect(() => {
-    const saved = getTrendResult('cameraGazeTrend');
-    setCameraData(saved);
-  }, []);
+  const [cameraData] = useState(() => getTrendResult('cameraGazeTrend'));
 
   return (
     <div style={styles.page}>

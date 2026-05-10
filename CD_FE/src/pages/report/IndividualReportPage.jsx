@@ -1,22 +1,26 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './IndividualReportPage.css';
 import { individualReports } from '../../mockdata/report/individualMock';
 
-export default function IndividualReportPage() {
-  const navigate = useNavigate();
-  const [reportList, setReportList] = useState([]);
-
-  const [selectedType, setSelectedType] = useState('all');
-  const [searchText, setSearchText] = useState('');
-
-  useEffect(() => {
+const getInitialReports = () => {
+  try {
     const savedReports = JSON.parse(
       localStorage.getItem('individualReports') || 'null',
     );
 
-    setReportList(savedReports || individualReports);
-  }, []);
+    return Array.isArray(savedReports) ? savedReports : individualReports;
+  } catch {
+    return individualReports;
+  }
+};
+
+export default function IndividualReportPage() {
+  const navigate = useNavigate();
+  const [reportList] = useState(getInitialReports);
+
+  const [selectedType, setSelectedType] = useState('all');
+  const [searchText, setSearchText] = useState('');
 
   const filteredReports = useMemo(() => {
     const keyword = searchText.trim().toLowerCase();

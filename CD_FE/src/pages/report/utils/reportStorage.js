@@ -1,10 +1,19 @@
+const parseSavedArray = (storageKey) => {
+  try {
+    const savedValue = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    return Array.isArray(savedValue) ? savedValue : [];
+  } catch {
+    return [];
+  }
+};
+
 export const saveTrendResult = (storageKey, value) => {
   const today = new Date();
   const month = today.getMonth() + 1;
   const day = today.getDate();
   const rawDate = `${month}/${day}`;
 
-  const savedData = JSON.parse(localStorage.getItem(storageKey)) || [];
+  const savedData = parseSavedArray(storageKey);
 
   const sameDateItems = savedData.filter((item) => item.rawDate === rawDate);
   const label =
@@ -25,5 +34,5 @@ export const saveTrendResult = (storageKey, value) => {
 };
 
 export const getTrendResult = (storageKey) => {
-  return JSON.parse(localStorage.getItem(storageKey)) || [];
+  return parseSavedArray(storageKey);
 };
