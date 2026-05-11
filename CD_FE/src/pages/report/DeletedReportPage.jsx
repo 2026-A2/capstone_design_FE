@@ -69,7 +69,20 @@ export default function DeletedReportPage() {
     const restoreReports = deletedStorage.reports.filter((report) =>
       selectedRestoreIds.includes(report.id),
     );
+    const restoredSessions = restoreReports.map(
+      (report) => report.session ?? report.id,
+    );
+    const deletedSessions =
+      JSON.parse(localStorage.getItem('deletedReportSessions')) || [];
 
+    const updatedDeletedSessions = deletedSessions.filter(
+      (session) => !restoredSessions.includes(session),
+    );
+
+    localStorage.setItem(
+      'deletedReportSessions',
+      JSON.stringify(updatedDeletedSessions),
+    );
     const restoreSessions = restoreReports.map(
       (report) => report.session || report.id,
     );

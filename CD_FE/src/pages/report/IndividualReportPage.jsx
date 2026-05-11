@@ -106,9 +106,23 @@ export default function IndividualReportPage() {
     const deletedReports = reportList.filter((report) =>
       selectedIds.includes(report.id),
     );
+    const deletedSessions =
+      JSON.parse(localStorage.getItem('deletedReportSessions')) || [];
 
-    const deletedSessions = deletedReports.map(
-      (report) => report.session || report.id,
+    const sessionsToDelete = deletedReports.map((report) => report.id);
+
+    const updatedDeletedSessions = [
+      ...new Set([...deletedSessions, ...sessionsToDelete]),
+    ];
+
+    localStorage.setItem(
+      'deletedReportSessions',
+      JSON.stringify(updatedDeletedSessions),
+    );
+
+    localStorage.setItem(
+      'deletedReportSessions',
+      JSON.stringify(updatedDeletedSessions),
     );
 
     const updatedReports = reportList.filter(
@@ -273,42 +287,43 @@ export default function IndividualReportPage() {
             />
 
             <div className="report-action-row">
-              <button type="button" onClick={handleDeleteSelected}>
-                선택 삭제
-              </button>
+              <div className="filter-buttons-wrapper">
+                <button
+                  className={selectedType === 'all' ? 'active' : ''}
+                  onClick={() => setSelectedType('all')}
+                >
+                  전체
+                </button>
 
-              <button type="button" onClick={handleDeleteAll}>
-                전체 삭제
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate('/report/individual/trash')}
-              >
-                삭제 보관함
-              </button>
-            </div>
+                <button
+                  className={selectedType === 'resume' ? 'active' : ''}
+                  onClick={() => setSelectedType('resume')}
+                >
+                  자소서 기반 면접
+                </button>
 
-            <div className="individual-filter-buttons">
-              <button
-                className={selectedType === 'all' ? 'active' : ''}
-                onClick={() => setSelectedType('all')}
-              >
-                전체
-              </button>
+                <button
+                  className={selectedType === 'industry' ? 'active' : ''}
+                  onClick={() => setSelectedType('industry')}
+                >
+                  산업 기반 면접
+                </button>
+              </div>
+              <div className="action-buttons-wrapper">
+                <button type="button" onClick={handleDeleteSelected}>
+                  선택 삭제
+                </button>
 
-              <button
-                className={selectedType === 'resume' ? 'active' : ''}
-                onClick={() => setSelectedType('resume')}
-              >
-                자소서 기반 면접
-              </button>
-
-              <button
-                className={selectedType === 'industry' ? 'active' : ''}
-                onClick={() => setSelectedType('industry')}
-              >
-                산업 기반 면접
-              </button>
+                <button type="button" onClick={handleDeleteAll}>
+                  전체 삭제
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate('/report/individual/trash')}
+                >
+                  삭제 보관함
+                </button>
+              </div>
             </div>
           </div>
 

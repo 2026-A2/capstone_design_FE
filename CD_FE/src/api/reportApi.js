@@ -2,6 +2,7 @@ import axiosInstance from './axiosInstance';
 
 import { individualReports } from '../mockdata/report/individualMock';
 import { individualReportsDetail } from '../mockdata/report/individualmockdetail';
+import { filterDeletedSessions } from '../pages/report/utils/filterDeletedSessions';
 
 import {
   speechRateTrend,
@@ -49,17 +50,17 @@ export const getIndividualReportDetail = async (id) => {
 export const getReportTrends = async () => {
   if (USE_MOCK) {
     return {
-      speechRateTrend,
-      voiceVolumeTrend,
-      silenceTrend,
-      fillerTrend,
-      smileTrend,
-      eyeContactTrend,
-      blinkTrend,
-      endingBlurTrend,
-      nodTrend,
-      shoulderTiltTrend,
-      bodyShakeTrend,
+      speechRateTrend: filterDeletedSessions(speechRateTrend),
+      voiceVolumeTrend: filterDeletedSessions(voiceVolumeTrend),
+      silenceTrend: filterDeletedSessions(silenceTrend),
+      fillerTrend: filterDeletedSessions(fillerTrend),
+      smileTrend: filterDeletedSessions(smileTrend),
+      eyeContactTrend: filterDeletedSessions(eyeContactTrend),
+      blinkTrend: filterDeletedSessions(blinkTrend),
+      endingBlurTrend: filterDeletedSessions(endingBlurTrend),
+      nodTrend: filterDeletedSessions(nodTrend),
+      shoulderTiltTrend: filterDeletedSessions(shoulderTiltTrend),
+      bodyShakeTrend: filterDeletedSessions(bodyShakeTrend),
     };
   }
 
