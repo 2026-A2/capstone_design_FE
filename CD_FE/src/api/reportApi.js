@@ -22,7 +22,18 @@ const USE_MOCK = true;
 
 export const getIndividualReports = async () => {
   if (USE_MOCK) {
+    // 개발 중에는 항상 최신 mock 데이터 사용 (localStorage 무시)
     return individualReports;
+  }
+
+  // 프로덕션: localStorage 확인 후 API 호출
+  try {
+    const savedReports = JSON.parse(localStorage.getItem('individualReports'));
+    if (savedReports && Array.isArray(savedReports)) {
+      return savedReports;
+    }
+  } catch (error) {
+    console.error('localStorage 읽기 실패:', error);
   }
 
   const response = await axiosInstance.get('/reports');
@@ -31,7 +42,23 @@ export const getIndividualReports = async () => {
 
 export const getIndividualReportSummary = async (id) => {
   if (USE_MOCK) {
+    // 개발 중에는 항상 최신 mock 데이터 사용 (localStorage 무시)
     return individualReports.find((report) => report.id === Number(id));
+  }
+
+  // 프로덕션: localStorage 확인 후 API 호출
+  try {
+    const savedReports = JSON.parse(localStorage.getItem('individualReports'));
+    if (savedReports && Array.isArray(savedReports)) {
+      const savedReport = savedReports.find(
+        (report) => report.id === Number(id),
+      );
+      if (savedReport) {
+        return savedReport;
+      }
+    }
+  } catch (error) {
+    console.error('localStorage 읽기 실패:', error);
   }
 
   const response = await axiosInstance.get(`/reports/${id}/summary`);

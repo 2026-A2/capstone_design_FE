@@ -5,10 +5,10 @@ export const speechRateTrend = [
 ];
 
 export const voiceVolumeTrend = [
-  { session: 1, maxVoiceVolume: 72, minVoiceVolume: 50 },
-  { session: 2, maxVoiceVolume: 75, minVoiceVolume: 48 },
-  { session: 3, maxVoiceVolume: 78, minVoiceVolume: 52 },
-  { session: 4, maxVoiceVolume: 73, minVoiceVolume: 50 },
+  { session: 1, avgVoiceVolume: -28 },
+  { session: 2, avgVoiceVolume: -32 },
+  { session: 3, avgVoiceVolume: -18 },
+  { session: 4, avgVoiceVolume: -40 },
 ];
 
 export const silenceTrend = [

@@ -127,7 +127,7 @@ export default function TotalSilencePage() {
       <div style={styles.infoBox}>
         <div style={styles.infoTitle}>분석 기준</div>
         <div style={styles.infoText}>
-          침묵 구간은 면접 답변 중 일정 시간 이상 말이 멈춘 횟수를 의미합니다.
+          침묵 구간은 면접 답변 중 3초 이상 말이 멈춘 횟수를 의미합니다.
           일반적으로 긴 침묵 구간은 3회 이하로 유지하는 것을 권장 기준으로 볼 수
           있습니다.
         </div>

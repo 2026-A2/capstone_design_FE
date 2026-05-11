@@ -36,3 +36,30 @@ export const saveTrendResult = (storageKey, value) => {
 export const getTrendResult = (storageKey) => {
   return parseSavedArray(storageKey);
 };
+const DELETED_REPORT_IDS_KEY = 'deletedReportIds';
+
+export const getDeletedReportIds = () => {
+  return parseSavedArray(DELETED_REPORT_IDS_KEY);
+};
+
+export const saveDeletedReportIds = (ids) => {
+  localStorage.setItem(DELETED_REPORT_IDS_KEY, JSON.stringify(ids));
+};
+
+export const addDeletedReportId = (id) => {
+  const deletedIds = getDeletedReportIds();
+
+  if (deletedIds.includes(id)) return;
+
+  saveDeletedReportIds([...deletedIds, id]);
+};
+
+export const restoreDeletedReportId = (id) => {
+  const deletedIds = getDeletedReportIds();
+
+  saveDeletedReportIds(deletedIds.filter((deletedId) => deletedId !== id));
+};
+
+export const clearDeletedReportIds = () => {
+  localStorage.removeItem(DELETED_REPORT_IDS_KEY);
+};

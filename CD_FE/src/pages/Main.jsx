@@ -30,7 +30,7 @@ function Main() {
           className="bg-white text-gray-700 px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition"
           onClick={() => navigate('/settings/analysis-guide')}
         >
-          분석 항목 안내
+          분석 기준 안내
         </button>
 
         <button

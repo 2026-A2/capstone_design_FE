@@ -9,9 +9,9 @@ export const individualReports = [
     habitSummary: '고개 움직임이 약간 있음',
     postureSummary: '전반적으로 안정적인 자세',
     detail: {
-      eyeContactRate: 61,
+      eyeContactRate: 59,
       speechRate: 132,
-      voiceVolume: 64,
+      voiceVolume: -15,
       silenceCount: 2,
       fillerCount: 3,
       smileRate: 42,
@@ -34,7 +34,7 @@ export const individualReports = [
     detail: {
       eyeContactRate: 68,
       speechRate: 138,
-      voiceVolume: 66,
+      voiceVolume: -25,
       silenceCount: 1,
       fillerCount: 4,
       smileRate: 51,
@@ -57,7 +57,7 @@ export const individualReports = [
     detail: {
       eyeContactRate: 74,
       speechRate: 145,
-      voiceVolume: 67,
+      voiceVolume: -18,
       silenceCount: 1,
       fillerCount: 1,
       smileRate: 58,

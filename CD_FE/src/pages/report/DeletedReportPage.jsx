@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './DeletedReportPage.css';
+import { individualReports } from '../../mockdata/report/individualMock';
+import { getDeletedReportIds, addDeletedReportId } from './utils/reportStorage';
 
 const REPORT_STORAGE_KEY = 'individualReports';
 const DELETED_STORAGE_KEY = 'deletedReportsStorage';

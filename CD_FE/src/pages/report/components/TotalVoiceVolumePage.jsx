@@ -61,30 +61,28 @@ export default function TotalVoiceVolumePage() {
       <InterviewTrendChart
         data={voiceVolumeData}
         xKey="session"
-        dataKey="maxVoiceVolume"
+        dataKey="avgVoiceVolume"
         lines={[
           {
-            dataKey: 'maxVoiceVolume',
-            name: '최대 음성 크기',
+            dataKey: 'avgVoiceVolume',
+            name: '평균 음성 크기',
             stroke: '#2563eb',
-          },
-          {
-            dataKey: 'minVoiceVolume',
-            name: '최소 음성 크기',
-            stroke: '#1d4ed8',
           },
         ]}
         yLabel="음성 크기(dB)"
-        minValue={0}
-        maxValue={100}
-        standardMin={50}
-        standardMax={70}
+        minValue={-60}
+        maxValue={0}
+        standardMin={-35}
+        standardMax={-20}
       />
 
       <div style={styles.infoBox}>
         <div style={styles.infoTitle}>분석 기준</div>
         <div style={styles.infoText}>
-          일반적으로 음성크기는 50~70dB 범위를 권장 기준으로 볼 수 있습니다.
+          음성 크기는 녹음 파일 내 최대 음량을 0dB로 둔 상대값 기준으로
+          분석합니다. 면접에서는 -20~-35dB 범위가 가장 이상적인 정상 범위이며,
+          -10dB 이상은 매우 큰 목소리, -50dB 미만은 전달력이 낮은 매우 작은
+          목소리로 볼 수 있습니다.
         </div>
       </div>
 

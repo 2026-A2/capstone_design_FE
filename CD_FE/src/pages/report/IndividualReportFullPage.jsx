@@ -1,4 +1,4 @@
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import './IndividualReportFullPage.css';
 import {
@@ -17,8 +17,9 @@ export default function IndividualReportFullPage() {
 
   useEffect(() => {
     const fetchReport = async () => {
-      const summaryData =
-        location.state || (await getIndividualReportSummary(id));
+      // 항상 최신 데이터를 API에서 가져오기
+      // USE_MOCK일 때는 mock 데이터, 프로덕션에서는 localStorage 또는 API 호출
+      const summaryData = await getIndividualReportSummary(id);
       const detailData = await getIndividualReportDetail(id);
 
       setReport(
@@ -33,7 +34,7 @@ export default function IndividualReportFullPage() {
     };
 
     fetchReport();
-  }, [id, location.state]);
+  }, [id]);
 
   if (!report) {
     return <div>로딩 중...</div>;
@@ -56,7 +57,16 @@ export default function IndividualReportFullPage() {
         if (value <= 6) return 'warning';
         return 'bad';
       case 'voiceVolume':
-        return value >= 50 && value <= 70 ? 'good' : 'bad';
+        // -10 이상: 매우 큼 (빨강)
+        // -10 ~ -20: 큼 (노랑)
+        // -20 ~ -35: 적정 (녹색)
+        // -35 ~ -50: 작음 (노랑)
+        // -50 미만: 매우 작음 (빨강)
+        if (value >= -10) return 'voice-very-high';
+        if (value >= -20) return 'voice-high';
+        if (value >= -35) return 'good';
+        if (value >= -50) return 'voice-low';
+        return 'voice-very-low';
       case 'smileRate':
         return value >= 50 ? 'good' : 'bad';
       case 'blinkCount':
@@ -82,6 +92,14 @@ export default function IndividualReportFullPage() {
         return '#FFC107';
       case 'bad':
         return '#F44336';
+      case 'voice-very-high':
+        return '#F44336'; // 빨강
+      case 'voice-high':
+        return '#FFC107'; // 노랑
+      case 'voice-low':
+        return '#FFC107'; // 노랑
+      case 'voice-very-low':
+        return '#F44336'; // 빨강
       default:
         return '#e0e0e0';
     }
@@ -95,6 +113,14 @@ export default function IndividualReportFullPage() {
         return '주의';
       case 'bad':
         return '체크 필요';
+      case 'voice-very-high':
+        return '매우 큼';
+      case 'voice-high':
+        return '큼';
+      case 'voice-low':
+        return '작음';
+      case 'voice-very-low':
+        return '매우 작음';
       default:
         return '';
     }
@@ -137,7 +163,8 @@ export default function IndividualReportFullPage() {
       key: 'voiceVolume',
       unit: 'dB',
       icon: '🔊',
-      recommendedText: '50-70 dB 권장',
+      recommendedText:
+        '평균 -20~-35dB 권장, -10 이상: 매우 큼, -10~-20: 큼, -35~-50: 작음, -50 미만: 매우 작음',
     },
     {
       label: '침묵 구간',
