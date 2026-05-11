@@ -1,11 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login.jsx';
 import Main from './pages/Main.jsx';
-import SettingsPage from './pages/settings/SettingsPage.jsx';
-import UserInfoPage from './pages/settings/UserInfoPage.jsx';
-import DeleteAccountPage from './pages/settings/DeleteAccountPage.jsx';
+
 import ResumeManagePage from './pages/settings/ResumeManagePage.jsx';
 import AnalysisGuidePage from './pages/settings/AnalysisGuidePage.jsx';
+import DeletedReportPage from './pages/report/DeletedReportPage.jsx';
 
 import Interview from './pages/interview/Interview.jsx';
 import Resume from './pages/interview/Resume.jsx';
@@ -38,11 +37,10 @@ function App() {
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/main" element={<Main />} />
-      <Route path="/settings" element={<SettingsPage />} />
-      <Route path="/settings/user-info" element={<UserInfoPage />} />
-      <Route path="/settings/delete-account" element={<DeleteAccountPage />} />
+
       <Route path="/settings/resume" element={<ResumeManagePage />} />
       <Route path="/settings/analysis-guide" element={<AnalysisGuidePage />} />
+      <Route path="/report/individual/trash" element={<DeletedReportPage />} />
 
       <Route path="/report" element={<ReportMainPage />} />
       <Route path="/report/individual" element={<IndividualReportPage />} />

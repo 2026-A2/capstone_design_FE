@@ -1,0 +1,160 @@
+.deleted-report-page {
+  min-height: 100vh;
+  background: #f5f7fc;
+  padding: 56px 18px 40px;
+  box-sizing: border-box;
+}
+
+.deleted-report-container {
+  width: min(980px, 100%);
+  margin: 0 auto;
+}
+
+.deleted-report-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.deleted-title-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: 0 !important;
+  flex: none !important;
+}
+
+.deleted-back-button {
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 16px;
+  background: white;
+  color: #1e1b6b;
+  font-size: 24px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.deleted-report-header h1 {
+  margin: 0;
+  font-size: 32px;
+  color: #172445;
+}
+
+.deleted-report-header p {
+  margin: 0;
+  color: #64748b;
+}
+
+.deleted-report-box {
+  background: white;
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
+}
+
+.deleted-action-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.deleted-action-row button {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  background: #f1f3ff;
+  color: #334155;
+}
+
+.deleted-action-row button:hover {
+  background: #e3e7ff;
+}
+
+.deleted-report-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.deleted-report-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+}
+
+.deleted-report-item input {
+  width: 18px;
+  height: 18px;
+}
+
+.deleted-report-number {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: #e5e4ff;
+  color: #5b5ce2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.deleted-report-content h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  color: #111827;
+}
+
+.deleted-report-content p {
+  margin: 0;
+  color: #64748b;
+}
+
+.deleted-report-date {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.empty-trash-box {
+  text-align: center;
+  padding: 60px 20px;
+  color: #64748b;
+}
+
+.empty-trash-icon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: #eef2ff;
+  color: #4f46e5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+.danger-button {
+  background: #ef4444 !important;
+  color: white !important;
+}
+
+.danger-button:hover {
+  background: #dc2626 !important;
+}

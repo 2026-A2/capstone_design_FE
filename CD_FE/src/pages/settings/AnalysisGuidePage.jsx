@@ -81,7 +81,7 @@ export default function AnalysisGuidePage() {
         <div className="analysis-guide-header">
           <button
             className="analysis-guide-back-button"
-            onClick={() => navigate('/settings')}
+            onClick={() => navigate('/main')}
           >
             ←
           </button>

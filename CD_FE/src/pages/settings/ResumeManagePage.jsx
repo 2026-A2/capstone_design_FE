@@ -32,7 +32,7 @@ export default function ResumeManagePage() {
   return (
     <div className="resume-manage-page">
       <div className="resume-manage-container">
-        <button className="back-button" onClick={() => navigate('/settings')}>
+        <button className="back-button" onClick={() => navigate('/main')}>
           ←
         </button>
 
@@ -68,10 +68,6 @@ export default function ResumeManagePage() {
             </button>
           </div>
         </div>
-
-        <button className="main-button" onClick={() => navigate('/settings')}>
-          설정으로 돌아가기
-        </button>
       </div>
     </div>
   );
