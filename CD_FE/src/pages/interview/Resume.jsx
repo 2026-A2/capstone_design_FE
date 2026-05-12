@@ -1,22 +1,44 @@
-import { useNavigate } from 'react-router-dom'
-import { useInterview } from '../../contexts/InterviewContext.jsx'
+import { useNavigate } from 'react-router-dom';
+import { useInterview } from '../../contexts/InterviewContext.jsx';
 
 function Resume() {
-  const navigate = useNavigate()
-  const { resumeText, setResumeText, setIndustry } = useInterview()
+  const navigate = useNavigate();
+  const { resumeText, setResumeText, setIndustry } = useInterview();
 
-  const trimmedLength = resumeText.trim().length
-  const isValid = trimmedLength > 0 && trimmedLength <= 300
+  const trimmedLength = resumeText.trim().length;
+  const isValid = trimmedLength > 0 && trimmedLength <= 300;
+
+  const saveResumeForSession = () => {
+    const savedList = JSON.parse(localStorage.getItem('resumeList') || '[]');
+
+    const nextSession = savedList.length + 1;
+
+    const newResume = {
+      id: crypto.randomUUID(),
+      session: nextSession,
+      title: `${nextSession}회차 자소서`,
+      content: resumeText.trim(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem(
+      'resumeList',
+      JSON.stringify([...savedList, newResume]),
+    );
+  };
 
   const handleNext = () => {
     if (!isValid) {
-      return
+      return;
     }
 
+    saveResumeForSession();
+
     // Resume flow does not require industry input.
-    setIndustry('')
-    navigate('/interview/question-count')
-  }
+    setIndustry('');
+    navigate('/interview/question-count');
+  };
 
   return (
     <div className="h-screen flex flex-col items-center justify-center gap-4 bg-[#efefef] text-center px-6">
@@ -42,7 +64,7 @@ function Resume() {
         다음
       </button>
     </div>
-  )
+  );
 }
 
-export default Resume
+export default Resume;
