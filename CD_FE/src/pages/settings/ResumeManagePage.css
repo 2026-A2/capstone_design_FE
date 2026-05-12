@@ -1,16 +1,16 @@
 .resume-manage-page {
   min-height: 100vh;
   background-color: #f3f7fd;
-  padding: 48px 40px 80px;
+  padding: 36px 28px 60px;
   box-sizing: border-box;
 }
 
 .resume-manage-container {
-  max-width: 1080px;
+  max-width: 980px;
   margin: 0 auto;
   background-color: #ffffff;
   border-radius: 22px;
-  padding: 32px;
+  padding: 28px;
   box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
 }
 
@@ -29,6 +29,10 @@
   color: #2563eb;
 }
 
+.resume-title-area {
+  margin-bottom: 28px;
+}
+
 .resume-manage-container h1 {
   margin: 0 0 10px;
   font-size: 28px;
@@ -37,7 +41,7 @@
 }
 
 .resume-subtitle {
-  margin: 0 0 24px;
+  margin: 0;
   line-height: 1.7;
   font-size: 15px;
   color: #64748b;
@@ -45,23 +49,56 @@
 
 .resume-manage-layout {
   display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 24px;
-  margin-top: 28px;
+  grid-template-columns: 250px 1fr;
+  gap: 20px;
+  margin-top: 24px;
 }
 
-.resume-list-card {
-  padding: 22px;
+.resume-list-card,
+.resume-card {
+  padding: 18px;
   border: 1px solid #dbeafe;
   border-radius: 18px;
   background-color: #f8fbff;
 }
 
-.resume-list-card h2 {
-  margin: 0 0 18px;
+.resume-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.resume-list-header h2,
+.resume-card h2 {
+  margin: 0;
   font-size: 20px;
   font-weight: 800;
   color: #1e3a8a;
+}
+
+.resume-list-header span {
+  font-size: 13px;
+  font-weight: 800;
+  color: #2563eb;
+}
+
+.new-resume-button {
+  width: 100%;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border: 1px solid #2563eb;
+  border-radius: 12px;
+  background-color: #ffffff;
+  color: #2563eb;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.new-resume-button:hover {
+  background-color: #eff6ff;
 }
 
 .resume-list {
@@ -75,7 +112,7 @@
   border: 1px solid #e5e7eb;
   background-color: #ffffff;
   border-radius: 14px;
-  padding: 14px;
+  padding: 12px;
   text-align: left;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -99,23 +136,29 @@
   color: #1e3a8a;
 }
 
+.resume-preview {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
 .resume-list-item span {
   font-size: 12px;
   color: #64748b;
 }
 
-.resume-card {
-  padding: 22px;
-  border: 1px solid #dbeafe;
-  border-radius: 18px;
-  background-color: #f8fbff;
+.resume-empty-message {
+  padding: 24px 10px;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
-.resume-card h2 {
-  margin: 0 0 8px;
-  font-size: 20px;
-  font-weight: 800;
-  color: #1e3a8a;
+.resume-empty-message p {
+  margin: 0 0 6px;
 }
 
 .resume-card-header {
@@ -127,7 +170,7 @@
 }
 
 .resume-card-header p {
-  margin: 0;
+  margin: 8px 0 0;
   font-size: 14px;
   color: #64748b;
   line-height: 1.6;
@@ -140,12 +183,38 @@
   font-weight: 600;
 }
 
-.resume-textarea {
+.resume-title-input {
   width: 100%;
-  min-height: 220px;
-  padding: 14px;
+  margin-bottom: 14px;
+  padding: 13px 14px;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
+  background-color: #ffffff;
+  font-size: 15px;
+  font-family: inherit;
+  color: #334155;
+  box-sizing: border-box;
+}
+
+.resume-title-input::placeholder,
+.resume-textarea::placeholder {
+  color: #cbd5e1;
+}
+
+.resume-title-input:focus,
+.resume-textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.resume-textarea {
+  width: 100%;
+  min-height: 180px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background-color: #ffffff;
   font-size: 15px;
   font-family: inherit;
   color: #334155;
@@ -153,14 +222,10 @@
   box-sizing: border-box;
 }
 
-.resume-textarea::placeholder {
-  color: #cbd5e1;
-}
-
-.resume-textarea:focus {
-  outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+.resume-meta {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #64748b;
 }
 
 .resume-button-row {
@@ -199,22 +264,9 @@
   background-color: #1d4ed8;
 }
 
-.main-button {
-  width: 100%;
-  margin-top: 24px;
-  padding: 13px 18px;
-  border: none;
-  background-color: #6b7280;
-  color: #ffffff;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.main-button:hover {
-  background-color: #4b5563;
+.save-button:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
 }
 
 @media (max-width: 768px) {
@@ -233,62 +285,4 @@
   .resume-card-header {
     flex-direction: column;
   }
-}
-.resume-title-area {
-  margin-bottom: 28px;
-}
-
-.resume-list-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 18px;
-}
-
-.resume-list-header h2 {
-  margin: 0;
-}
-
-.resume-list-header span {
-  font-size: 13px;
-  font-weight: 800;
-  color: #2563eb;
-}
-
-.resume-preview {
-  margin: 0 0 8px;
-  font-size: 13px;
-  color: #475569;
-  line-height: 1.5;
-  word-break: keep-all;
-}
-
-.resume-meta {
-  margin-top: 12px;
-  font-size: 13px;
-  color: #64748b;
-}
-
-.resume-empty-card {
-  margin-top: 28px;
-  padding: 36px;
-  border: 1px solid #dbeafe;
-  border-radius: 18px;
-  background-color: #f8fbff;
-  text-align: center;
-}
-
-.resume-empty-card h2 {
-  margin: 0 0 10px;
-  color: #1e3a8a;
-}
-
-.resume-empty-card p {
-  margin: 0 0 20px;
-  color: #64748b;
-}
-
-.save-button:disabled {
-  background-color: #94a3b8;
-  cursor: not-allowed;
 }

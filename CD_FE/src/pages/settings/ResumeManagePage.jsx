@@ -7,22 +7,27 @@ export default function ResumeManagePage() {
 
   const [resumeList, setResumeList] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
+  const [editTitle, setEditTitle] = useState('');
   const [editContent, setEditContent] = useState('');
 
   useEffect(() => {
     const savedList = JSON.parse(localStorage.getItem('resumeList') || '[]');
 
     const sortedList = [...savedList].sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      (a, b) =>
+        new Date(b.updatedAt || b.createdAt) -
+        new Date(a.updatedAt || a.createdAt),
     );
 
     setResumeList(sortedList);
-    window.scrollTo(0, 0);
 
     if (sortedList.length > 0) {
       setSelectedId(sortedList[0].id);
+      setEditTitle(sortedList[0].title);
       setEditContent(sortedList[0].content);
     }
+
+    window.scrollTo(0, 0);
   }, []);
 
   const selectedResume = resumeList.find((resume) => resume.id === selectedId);
@@ -31,29 +36,64 @@ export default function ResumeManagePage() {
     localStorage.setItem('resumeList', JSON.stringify(list));
   };
 
+  const resetForm = () => {
+    setSelectedId(null);
+    setEditTitle('');
+    setEditContent('');
+  };
+
   const handleSelectResume = (resume) => {
     setSelectedId(resume.id);
+    setEditTitle(resume.title);
     setEditContent(resume.content);
   };
 
   const handleSave = () => {
-    if (!selectedId || editContent.trim().length === 0) return;
+    if (editTitle.trim().length === 0) {
+      alert('자소서 제목을 입력해주세요.');
+      return;
+    }
 
-    const updatedList = resumeList.map((resume) =>
-      resume.id === selectedId
-        ? {
-            ...resume,
-            content: editContent.trim(),
-            updatedAt: new Date().toISOString(),
-          }
-        : resume,
-    );
+    if (editContent.trim().length === 0) {
+      alert('자소서 내용을 입력해주세요.');
+      return;
+    }
+
+    const now = new Date().toISOString();
+
+    if (selectedId) {
+      const updatedList = resumeList.map((resume) =>
+        resume.id === selectedId
+          ? {
+              ...resume,
+              title: editTitle.trim(),
+              content: editContent.trim(),
+              updatedAt: now,
+            }
+          : resume,
+      );
+
+      setResumeList(updatedList);
+      saveToLocalStorage(updatedList);
+      alert('자소서가 수정되었습니다.');
+      return;
+    }
+
+    const newResume = {
+      id: Date.now(),
+      title: editTitle.trim(),
+      content: editContent.trim(),
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    const updatedList = [newResume, ...resumeList];
 
     setResumeList(updatedList);
     saveToLocalStorage(updatedList);
-    setEditContent(editContent.trim());
+    setSelectedId(newResume.id);
 
-    alert('자소서가 수정되었습니다.');
+    alert('자소서가 등록되었습니다.');
   };
 
   const handleDelete = () => {
@@ -66,25 +106,15 @@ export default function ResumeManagePage() {
       (resume) => resume.id !== selectedId,
     );
 
-    const reorderedList = filteredList
-      .slice()
-      .reverse()
-      .map((resume, index) => ({
-        ...resume,
-        session: index + 1,
-        title: `${index + 1}회차 자소서`,
-      }))
-      .reverse();
+    setResumeList(filteredList);
+    saveToLocalStorage(filteredList);
 
-    setResumeList(reorderedList);
-    saveToLocalStorage(reorderedList);
-
-    if (reorderedList.length > 0) {
-      setSelectedId(reorderedList[0].id);
-      setEditContent(reorderedList[0].content);
+    if (filteredList.length > 0) {
+      setSelectedId(filteredList[0].id);
+      setEditTitle(filteredList[0].title);
+      setEditContent(filteredList[0].content);
     } else {
-      setSelectedId(null);
-      setEditContent('');
+      resetForm();
     }
 
     alert('자소서가 삭제되었습니다.');
@@ -100,30 +130,31 @@ export default function ResumeManagePage() {
         <div className="resume-title-area">
           <h1>자소서 관리</h1>
           <p className="resume-subtitle">
-            면접 회차별로 입력한 자기소개서를 확인하고 수정할 수 있습니다.
+            면접에 사용할 자기소개서를 미리 등록하고 수정할 수 있습니다.
           </p>
         </div>
 
-        {resumeList.length === 0 ? (
-          <div className="resume-empty-card">
-            <h2>저장된 자소서가 없습니다.</h2>
-            <p>자소서 기반 면접을 진행하면 이곳에 회차별로 저장됩니다.</p>
+        <div className="resume-manage-layout">
+          <div className="resume-list-card">
+            <div className="resume-list-header">
+              <h2>저장된 자소서</h2>
+              <span>{resumeList.length}개</span>
+            </div>
+
             <button
               type="button"
-              className="save-button"
-              onClick={() => navigate('/interview/resume')}
+              className="new-resume-button"
+              onClick={resetForm}
             >
-              자소서 입력하러 가기
+              + 새 자소서 등록
             </button>
-          </div>
-        ) : (
-          <div className="resume-manage-layout">
-            <div className="resume-list-card">
-              <div className="resume-list-header">
-                <h2>저장된 자소서</h2>
-                <span>{resumeList.length}개</span>
-              </div>
 
+            {resumeList.length === 0 ? (
+              <div className="resume-empty-message">
+                <p>아직 등록된 자소서가 없습니다.</p>
+                <p>오른쪽 입력칸에서 자소서를 등록해보세요.</p>
+              </div>
+            ) : (
               <div className="resume-list">
                 {resumeList.map((resume) => (
                   <button
@@ -144,39 +175,53 @@ export default function ResumeManagePage() {
                     </p>
 
                     <span>
-                      {new Date(resume.createdAt).toLocaleDateString()}
+                      {new Date(
+                        resume.updatedAt || resume.createdAt,
+                      ).toLocaleDateString()}
                     </span>
                   </button>
                 ))}
               </div>
+            )}
+          </div>
+
+          <div className="resume-card">
+            <div className="resume-card-header">
+              <div>
+                <h2>{selectedId ? '자소서 수정' : '새 자소서 등록'}</h2>
+                <p>자소서 제목과 내용을 입력해 저장할 수 있습니다.</p>
+              </div>
+
+              <span className="char-count">{editContent.length}/300자</span>
             </div>
 
-            <div className="resume-card">
-              <div className="resume-card-header">
-                <div>
-                  <h2>{selectedResume?.title}</h2>
-                  <p>선택한 회차의 자소서 내용을 수정할 수 있습니다.</p>
-                </div>
+            <input
+              className="resume-title-input"
+              value={editTitle}
+              maxLength={30}
+              onChange={(e) => setEditTitle(e.target.value)}
+              placeholder="예: 금융권 지원 자소서"
+            />
 
-                <span className="char-count">{editContent.length}/300자</span>
-              </div>
+            <textarea
+              className="resume-textarea"
+              value={editContent}
+              maxLength={300}
+              onChange={(e) => setEditContent(e.target.value)}
+              placeholder="면접에 사용할 자기소개서 내용을 입력해주세요."
+            />
 
-              <textarea
-                className="resume-textarea"
-                value={editContent}
-                maxLength={300}
-                onChange={(e) => setEditContent(e.target.value)}
-                placeholder="자소서 내용을 입력해주세요."
-              />
+            <div className="resume-meta">
+              최근 수정:{' '}
+              {selectedResume?.updatedAt
+                ? new Date(selectedResume.updatedAt).toLocaleString()
+                : selectedId
+                  ? '-'
+                  : '새 자소서 작성 중'}
+            </div>
 
-              <div className="resume-meta">
-                최근 수정:{' '}
-                {selectedResume?.updatedAt
-                  ? new Date(selectedResume.updatedAt).toLocaleString()
-                  : '-'}
-              </div>
-
-              <div className="resume-button-row">
+            <div className="resume-button-row">
+              {selectedId && (
                 <button
                   type="button"
                   className="delete-button"
@@ -184,18 +229,22 @@ export default function ResumeManagePage() {
                 >
                   삭제
                 </button>
-                <button
-                  type="button"
-                  className="save-button"
-                  onClick={handleSave}
-                  disabled={editContent.trim().length === 0}
-                >
-                  저장
-                </button>
-              </div>
+              )}
+
+              <button
+                type="button"
+                className="save-button"
+                onClick={handleSave}
+                disabled={
+                  editTitle.trim().length === 0 ||
+                  editContent.trim().length === 0
+                }
+              >
+                {selectedId ? '수정 저장' : '등록'}
+              </button>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

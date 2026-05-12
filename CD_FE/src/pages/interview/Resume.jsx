@@ -8,32 +8,10 @@ function Resume() {
   const trimmedLength = resumeText.trim().length;
   const isValid = trimmedLength > 0 && trimmedLength <= 300;
 
-  const saveResumeForSession = () => {
-    const savedList = JSON.parse(localStorage.getItem('resumeList') || '[]');
-
-    const nextSession = savedList.length + 1;
-
-    const newResume = {
-      id: crypto.randomUUID(),
-      session: nextSession,
-      title: `${nextSession}회차 자소서`,
-      content: resumeText.trim(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    localStorage.setItem(
-      'resumeList',
-      JSON.stringify([...savedList, newResume]),
-    );
-  };
-
   const handleNext = () => {
     if (!isValid) {
       return;
     }
-
-    saveResumeForSession();
 
     // Resume flow does not require industry input.
     setIndustry('');
