@@ -3,7 +3,7 @@ export const individualReports = [
     id: 1,
     title: '1회차 면접 리포트',
     type: 'resume',
-    eyeContact: '카메라 응시율 61%',
+    eyeContact: '카메라 응시율 59%',
     speechSummary: '발화 속도 적정',
     expressionSummary: '표정 안정',
     habitSummary: '고개 움직임이 약간 있음',
