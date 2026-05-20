@@ -238,6 +238,38 @@ export default function IndividualReportFullPage() {
       [itemIndex]: !prev[itemIndex],
     }));
   };
+  const handleDownloadReport = () => {
+    const reportText = `
+${report.title}
+
+[분석 결과 요약]
+
+${analysisItems
+  .map(
+    (item) => `
+- ${item.label}
+  값: ${item.value !== undefined ? item.value : '-'}${item.unit}
+  상태: ${getStatusLabel(item.status)}
+  권장 기준: ${item.recommendedText}
+  상세 분석: ${item.detailContent || '상세 분석 정보가 없습니다.'}
+`,
+  )
+  .join('\n')}
+`;
+
+    const blob = new Blob([reportText], {
+      type: 'text/plain;charset=utf-8',
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${report.title || 'interview-report'}.txt`;
+    link.click();
+
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="full-report-page">
@@ -346,9 +378,7 @@ export default function IndividualReportFullPage() {
 
             <button
               className="action-btn download-btn"
-              onClick={() =>
-                alert('리포트 다운로드 기능은 추후 구현 예정입니다.')
-              }
+              onClick={handleDownloadReport}
             >
               리포트 다운로드
             </button>
