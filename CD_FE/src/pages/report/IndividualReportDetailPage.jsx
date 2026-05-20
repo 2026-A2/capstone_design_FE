@@ -1,7 +1,7 @@
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import './IndividualReportDetailPage.css';
 import { useEffect, useState } from 'react';
-import { getIndividualReports } from '../../api/reportApi';
+import { getIndividualReportSummary } from '../../api/reportApi';
 
 export default function IndividualReportDetailPage() {
   const navigate = useNavigate();
@@ -12,15 +12,12 @@ export default function IndividualReportDetailPage() {
 
   useEffect(() => {
     const fetchReport = async () => {
-      // 이전 페이지에서 state로 넘겨받은 report가 있으면 그걸 먼저 사용
       if (location.state) {
         setReport(location.state);
         return;
       }
 
-      // state가 없으면 mock/api에서 id로 찾아오기
-      const reports = await getIndividualReports();
-      const selectedReport = reports.find((item) => String(item.id) === id);
+      const selectedReport = await getIndividualReportSummary(id);
 
       setReport(
         selectedReport || {

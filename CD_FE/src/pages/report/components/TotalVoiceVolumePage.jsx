@@ -10,13 +10,6 @@ export default function TotalVoiceVolumePage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const savedData = JSON.parse(localStorage.getItem('voiceVolumeTrend'));
-
-      if (savedData && savedData.length > 0) {
-        setVoiceVolumeData(savedData);
-        return;
-      }
-
       const trends = await getReportTrends();
       setVoiceVolumeData(trends.voiceVolumeTrend || []);
     };

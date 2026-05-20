@@ -10,17 +10,8 @@ export default function TotalGazeReportPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const savedEyeContactData = JSON.parse(
-        localStorage.getItem('eyeContactTrend'),
-      );
-
-      if (savedEyeContactData && savedEyeContactData.length > 0) {
-        setEyeContactData(savedEyeContactData);
-        return;
-      }
-
       const trends = await getReportTrends();
-      setEyeContactData(trends.eyeContactTrend);
+      setEyeContactData(trends.eyeContactTrend || []);
     };
 
     fetchData();

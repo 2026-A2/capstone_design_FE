@@ -20,15 +20,8 @@ export default function TotalFillerPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const savedFillerData = JSON.parse(localStorage.getItem('fillerTrend'));
-
-      if (savedFillerData && savedFillerData.length > 0) {
-        setFillerData(savedFillerData);
-        return;
-      }
-
       const trends = await getReportTrends();
-      setFillerData(trends.fillerTrend);
+      setFillerData(trends.fillerTrend || []);
     };
 
     fetchData();

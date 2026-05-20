@@ -9,15 +9,8 @@ export default function TotalBlinkPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const savedData = JSON.parse(localStorage.getItem('blinkTrend'));
-
-      if (savedData && savedData.length > 0) {
-        setBlinkData(savedData);
-        return;
-      }
-
       const trends = await getReportTrends();
-      setBlinkData(trends.blinkTrend);
+      setBlinkData(trends.blinkTrend || []);
     };
 
     fetchData();

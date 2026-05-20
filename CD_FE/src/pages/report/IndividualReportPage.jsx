@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './IndividualReportPage.css';
-import { individualReports } from '../../mockdata/report/individualMock';
+import { getIndividualReports } from '../../api/reportApi';
 
 const REPORT_STORAGE_KEY = 'individualReports';
 const DELETED_STORAGE_KEY = 'deletedReportsStorage';
@@ -15,22 +15,10 @@ const TREND_KEYS = [
   'smileTrend',
   'blinkTrend',
   'endingBlurTrend',
-  'headNodTrend',
+  'nodTrend',
   'shoulderTiltTrend',
   'bodyShakeTrend',
 ];
-
-const getInitialReports = () => {
-  try {
-    const savedReports = JSON.parse(
-      localStorage.getItem(REPORT_STORAGE_KEY) || 'null',
-    );
-
-    return Array.isArray(savedReports) ? savedReports : individualReports;
-  } catch {
-    return individualReports;
-  }
-};
 
 const getDeletedStorage = () => {
   try {
@@ -44,21 +32,51 @@ const getDeletedStorage = () => {
   }
 };
 
+const getDeletedSessions = () => {
+  try {
+    return JSON.parse(localStorage.getItem('deletedReportSessions') || '[]');
+  } catch {
+    return [];
+  }
+};
+
 export default function IndividualReportPage() {
   const navigate = useNavigate();
 
-  const [reportList, setReportList] = useState(getInitialReports);
+  const [reportList, setReportList] = useState([]);
   const [deletedStorage, setDeletedStorage] = useState(getDeletedStorage);
+  const [deletedSessions, setDeletedSessions] = useState(getDeletedSessions);
   const [selectedIds, setSelectedIds] = useState([]);
-  const [selectedRestoreIds, setSelectedRestoreIds] = useState([]);
 
   const [selectedType, setSelectedType] = useState('all');
   const [searchText, setSearchText] = useState('');
+
+  useEffect(() => {
+    const fetchReports = async () => {
+      const reports = await getIndividualReports();
+      const savedDeletedSessions = getDeletedSessions();
+
+      const visibleReports = reports.filter(
+        (report) => !savedDeletedSessions.includes(report.session ?? report.id),
+      );
+
+      setReportList(visibleReports);
+      setDeletedSessions(savedDeletedSessions);
+    };
+
+    fetchReports();
+  }, []);
 
   const filteredReports = useMemo(() => {
     const keyword = searchText.trim().toLowerCase();
 
     return reportList.filter((report, index) => {
+      const reportSession = report.session ?? report.id;
+
+      if (deletedSessions.includes(reportSession)) {
+        return false;
+      }
+
       const reportType = report.type || 'resume';
       const typeMatched = selectedType === 'all' || reportType === selectedType;
 
@@ -76,7 +94,7 @@ export default function IndividualReportPage() {
 
       return typeMatched && searchMatched;
     });
-  }, [reportList, selectedType, searchText]);
+  }, [reportList, selectedType, searchText, deletedSessions]);
 
   const saveDeletedStorage = (nextStorage) => {
     localStorage.setItem(DELETED_STORAGE_KEY, JSON.stringify(nextStorage));
@@ -85,12 +103,6 @@ export default function IndividualReportPage() {
 
   const handleSelect = (id) => {
     setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
-    );
-  };
-
-  const handleSelectRestore = (id) => {
-    setSelectedRestoreIds((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
     );
   };
@@ -106,10 +118,10 @@ export default function IndividualReportPage() {
     const deletedReports = reportList.filter((report) =>
       selectedIds.includes(report.id),
     );
-    const deletedSessions =
-      JSON.parse(localStorage.getItem('deletedReportSessions')) || [];
 
-    const sessionsToDelete = deletedReports.map((report) => report.id);
+    const sessionsToDelete = deletedReports.map(
+      (report) => report.session ?? report.id,
+    );
 
     const updatedDeletedSessions = [
       ...new Set([...deletedSessions, ...sessionsToDelete]),
@@ -120,10 +132,7 @@ export default function IndividualReportPage() {
       JSON.stringify(updatedDeletedSessions),
     );
 
-    localStorage.setItem(
-      'deletedReportSessions',
-      JSON.stringify(updatedDeletedSessions),
-    );
+    setDeletedSessions(updatedDeletedSessions);
 
     const updatedReports = reportList.filter(
       (report) => !selectedIds.includes(report.id),
@@ -135,14 +144,14 @@ export default function IndividualReportPage() {
     };
 
     TREND_KEYS.forEach((key) => {
-      const data = JSON.parse(localStorage.getItem(key)) || [];
+      const data = JSON.parse(localStorage.getItem(key) || '[]');
 
       const deletedTrendItems = data.filter((item) =>
-        deletedSessions.includes(item.session),
+        sessionsToDelete.includes(item.session),
       );
 
       const remainedTrendItems = data.filter(
-        (item) => !deletedSessions.includes(item.session),
+        (item) => !sessionsToDelete.includes(item.session),
       );
 
       nextDeletedStorage.trends[key] = [
@@ -169,9 +178,20 @@ export default function IndividualReportPage() {
 
     if (!window.confirm('전체 리포트를 삭제하시겠습니까?')) return;
 
-    const deletedSessions = reportList.map(
-      (report) => report.session || report.id,
+    const sessionsToDelete = reportList.map(
+      (report) => report.session ?? report.id,
     );
+
+    const updatedDeletedSessions = [
+      ...new Set([...deletedSessions, ...sessionsToDelete]),
+    ];
+
+    localStorage.setItem(
+      'deletedReportSessions',
+      JSON.stringify(updatedDeletedSessions),
+    );
+
+    setDeletedSessions(updatedDeletedSessions);
 
     const nextDeletedStorage = {
       reports: [...deletedStorage.reports, ...reportList],
@@ -179,10 +199,10 @@ export default function IndividualReportPage() {
     };
 
     TREND_KEYS.forEach((key) => {
-      const data = JSON.parse(localStorage.getItem(key)) || [];
+      const data = JSON.parse(localStorage.getItem(key) || '[]');
 
       const deletedTrendItems = data.filter((item) =>
-        deletedSessions.includes(item.session),
+        sessionsToDelete.includes(item.session),
       );
 
       nextDeletedStorage.trends[key] = [
@@ -190,7 +210,7 @@ export default function IndividualReportPage() {
         ...deletedTrendItems,
       ];
 
-      localStorage.removeItem(key);
+      localStorage.setItem(key, JSON.stringify([]));
     });
 
     localStorage.setItem(REPORT_STORAGE_KEY, JSON.stringify([]));
@@ -199,64 +219,6 @@ export default function IndividualReportPage() {
 
     setSelectedIds([]);
     alert('전체 리포트가 삭제 보관함으로 이동되었습니다.');
-  };
-
-  const handleRestoreSelected = () => {
-    if (selectedRestoreIds.length === 0) {
-      alert('복구할 리포트를 선택해주세요.');
-      return;
-    }
-
-    const restoreReports = deletedStorage.reports.filter((report) =>
-      selectedRestoreIds.includes(report.id),
-    );
-
-    const restoreSessions = restoreReports.map(
-      (report) => report.session || report.id,
-    );
-
-    const nextReportList = [...reportList, ...restoreReports].sort(
-      (a, b) => (a.session || a.id) - (b.session || b.id),
-    );
-
-    const nextDeletedReports = deletedStorage.reports.filter(
-      (report) => !selectedRestoreIds.includes(report.id),
-    );
-
-    const nextDeletedTrends = { ...deletedStorage.trends };
-
-    TREND_KEYS.forEach((key) => {
-      const deletedTrendData = nextDeletedTrends[key] || [];
-
-      const restoreTrendItems = deletedTrendData.filter((item) =>
-        restoreSessions.includes(item.session),
-      );
-
-      const remainedDeletedTrendItems = deletedTrendData.filter(
-        (item) => !restoreSessions.includes(item.session),
-      );
-
-      const currentTrendData = JSON.parse(localStorage.getItem(key)) || [];
-
-      const nextTrendData = [...currentTrendData, ...restoreTrendItems].sort(
-        (a, b) => a.session - b.session,
-      );
-
-      localStorage.setItem(key, JSON.stringify(nextTrendData));
-      nextDeletedTrends[key] = remainedDeletedTrendItems;
-    });
-
-    const nextDeletedStorage = {
-      reports: nextDeletedReports,
-      trends: nextDeletedTrends,
-    };
-
-    localStorage.setItem(REPORT_STORAGE_KEY, JSON.stringify(nextReportList));
-    setReportList(nextReportList);
-    saveDeletedStorage(nextDeletedStorage);
-
-    setSelectedRestoreIds([]);
-    alert('선택한 리포트가 복구되었습니다.');
   };
 
   return (
@@ -309,6 +271,7 @@ export default function IndividualReportPage() {
                   산업 기반 면접
                 </button>
               </div>
+
               <div className="action-buttons-wrapper">
                 <button type="button" onClick={handleDeleteSelected}>
                   선택 삭제
@@ -317,6 +280,7 @@ export default function IndividualReportPage() {
                 <button type="button" onClick={handleDeleteAll}>
                   전체 삭제
                 </button>
+
                 <button
                   type="button"
                   onClick={() => navigate('/report/individual/trash')}
@@ -348,7 +312,9 @@ export default function IndividualReportPage() {
                       onClick={(e) => e.stopPropagation()}
                     />
 
-                    <div className="report-number">{index + 1}</div>
+                    <div className="report-number">
+                      {report.session ?? index + 1}
+                    </div>
 
                     <div className="report-card-content">
                       <h2>{report.title || `${index + 1}회차 면접`}</h2>

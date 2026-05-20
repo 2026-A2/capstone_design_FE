@@ -9,15 +9,8 @@ export default function TotalShoulderTiltPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const savedData = JSON.parse(localStorage.getItem('shoulderTiltTrend'));
-
-      if (savedData && savedData.length > 0) {
-        setData(savedData);
-        return;
-      }
-
       const trends = await getReportTrends();
-      setData(trends.shoulderTiltTrend);
+      setData(trends.shoulderTiltTrend || []);
     };
 
     fetchData();

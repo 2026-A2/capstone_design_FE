@@ -10,20 +10,12 @@ export default function TotalNodPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const savedData = JSON.parse(localStorage.getItem('nodTrend'));
-
-      if (savedData && savedData.length > 0) {
-        setNodData(savedData);
-        return;
-      }
-
       const trends = await getReportTrends();
-      setNodData(trends.nodTrend);
+      setNodData(trends.nodTrend || []);
     };
 
     fetchData();
   }, []);
-
   const chartData = nodData.map((item) => ({
     date: item.session,
     value: item.value,

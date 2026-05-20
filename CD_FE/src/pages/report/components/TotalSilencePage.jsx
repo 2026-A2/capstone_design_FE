@@ -20,15 +20,8 @@ export default function TotalSilencePage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const savedData = JSON.parse(localStorage.getItem('silenceTrend'));
-
-      if (savedData && savedData.length > 0) {
-        setSilenceData(savedData);
-        return;
-      }
-
       const trends = await getReportTrends();
-      setSilenceData(trends.silenceTrend);
+      setSilenceData(trends.silenceTrend || []);
     };
 
     fetchData();

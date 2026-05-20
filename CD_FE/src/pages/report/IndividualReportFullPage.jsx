@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import './IndividualReportFullPage.css';
 import {
@@ -8,7 +8,6 @@ import {
 
 export default function IndividualReportFullPage() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { id } = useParams();
 
   const [expandedItems, setExpandedItems] = useState({});
@@ -17,8 +16,6 @@ export default function IndividualReportFullPage() {
 
   useEffect(() => {
     const fetchReport = async () => {
-      // 항상 최신 데이터를 API에서 가져오기
-      // USE_MOCK일 때는 mock 데이터, 프로덕션에서는 localStorage 또는 API 호출
       const summaryData = await getIndividualReportSummary(id);
       const detailData = await getIndividualReportDetail(id);
 
@@ -57,11 +54,6 @@ export default function IndividualReportFullPage() {
         if (value <= 6) return 'warning';
         return 'bad';
       case 'voiceVolume':
-        // -10 이상: 매우 큼 (빨강)
-        // -10 ~ -20: 큼 (노랑)
-        // -20 ~ -35: 적정 (녹색)
-        // -35 ~ -50: 작음 (노랑)
-        // -50 미만: 매우 작음 (빨강)
         if (value >= -10) return 'voice-very-high';
         if (value >= -20) return 'voice-high';
         if (value >= -35) return 'good';
@@ -93,13 +85,13 @@ export default function IndividualReportFullPage() {
       case 'bad':
         return '#F44336';
       case 'voice-very-high':
-        return '#F44336'; // 빨강
+        return '#F44336';
       case 'voice-high':
-        return '#FFC107'; // 노랑
+        return '#FFC107';
       case 'voice-low':
-        return '#FFC107'; // 노랑
+        return '#FFC107';
       case 'voice-very-low':
-        return '#F44336'; // 빨강
+        return '#F44336';
       default:
         return '#e0e0e0';
     }
@@ -127,10 +119,12 @@ export default function IndividualReportFullPage() {
   };
 
   const getDetailFromData = (label) => {
-    if (!detailReport) return { description: '', detail: '' };
+    if (!detailReport?.categories) {
+      return { description: '', detail: '' };
+    }
 
     for (const category of detailReport.categories) {
-      const item = category.items.find((i) => i.label === label);
+      const item = category.items?.find((i) => i.label === label);
 
       if (item) {
         return {
@@ -185,7 +179,7 @@ export default function IndividualReportFullPage() {
       key: 'smileRate',
       unit: '%',
       icon: '😊',
-      recommendedText: '50% 이상 권장, 면접시작·마무리2회권장',
+      recommendedText: '50% 이상 권장, 면접시작·마무리 2회 권장',
     },
     {
       label: '눈 깜빡임',

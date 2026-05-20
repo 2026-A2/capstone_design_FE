@@ -9,15 +9,8 @@ export default function TotalSmilePage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const savedData = JSON.parse(localStorage.getItem('smileTrend'));
-
-      if (savedData && savedData.length > 0) {
-        setSmileData(savedData);
-        return;
-      }
-
       const trends = await getReportTrends();
-      setSmileData(trends.smileTrend);
+      setSmileData(trends.smileTrend || []);
     };
 
     fetchData();

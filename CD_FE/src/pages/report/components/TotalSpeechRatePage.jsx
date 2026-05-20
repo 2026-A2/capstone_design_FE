@@ -10,15 +10,8 @@ export default function TotalSpeechRatePage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const savedData = JSON.parse(localStorage.getItem('speechRateTrend'));
-
-      if (savedData && savedData.length > 0) {
-        setSpeechRateData(savedData);
-        return;
-      }
-
       const trends = await getReportTrends();
-      setSpeechRateData(trends.speechRateTrend);
+      setSpeechRateData(trends.speechRateTrend || []);
     };
 
     fetchData();

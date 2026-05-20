@@ -20,15 +20,8 @@ export default function TotalEndingBlurPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const savedData = JSON.parse(localStorage.getItem('endingBlurTrend'));
-
-      if (savedData && savedData.length > 0) {
-        setEndingBlurData(savedData);
-        return;
-      }
-
       const trends = await getReportTrends();
-      setEndingBlurData(trends.endingBlurTrend);
+      setEndingBlurData(trends.endingBlurTrend || []);
     };
 
     fetchData();

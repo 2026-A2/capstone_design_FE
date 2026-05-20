@@ -19,15 +19,8 @@ export default function TotalBodyShakePage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const savedData = JSON.parse(localStorage.getItem('bodyShakeTrend'));
-
-      if (savedData && savedData.length > 0) {
-        setBodyShakeData(savedData);
-        return;
-      }
-
       const trends = await getReportTrends();
-      setBodyShakeData(trends.bodyShakeTrend);
+      setBodyShakeData(trends.bodyShakeTrend || []);
     };
 
     fetchData();
