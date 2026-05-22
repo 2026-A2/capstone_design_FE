@@ -38,45 +38,47 @@ function Main() {
     <div className="min-h-screen bg-[#f4f7fb] text-slate-900">
       <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto flex h-[74px] max-w-[1640px] items-center justify-between px-6 sm:px-10 xl:px-12">
-          <button
-            type="button"
-            className="flex items-center gap-3 text-left"
-            onClick={() => navigate('/main')}
-          >
-            <span className="h-7 w-7 rounded-md bg-[#263f98]" />
-            <span className="text-xl font-extrabold text-[#1f3d91]">InterviewLens</span>
-          </button>
+          <div className="flex h-full items-center gap-12">
+            <button
+              type="button"
+              className="flex items-center gap-3 text-left"
+              onClick={() => navigate('/main')}
+            >
+              <span className="h-7 w-7 rounded-md bg-[#263f98]" />
+              <span className="text-xl font-extrabold text-[#1f3d91]">InterviewLens</span>
+            </button>
 
-          <nav className="hidden h-full items-center gap-9 text-base font-bold text-slate-600 md:flex">
-            <button
-              type="button"
-              className="h-full border-b-[3px] border-[#263f98] px-1 text-[#263f98]"
-              onClick={() => navigate('/interview')}
-            >
-              면접 연습
-            </button>
-            <button
-              type="button"
-              className="h-full px-1 transition hover:text-[#263f98]"
-              onClick={() => navigate('/report')}
-            >
-              결과 리포트
-            </button>
-            <button
-              type="button"
-              className="h-full px-1 transition hover:text-[#263f98]"
-              onClick={() => navigate('/settings/resume')}
-            >
-              내 자소서
-            </button>
-            <button
-              type="button"
-              className="h-full px-1 transition hover:text-[#263f98]"
-              onClick={() => navigate('/settings/analysis-guide')}
-            >
-              분석 기준
-            </button>
-          </nav>
+            <nav className="hidden h-full items-center gap-9 text-base font-bold text-slate-600 md:flex">
+              <button
+                type="button"
+                className="h-full border-b-[3px] border-[#263f98] px-1 text-[#263f98]"
+                onClick={() => navigate('/interview')}
+              >
+                면접 연습
+              </button>
+              <button
+                type="button"
+                className="h-full px-1 transition hover:text-[#263f98]"
+                onClick={() => navigate('/report')}
+              >
+                결과 리포트
+              </button>
+              <button
+                type="button"
+                className="h-full px-1 transition hover:text-[#263f98]"
+                onClick={() => navigate('/settings/resume')}
+              >
+                내 자소서
+              </button>
+              <button
+                type="button"
+                className="h-full px-1 transition hover:text-[#263f98]"
+                onClick={() => navigate('/settings/analysis-guide')}
+              >
+                분석 기준
+              </button>
+            </nav>
+          </div>
 
           <div className="flex items-center gap-5">
             <button
