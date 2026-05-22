@@ -257,7 +257,30 @@
   font-size: 11px;
   color: #94a3b8;
 }
+.resume-tip-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+  padding: 16px 20px;
+  border: 1px solid #e5eaf3;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.03);
+}
 
+.resume-tip-icon {
+  flex-shrink: 0;
+  font-size: 15px;
+}
+
+.resume-tip-box p {
+  margin: 0;
+  line-height: 1.6;
+}
 @media (max-width: 768px) {
   .resume-manage-page {
     padding: 28px 18px 50px;
@@ -276,4 +299,12 @@
   .resume-actions {
     flex-wrap: wrap;
   }
+  .resume-tip-box {
+    align-items: flex-start;
+  }
+}
+.upload-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }

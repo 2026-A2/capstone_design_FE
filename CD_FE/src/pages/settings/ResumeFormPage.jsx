@@ -1,15 +1,31 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import './ResumeFormPage.css';
 
 export default function ResumeFormPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { id } = useParams();
 
   const isEditMode = Boolean(id);
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+
+  useEffect(() => {
+    if (isEditMode) return;
+
+    const uploadedFileName = location.state?.uploadedFileName;
+    const uploadedContent = location.state?.uploadedContent;
+
+    if (uploadedFileName) {
+      setTitle(uploadedFileName.replace('.txt', ''));
+    }
+
+    if (uploadedContent) {
+      setContent(uploadedContent.slice(0, 300));
+    }
+  }, [isEditMode, location.state]);
 
   useEffect(() => {
     if (!isEditMode) return;

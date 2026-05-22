@@ -31,6 +31,36 @@ export default function ResumeManagePage() {
     return new Date(date).toLocaleDateString('ko-KR').replaceAll(' ', '');
   };
 
+  const handleUploadResume = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'text/plain') {
+      alert('TXT 파일만 업로드할 수 있습니다.');
+      e.target.value = '';
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('10MB 이하의 파일만 업로드할 수 있습니다.');
+      e.target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      navigate('/settings/resume/new', {
+        state: {
+          uploadedFileName: file.name,
+          uploadedContent: reader.result,
+        },
+      });
+    };
+
+    reader.readAsText(file, 'UTF-8');
+  };
+
   const handleDelete = (id) => {
     const confirmed = window.confirm('선택한 자소서를 삭제하시겠습니까?');
     if (!confirmed) return;
@@ -71,28 +101,47 @@ export default function ResumeManagePage() {
             <nav className="hidden h-full items-center gap-9 text-base font-bold text-slate-600 md:flex">
               <button
                 type="button"
-                className={`h-full px-1 transition ${location.pathname === '/interview' ? 'border-b-[3px] border-[#263f98] text-[#263f98]' : 'hover:text-[#263f98]'}`}
+                className={`h-full px-1 transition ${
+                  location.pathname === '/interview'
+                    ? 'border-b-[3px] border-[#263f98] text-[#263f98]'
+                    : 'hover:text-[#263f98]'
+                }`}
                 onClick={() => navigate('/interview')}
               >
                 면접 연습
               </button>
+
               <button
                 type="button"
-                className={`h-full px-1 transition ${location.pathname.startsWith('/report') ? 'border-b-[3px] border-[#263f98] text-[#263f98]' : 'hover:text-[#263f98]'}`}
+                className={`h-full px-1 transition ${
+                  location.pathname.startsWith('/report')
+                    ? 'border-b-[3px] border-[#263f98] text-[#263f98]'
+                    : 'hover:text-[#263f98]'
+                }`}
                 onClick={() => navigate('/report')}
               >
                 결과 리포트
               </button>
+
               <button
                 type="button"
-                className={`h-full px-1 transition ${location.pathname.startsWith('/settings/resume') ? 'border-b-[3px] border-[#263f98] text-[#263f98]' : 'hover:text-[#263f98]'}`}
+                className={`h-full px-1 transition ${
+                  location.pathname.startsWith('/settings/resume')
+                    ? 'border-b-[3px] border-[#263f98] text-[#263f98]'
+                    : 'hover:text-[#263f98]'
+                }`}
                 onClick={() => navigate('/settings/resume')}
               >
                 내 자소서
               </button>
+
               <button
                 type="button"
-                className={`h-full px-1 transition ${location.pathname.startsWith('/settings/analysis-guide') ? 'border-b-[3px] border-[#263f98] text-[#263f98]' : 'hover:text-[#263f98]'}`}
+                className={`h-full px-1 transition ${
+                  location.pathname.startsWith('/settings/analysis-guide')
+                    ? 'border-b-[3px] border-[#263f98] text-[#263f98]'
+                    : 'hover:text-[#263f98]'
+                }`}
                 onClick={() => navigate('/settings/analysis-guide')}
               >
                 분석 기준
@@ -150,13 +199,15 @@ export default function ResumeManagePage() {
               </p>
 
               <div className="empty-button-row">
-                <button
-                  type="button"
-                  className="primary-add-button"
-                  onClick={() => navigate('/settings/resume/new')}
-                >
+                <label className="primary-add-button upload-label">
                   + 자소서 업로드
-                </button>
+                  <input
+                    type="file"
+                    accept=".txt"
+                    hidden
+                    onChange={handleUploadResume}
+                  />
+                </label>
 
                 <button
                   type="button"
@@ -167,9 +218,7 @@ export default function ResumeManagePage() {
                 </button>
               </div>
 
-              <span className="empty-guide">
-                지원 형식 · PDF · DOCX · TXT · 최대 10MB
-              </span>
+              <span className="empty-guide">지원 형식 · TXT · 최대 10MB</span>
             </section>
           ) : (
             <>
@@ -274,6 +323,14 @@ export default function ResumeManagePage() {
                   ))}
                 </div>
               </section>
+
+              <div className="resume-tip-box">
+                <span className="resume-tip-icon">💡</span>
+                <p>
+                  ‘기본 자소서’로 설정하면 면접 시작 시 자동으로 선택되어 한
+                  단계가 생략돼요. 자주 쓰는 자소서를 기본으로 두세요.
+                </p>
+              </div>
             </>
           )}
         </div>
