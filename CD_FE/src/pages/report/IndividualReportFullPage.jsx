@@ -201,7 +201,7 @@ export default function IndividualReportFullPage() {
       unit: '%',
       icon: '📉',
       recommendedText: '0-25% 권장',
-      category: '습관',
+      category: '발화',
     },
     {
       label: '고개 끄덕임',
