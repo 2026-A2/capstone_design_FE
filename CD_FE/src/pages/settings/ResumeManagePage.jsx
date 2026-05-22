@@ -55,12 +55,23 @@ export default function ResumeManagePage() {
     <div className="resume-manage-page">
       <div className="resume-manage-container">
         <header className="resume-manage-header">
-          <div>
-            <h1>내 자소서</h1>
-            <p>
-              자소서를 등록해두면 직무에 맞는 맞춤 질문을 받을 수 있어요. 면접
-              시작 전에 빠르게 선택만 하면 됩니다.
-            </p>
+          <div className="header-left">
+            <button
+              type="button"
+              className="back-button"
+              onClick={() => navigate('/main')}
+              aria-label="뒤로가기"
+            >
+              ←
+            </button>
+
+            <div>
+              <h1>내 자소서</h1>
+              <p>
+                자소서를 등록해두면 직무에 맞는 맞춤 질문을 받을 수 있어요. 면접
+                시작 전에 빠르게 선택만 하면 됩니다.
+              </p>
+            </div>
           </div>
 
           {resumeList.length > 0 && (
@@ -112,7 +123,6 @@ export default function ResumeManagePage() {
               <div className="summary-card">
                 <span>등록 자소서</span>
                 <strong>{resumeList.length}개</strong>
-                <p>최대 5개 등록 가능</p>
               </div>
 
               <div className="summary-card">
