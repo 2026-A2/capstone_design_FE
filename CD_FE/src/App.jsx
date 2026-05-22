@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/Login.jsx';
 import Main from './pages/Main.jsx';
 
 import ResumeManagePage from './pages/settings/ResumeManagePage.jsx';
@@ -35,7 +34,7 @@ import TotalBodyShakePage from './pages/report/components/TotalBodyShakePage.jsx
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
+      <Route path="/" element={<Main />} />
       <Route path="/main" element={<Main />} />
 
       <Route path="/settings/resume" element={<ResumeManagePage />} />
@@ -90,7 +89,7 @@ function App() {
       <Route path="/interview/questions" element={<QuestionsResult />} />
       <Route path="/interview/review" element={<RecordingReview />} />
       <Route path="/interview/complete" element={<InterviewComplete />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/main" replace />} />
     </Routes>
   );
 }
