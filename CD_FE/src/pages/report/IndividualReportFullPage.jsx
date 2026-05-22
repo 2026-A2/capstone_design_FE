@@ -250,23 +250,32 @@ export default function IndividualReportFullPage() {
     }));
   };
   const handleDownloadReport = () => {
-    const reportText = `
-${report.title}
+    const categories = ['시선처리', '발화', '표정', '습관', '자세'];
+    
+    let reportText = `${report.title}\n\n[분석 결과 상세]\n\n`;
 
-[분석 결과 요약]
+    categories.forEach((category) => {
+      const categoryItems = analysisItems.filter(
+        (item) => item.category === category,
+      );
 
-${analysisItems
-  .map(
-    (item) => `
+      if (categoryItems.length === 0) return;
+
+      reportText += `■ ${category}\n`;
+      reportText += categoryItems
+        .map(
+          (item) => `
 - ${item.label}
   값: ${item.value !== undefined ? item.value : '-'}${item.unit}
   상태: ${getStatusLabel(item.status)}
   권장 기준: ${item.recommendedText}
   상세 분석: ${item.detailContent || '상세 분석 정보가 없습니다.'}
 `,
-  )
-  .join('\n')}
-`;
+        )
+        .join('');
+
+      reportText += '\n';
+    });
 
     const blob = new Blob([reportText], {
       type: 'text/plain;charset=utf-8',

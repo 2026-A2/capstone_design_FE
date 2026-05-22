@@ -31,7 +31,7 @@ export default function ReportPage() {
             <ul className="report-feature-list blue">
               <li>한 회차의 5개 카테고리 요약</li>
               <li>11개 세부 항목별 권장 범위와 사용자 값</li>
-              <li>회차별 출처ㆍ정성 코멘트</li>
+              <li>회차별 상세 분석 결과 제공</li>
             </ul>
             <button>회차 선택하러 가기</button>
           </div>

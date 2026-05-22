@@ -87,7 +87,7 @@ const analysisGuides = [
     items: [
       {
         title: '어깨 기울기',
-        standard: '≥ 90% 안정 75~89% 보통< 75% 이탈',
+        standard: '≥ 90% 안정, 75~89% 보통, < 75% 이탈',
         description: '어깨 라인이 평행 상태를 유지한 시간 비율입니다.',
       },
       {
