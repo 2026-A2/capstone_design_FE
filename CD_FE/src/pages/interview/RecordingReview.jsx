@@ -138,7 +138,7 @@ function RecordingReview() {
           <video
             src={recordingUrl}
             controls
-            className="mt-8 aspect-video w-full max-w-2xl rounded-3xl bg-gray-950 object-contain"
+            className="mt-8 aspect-video w-full max-w-2xl scale-x-[-1] rounded-3xl bg-gray-950 object-contain"
           />
         )}
 
