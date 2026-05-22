@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import './AnalysisGuidePage.css';
 
@@ -102,70 +102,122 @@ const analysisGuides = [
 
 export default function AnalysisGuidePage() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   return (
-    <div className="analysis-guide-page">
-      <div className="analysis-guide-container">
-        <div className="analysis-guide-header">
-          <button
-            className="analysis-guide-back-button"
-            onClick={() => navigate('/main')}
-          >
-            ←
-          </button>
+    <div className="min-h-screen bg-[#f4f7fb] text-slate-900">
+      <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex h-[74px] max-w-[1640px] items-center justify-between px-6 sm:px-10 xl:px-12">
+          <div className="flex h-full items-center gap-12">
+            <button
+              type="button"
+              className="flex items-center gap-3 text-left"
+              onClick={() => navigate('/main')}
+            >
+              <span className="h-7 w-7 rounded-md bg-[#263f98]" />
+              <span className="text-xl font-extrabold text-[#1f3d91]">
+                InterviewLens
+              </span>
+            </button>
 
-          <div>
-            <h1>분석 기준 안내</h1>
-            <p>면접 분석에 사용되는 11가지 항목의 평가 기준입니다.</p>
+            <nav className="hidden h-full items-center gap-9 text-base font-bold text-slate-600 md:flex">
+              <button
+                type="button"
+                className={`h-full px-1 transition ${location.pathname === '/interview' ? 'border-b-[3px] border-[#263f98] text-[#263f98]' : 'hover:text-[#263f98]'}`}
+                onClick={() => navigate('/interview')}
+              >
+                면접 연습
+              </button>
+              <button
+                type="button"
+                className={`h-full px-1 transition ${location.pathname.startsWith('/report') ? 'border-b-[3px] border-[#263f98] text-[#263f98]' : 'hover:text-[#263f98]'}`}
+                onClick={() => navigate('/report')}
+              >
+                결과 리포트
+              </button>
+              <button
+                type="button"
+                className={`h-full px-1 transition ${location.pathname.startsWith('/settings/resume') ? 'border-b-[3px] border-[#263f98] text-[#263f98]' : 'hover:text-[#263f98]'}`}
+                onClick={() => navigate('/settings/resume')}
+              >
+                내 자소서
+              </button>
+              <button
+                type="button"
+                className={`h-full px-1 transition ${location.pathname.startsWith('/settings/analysis-guide') ? 'border-b-[3px] border-[#263f98] text-[#263f98]' : 'hover:text-[#263f98]'}`}
+                onClick={() => navigate('/settings/analysis-guide')}
+              >
+                분석 기준
+              </button>
+            </nav>
+          </div>
+
+          <div className="flex items-center gap-5">
+            <button
+              type="button"
+              aria-label="분석 기준 안내"
+              className="h-8 w-8 rounded-full bg-slate-100 transition hover:bg-slate-200"
+              onClick={() => navigate('/settings/analysis-guide')}
+            />
+            <button
+              type="button"
+              aria-label="내 자소서 관리"
+              className="h-11 w-11 rounded-full bg-blue-100 transition hover:bg-blue-200"
+              onClick={() => navigate('/settings/resume')}
+            />
           </div>
         </div>
+      </header>
 
-        <div className="analysis-guide-grid">
-          {analysisGuides.map((category) => (
-            <div key={category.category} className="analysis-guide-section">
-              <div
-                className="category-header"
-                style={{ borderLeftColor: category.categoryColor }}
-              >
-                <h3 style={{ color: category.categoryColor }}>
-                  {category.category}
-                </h3>
-              </div>
+      <main className="mx-auto max-w-[1640px] px-6 py-7 sm:px-10 xl:px-12">
+        <div className="analysis-guide-page-content">
+          <div className="analysis-guide-grid">
+            {analysisGuides.map((category) => (
+              <div key={category.category} className="analysis-guide-section">
+                <div
+                  className="category-header"
+                  style={{ borderLeftColor: category.categoryColor }}
+                >
+                  <h3 style={{ color: category.categoryColor }}>
+                    {category.category}
+                  </h3>
+                </div>
 
-              <div className="category-items">
-                {category.items.map((item, itemIndex) => (
-                  <div
-                    key={item.title}
-                    className="analysis-guide-card"
-                    style={{
-                      borderTop: `3px solid ${category.categoryColor}`,
-                    }}
-                  >
+                <div className="category-items">
+                  {category.items.map((item, itemIndex) => (
                     <div
-                      className="analysis-guide-number"
-                      style={{ background: category.categoryColor }}
+                      key={item.title}
+                      className="analysis-guide-card"
+                      style={{
+                        borderTop: `3px solid ${category.categoryColor}`,
+                      }}
                     >
-                      {itemIndex + 1}
-                    </div>
+                      <div
+                        className="analysis-guide-number"
+                        style={{ background: category.categoryColor }}
+                      >
+                        {itemIndex + 1}
+                      </div>
 
-                    <div className="analysis-guide-content">
-                      <h2>{item.title}</h2>
-                      <strong style={{ color: category.categoryColor }}>
-                        {item.standard}
-                      </strong>
-                      <p>{item.description}</p>
+                      <div className="analysis-guide-content">
+                        <h2>{item.title}</h2>
+                        <strong style={{ color: category.categoryColor }}>
+                          {item.standard}
+                        </strong>
+                        <p>{item.description}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
