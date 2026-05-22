@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Main from './pages/Main.jsx';
 
 import ResumeManagePage from './pages/settings/ResumeManagePage.jsx';
+import ResumeFormPage from './pages/settings/ResumeFormPage';
 import AnalysisGuidePage from './pages/settings/AnalysisGuidePage.jsx';
 import DeletedReportPage from './pages/report/DeletedReportPage.jsx';
 
@@ -38,6 +39,10 @@ function App() {
       <Route path="/main" element={<Main />} />
 
       <Route path="/settings/resume" element={<ResumeManagePage />} />
+
+      <Route path="/settings/resume/new" element={<ResumeFormPage />} />
+
+      <Route path="/settings/resume/edit/:id" element={<ResumeFormPage />} />
       <Route path="/settings/analysis-guide" element={<AnalysisGuidePage />} />
       <Route path="/report/individual/trash" element={<DeletedReportPage />} />
 

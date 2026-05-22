@@ -1,0 +1,171 @@
+.resume-form-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(37, 99, 235, 0.08),
+      transparent 32%
+    ),
+    #f5f7fc;
+  padding: 28px 20px 44px;
+  box-sizing: border-box;
+}
+
+.resume-form-container {
+  width: min(760px, 100%);
+  margin: 0 auto;
+}
+
+.resume-form-back-button {
+  width: 44px;
+  height: 44px;
+  margin-bottom: 22px;
+  border: none;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #172554;
+  font-size: 22px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.resume-form-header {
+  margin-bottom: 22px;
+}
+
+.resume-form-header h1 {
+  margin: 0 0 8px;
+  font-size: 30px;
+  font-weight: 900;
+  color: #172554;
+}
+
+.resume-form-header p {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.resume-form-card {
+  background: #ffffff;
+  border: 1px solid #e8eef8;
+  border-radius: 22px;
+  padding: 26px 28px;
+  box-shadow: 0 16px 38px rgba(15, 23, 42, 0.08);
+}
+
+.resume-form-label {
+  display: block;
+  margin-bottom: 20px;
+  font-size: 15px;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.resume-form-label input,
+.resume-form-label textarea {
+  width: 100%;
+  margin-top: 10px;
+  border: 1px solid #dbe4f0;
+  border-radius: 14px;
+  background: #f8fbff;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  font-size: 15px;
+  font-family: inherit;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.resume-form-label input {
+  height: 52px;
+}
+
+.resume-form-label textarea {
+  min-height: 210px;
+  resize: vertical;
+  line-height: 1.7;
+}
+
+.resume-form-label input:focus,
+.resume-form-label textarea:focus {
+  outline: none;
+  border-color: #2f48d8;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(47, 72, 216, 0.1);
+}
+
+.resume-form-count {
+  margin-top: -8px;
+  margin-bottom: 18px;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.resume-form-button-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.resume-form-cancel-button,
+.resume-form-save-button {
+  min-width: 104px;
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.resume-form-cancel-button {
+  background: #eef2f7;
+  color: #475569;
+}
+
+.resume-form-save-button {
+  background: linear-gradient(135deg, #24388f, #3554d1);
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(36, 56, 143, 0.22);
+}
+
+.resume-form-save-button:disabled {
+  background: #94a3b8;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .resume-form-page {
+    padding: 24px 16px 40px;
+  }
+
+  .resume-form-container {
+    width: 100%;
+  }
+
+  .resume-form-header h1 {
+    font-size: 26px;
+  }
+
+  .resume-form-card {
+    padding: 22px;
+  }
+
+  .resume-form-label textarea {
+    min-height: 190px;
+  }
+
+  .resume-form-button-row {
+    flex-direction: column;
+  }
+
+  .resume-form-cancel-button,
+  .resume-form-save-button {
+    width: 100%;
+  }
+}
