@@ -1,7 +1,23 @@
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { getInterviewFinalReport } from '../../api/interviewRecordingApi'
 import { useInterview } from '../../contexts/InterviewContext.jsx'
+
+const temporaryFinalReport = {
+  status: 'success',
+  interview_id: 102,
+  report: {
+    focus_rate: 63.0,
+    left_gaze_rate: 18.5,
+    right_gaze_rate: 9.5,
+    blinks_per_min: 65,
+    nod_count: 12,
+    shoulder_stability: 65,
+    lr_sway_count: 45,
+    fb_sway_count: 12,
+    total_smile_rate: 72,
+    is_swaying: true,
+  },
+}
 
 const reportItems = [
   { key: 'focus_rate', label: '정면 응시율', unit: '%' },
@@ -13,9 +29,18 @@ const reportItems = [
   { key: 'lr_sway_count', label: '좌우 흔들림', unit: '회' },
   { key: 'fb_sway_count', label: '앞뒤 흔들림', unit: '회' },
   { key: 'total_smile_rate', label: '전체 미소율', unit: '%' },
+  {
+    key: 'is_swaying',
+    label: '몸 흔들림 여부',
+    format: (value) => (value ? '감지됨' : '미감지'),
+  },
 ]
 
-const formatValue = (value, unit) => {
+const formatValue = (value, unit = '') => {
+  if (typeof value === 'boolean') {
+    return value ? '감지됨' : '미감지'
+  }
+
   if (typeof value === 'number') {
     return `${Number.isInteger(value) ? value : value.toFixed(1)}${unit}`
   }
@@ -29,26 +54,20 @@ function InterviewComplete() {
   const [reportState, setReportState] = useState('idle')
   const [reportError, setReportError] = useState('')
 
+  const currentInterviewId = interviewSession?.id
   const report = finalReport?.report
-  const reportInterviewId = finalReport?.interview_id ?? interviewSession?.id
+  const reportInterviewId = finalReport?.interview_id ?? currentInterviewId
 
   const handleShowReport = async () => {
-    if (!interviewSession?.id || reportState === 'loading') {
+    if (reportState === 'loading') {
       return
     }
 
     setReportState('loading')
     setReportError('')
 
-    try {
-      const data = await getInterviewFinalReport(interviewSession.id)
-
-      setFinalReport(data)
-      setReportState('success')
-    } catch {
-      setReportState('error')
-      setReportError('최종 리포트를 불러오지 못했습니다. 백엔드 API 연결 상태를 확인해주세요.')
-    }
+    setFinalReport(temporaryFinalReport)
+    setReportState('success')
   }
 
   return (
@@ -68,10 +87,8 @@ function InterviewComplete() {
           <div className="mt-8 w-full text-left">
             <div className="rounded-2xl bg-blue-50 px-6 py-5 text-center">
               <p className="text-sm font-semibold text-blue-700">면접 ID {reportInterviewId}</p>
-              <p className="mt-2 text-4xl font-bold text-blue-700">
-                {formatValue(report.overall_score, '점')}
-              </p>
-              <p className="mt-1 text-sm font-semibold text-blue-600">전체 면접 점수</p>
+              <p className="mt-2 text-3xl font-bold text-blue-700">행동 분석 리포트</p>
+              <p className="mt-1 text-sm font-semibold text-blue-600">백엔드 분석 결과</p>
             </div>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -79,25 +96,12 @@ function InterviewComplete() {
                 <div key={item.key} className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
                   <p className="text-sm font-semibold text-gray-500">{item.label}</p>
                   <p className="mt-2 text-2xl font-bold text-gray-900">
-                    {formatValue(report[item.key], item.unit)}
+                    {item.format
+                      ? item.format(report[item.key])
+                      : formatValue(report[item.key], item.unit)}
                   </p>
                 </div>
               ))}
-            </div>
-
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
-                <p className="text-sm font-semibold text-gray-500">시작 10초 미소</p>
-                <p className="mt-2 text-xl font-bold text-gray-900">
-                  {report.start_smile_status ? '감지됨' : '미감지'}
-                </p>
-              </div>
-              <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
-                <p className="text-sm font-semibold text-gray-500">종료 10초 미소</p>
-                <p className="mt-2 text-xl font-bold text-gray-900">
-                  {report.end_smile_status ? '감지됨' : '미감지'}
-                </p>
-              </div>
             </div>
           </div>
         )}
@@ -105,7 +109,7 @@ function InterviewComplete() {
         <button
           type="button"
           onClick={report ? () => navigate('/main') : handleShowReport}
-          disabled={!interviewSession?.id || reportState === 'loading'}
+          disabled={reportState === 'loading'}
           className="mt-10 rounded-2xl bg-blue-500 px-6 py-4 text-lg font-semibold text-white transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-300"
         >
           {report

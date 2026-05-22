@@ -90,6 +90,7 @@ function InterviewProvider({ children }) {
       }
 
       setInterviewSession(session);
+      setFinalReport(null);
       return session;
     } catch (requestError) {
       setError('면접 세션 생성에 실패했습니다. 잠시 후 다시 시도해주세요.');
