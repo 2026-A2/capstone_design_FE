@@ -308,7 +308,7 @@ ${analysisItems
           </div>
 
           <div className="analysis-container">
-            <h3 className="analysis-title">분석 결과 요약</h3>
+            <h3 className="analysis-title">분석 결과 상세</h3>
 
             <div className="analysis-items">
               {['시선처리', '발화', '표정', '습관', '자세'].map((category) => {

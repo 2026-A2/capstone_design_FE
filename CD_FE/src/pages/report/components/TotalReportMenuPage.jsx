@@ -29,6 +29,7 @@ export default function TotalReportMenuPage() {
         <p className="total-menu-desc">
           누적 면접 데이터를 바탕으로 아래 순서대로 분석 결과를 확인할 수
           있습니다.
+          <br />각 항목을 클릭하면 해당 분석 페이지로 바로 이동할 수 있습니다.
         </p>
 
         <div className="total-menu-grid">
