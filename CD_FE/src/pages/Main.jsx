@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 const stats = [
   { label: '총 연습 횟수', value: '12회', detail: '+3 이번 주', tone: 'text-blue-600' },
-  { label: '평균 점수', value: '84점', detail: '▲ 6점', tone: 'text-emerald-500' },
+  { label: '이번 주 연습', value: '3회', detail: '지난 주 +1', tone: 'text-emerald-500' },
   { label: '주요 개선 항목', value: '시선 처리', detail: '3회 연속 지적', tone: 'text-amber-500' },
   { label: '오늘의 연습', value: '미완료', detail: '지금 시작하기 ->', tone: 'text-red-500' },
 ];
@@ -11,25 +11,22 @@ const reports = [
   {
     round: '12회차',
     time: '오늘 14:32',
-    name: '변지은',
-    score: '87점',
-    color: 'border-emerald-500',
+    title: '프론트엔드 개발자 면접',
+    summary: '필러어 줄이기 + 자세 유지에 집중',
     tags: ['자세', '시선'],
   },
   {
     round: '11회차',
     time: '2일 전',
-    name: '변지은',
-    score: '79점',
-    color: 'border-amber-500',
+    title: '프론트엔드 개발자 면접',
+    summary: '발화 속도 안정 · 표정 다소 경직',
     tags: ['표정', '발화 속도'],
   },
   {
     round: '10회차',
     time: '1주 전',
-    name: '변지은',
-    score: '82점',
-    color: 'border-blue-600',
+    title: '프론트엔드 개발자 면접',
+    summary: '전반적으로 안정 · 손동작 빈도 ↑',
     tags: ['습관', '손동작'],
   },
 ];
@@ -99,7 +96,7 @@ function Main() {
       </header>
 
       <main className="mx-auto max-w-[1640px] px-6 py-7 sm:px-10 xl:px-12">
-        <section className="relative isolate min-h-[410px] overflow-hidden rounded-[28px] bg-[#263f98] px-8 py-14 text-white shadow-sm sm:px-16 lg:px-[68px]">
+        <section className="relative isolate min-h-[336px] overflow-hidden rounded-[24px] bg-[#263f98] px-8 py-12 text-white shadow-sm sm:px-14 lg:px-14">
           <div className="absolute -right-16 -top-32 h-[520px] w-[520px] rounded-full bg-[#4969df]" />
           <div className="absolute bottom-[-150px] right-[12%] h-[390px] w-[390px] rounded-full bg-[#7289df]" />
 
@@ -109,20 +106,20 @@ function Main() {
               AI 면접 분석
             </span>
 
-            <h1 className="mt-8 text-[40px] font-extrabold leading-tight tracking-normal sm:text-[52px]">
+            <h1 className="mt-7 text-[34px] font-extrabold leading-tight tracking-normal sm:text-[44px]">
               오늘도 면접 연습을
               <br />
               같이 한번 해볼까요?
             </h1>
 
-            <p className="mt-8 text-base font-medium leading-7 text-blue-100">
+            <p className="mt-7 text-sm font-medium leading-7 text-blue-100 sm:text-base">
               웹캠과 AI로 당신의 면접 태도를 분석하고, 맞춤형 피드백으로 성장을 도와드려요.
             </p>
 
-            <div className="mt-8 flex w-full flex-col gap-4 sm:flex-row">
+            <div className="mt-7 flex w-full flex-col gap-4 sm:flex-row">
               <button
                 type="button"
-                className="flex h-[72px] items-center justify-center gap-3 rounded-[26px] bg-[#ff675e] px-10 text-lg font-extrabold text-white transition hover:bg-[#f25750] sm:min-w-[265px]"
+                className="flex h-[60px] items-center justify-center gap-3 rounded-[20px] bg-[#ff675e] px-9 text-base font-extrabold text-white transition hover:bg-[#f25750] sm:min-w-[217px]"
                 onClick={() => navigate('/interview')}
               >
                 <span className="h-0 w-0 border-b-[9px] border-l-[6px] border-r-[6px] border-b-white border-l-transparent border-r-transparent" />
@@ -131,7 +128,7 @@ function Main() {
 
               <button
                 type="button"
-                className="h-[72px] rounded-[16px] bg-white/10 px-10 text-lg font-bold text-white transition hover:bg-white/15 sm:min-w-[205px]"
+                className="h-[60px] rounded-[14px] bg-white/10 px-9 text-base font-bold text-white transition hover:bg-white/15 sm:min-w-[165px]"
                 onClick={() => navigate('/settings/resume')}
               >
                 내 자소서 관리
@@ -172,7 +169,7 @@ function Main() {
               <button
                 type="button"
                 key={report.round}
-                className="min-h-[264px] rounded-[18px] border border-slate-200 bg-white px-7 py-7 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                className="min-h-[214px] rounded-[14px] border border-slate-200 bg-white px-6 py-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                 onClick={() => navigate('/report')}
               >
                 <div className="flex items-center justify-between">
@@ -182,16 +179,14 @@ function Main() {
                   <span className="text-sm font-medium text-slate-500">{report.time}</span>
                 </div>
 
-                <p className="mt-4 text-xl font-extrabold text-slate-950">{report.name}</p>
+                <p className="mt-4 text-base font-extrabold text-slate-950 sm:text-lg">{report.title}</p>
+                <p className="mt-3 text-sm font-medium text-slate-600">{report.summary}</p>
 
-                <div className="mt-5 flex items-center gap-5">
-                  <span className={`flex h-[86px] w-[86px] items-center justify-center rounded-full border-[5px] ${report.color} text-[28px] font-extrabold`}>
-                    {report.score}
-                  </span>
-                  <span className="text-sm font-bold text-slate-500">종합 점수</span>
-                </div>
+                <span className="mt-6 inline-flex rounded-full bg-emerald-100 px-5 py-2 text-xs font-extrabold text-emerald-600">
+                  ✓ 완료
+                </span>
 
-                <div className="mt-5 flex flex-wrap items-center gap-8">
+                <div className="mt-5 flex flex-wrap items-center gap-7">
                   <span className="text-sm font-bold text-slate-500">주요 피드백</span>
                   {report.tags.map((tag) => (
                     <span
