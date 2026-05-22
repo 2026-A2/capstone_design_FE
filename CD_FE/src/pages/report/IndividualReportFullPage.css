@@ -124,6 +124,27 @@
 .analysis-items {
   display: flex;
   flex-direction: column;
+  gap: 24px;
+}
+
+/* Analysis Category */
+.analysis-category {
+  margin-bottom: 12px;
+}
+
+.category-title {
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #6266e8;
+  padding: 0 4px;
+  border-left: 3px solid #6266e8;
+  padding-left: 12px;
+}
+
+.category-items {
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 

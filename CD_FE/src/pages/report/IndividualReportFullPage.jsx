@@ -144,6 +144,7 @@ export default function IndividualReportFullPage() {
       unit: '%',
       icon: '📷',
       recommendedText: '60% 이상 권장',
+      category: '시선처리',
     },
     {
       label: '발화 속도',
@@ -151,6 +152,7 @@ export default function IndividualReportFullPage() {
       unit: 'SPM',
       icon: '🎙️',
       recommendedText: '200-260 SPM 권장',
+      category: '발화',
     },
     {
       label: '음성 크기',
@@ -159,6 +161,7 @@ export default function IndividualReportFullPage() {
       icon: '🔊',
       recommendedText:
         '평균 -20~-35dB 권장, -10 이상: 매우 큼, -10~-20: 큼, -35~-50: 작음, -50 미만: 매우 작음',
+      category: '발화',
     },
     {
       label: '침묵 구간',
@@ -166,6 +169,7 @@ export default function IndividualReportFullPage() {
       unit: '회',
       icon: '⏸️',
       recommendedText: '3회 이하 권장',
+      category: '발화',
     },
     {
       label: '필러 사용',
@@ -173,6 +177,7 @@ export default function IndividualReportFullPage() {
       unit: '회',
       icon: '💬',
       recommendedText: '3회 이하 권장',
+      category: '발화',
     },
     {
       label: '미소율',
@@ -180,6 +185,7 @@ export default function IndividualReportFullPage() {
       unit: '%',
       icon: '😊',
       recommendedText: '50% 이상 권장, 면접시작·마무리 2회 권장',
+      category: '표정',
     },
     {
       label: '눈 깜빡임',
@@ -187,6 +193,7 @@ export default function IndividualReportFullPage() {
       unit: '회/분',
       icon: '👁️',
       recommendedText: '분당 15-20회 권장',
+      category: '습관',
     },
     {
       label: '문장 끝 흐릿함',
@@ -194,6 +201,7 @@ export default function IndividualReportFullPage() {
       unit: '%',
       icon: '📉',
       recommendedText: '0-25% 권장',
+      category: '습관',
     },
     {
       label: '고개 끄덕임',
@@ -201,6 +209,7 @@ export default function IndividualReportFullPage() {
       unit: '%',
       icon: '👤',
       recommendedText: '80-100% 권장',
+      category: '습관',
     },
     {
       label: '어깨 기울기',
@@ -208,6 +217,7 @@ export default function IndividualReportFullPage() {
       unit: '%',
       icon: '💪',
       recommendedText: '80-100% 권장',
+      category: '자세',
     },
     {
       label: '몸 흔들림',
@@ -215,6 +225,7 @@ export default function IndividualReportFullPage() {
       unit: '회',
       icon: '🔄',
       recommendedText: '1회 이하 권장',
+      category: '자세',
     },
   ];
 
@@ -300,68 +311,95 @@ ${analysisItems
             <h3 className="analysis-title">분석 결과 요약</h3>
 
             <div className="analysis-items">
-              {analysisItems.map((item, itemIndex) => {
-                const isExpanded = expandedItems[itemIndex];
+              {['시선처리', '발화', '표정', '습관', '자세'].map((category) => {
+                const categoryItems = analysisItems.filter(
+                  (item) => item.category === category,
+                );
+
+                if (categoryItems.length === 0) return null;
 
                 return (
-                  <div key={itemIndex} className="analysis-card">
-                    <div
-                      className="analysis-header"
-                      onClick={() => toggleItemExpand(itemIndex)}
-                      style={{
-                        borderLeftColor: getStatusColor(item.status),
-                        backgroundColor: `${getStatusColor(item.status)}15`,
-                      }}
-                    >
-                      <div className="analysis-left">
-                        <span className="analysis-icon">{item.icon}</span>
+                  <div key={category} className="analysis-category">
+                    <h4 className="category-title">{category}</h4>
+                    <div className="category-items">
+                      {categoryItems.map((item, itemIndex) => {
+                        const globalIndex = analysisItems.indexOf(item);
+                        const isExpanded = expandedItems[globalIndex];
 
-                        <div className="analysis-info">
-                          <h4>{item.label}</h4>
-                          <p>{item.description}</p>
-                        </div>
-                      </div>
+                        return (
+                          <div key={globalIndex} className="analysis-card">
+                            <div
+                              className="analysis-header"
+                              onClick={() => toggleItemExpand(globalIndex)}
+                              style={{
+                                borderLeftColor: getStatusColor(item.status),
+                                backgroundColor: `${getStatusColor(
+                                  item.status,
+                                )}15`,
+                              }}
+                            >
+                              <div className="analysis-left">
+                                <span className="analysis-icon">
+                                  {item.icon}
+                                </span>
 
-                      <div className="analysis-right">
-                        <div
-                          className="status-badge"
-                          style={{
-                            backgroundColor: getStatusColor(item.status),
-                          }}
-                        >
-                          <span className="status-text">
-                            {getStatusLabel(item.status)}
-                          </span>
-                        </div>
+                                <div className="analysis-info">
+                                  <h4>{item.label}</h4>
+                                  <p>{item.description}</p>
+                                </div>
+                              </div>
 
-                        <div className="value-display">
-                          <span className="value-number">
-                            {item.value !== undefined ? item.value : '-'}
-                          </span>
-                          <span className="value-unit">{item.unit}</span>
-                        </div>
+                              <div className="analysis-right">
+                                <div
+                                  className="status-badge"
+                                  style={{
+                                    backgroundColor: getStatusColor(
+                                      item.status,
+                                    ),
+                                  }}
+                                >
+                                  <span className="status-text">
+                                    {getStatusLabel(item.status)}
+                                  </span>
+                                </div>
 
-                        <button className="expand-btn">
-                          {isExpanded ? '▼' : '▶'}
-                        </button>
-                      </div>
+                                <div className="value-display">
+                                  <span className="value-number">
+                                    {item.value !== undefined
+                                      ? item.value
+                                      : '-'}
+                                  </span>
+                                  <span className="value-unit">
+                                    {item.unit}
+                                  </span>
+                                </div>
+
+                                <button className="expand-btn">
+                                  {isExpanded ? '▼' : '▶'}
+                                </button>
+                              </div>
+                            </div>
+
+                            {isExpanded && (
+                              <div className="analysis-detail">
+                                <div className="detail-section">
+                                  <h5>권장 기준</h5>
+                                  <p>{item.recommendedText}</p>
+                                </div>
+
+                                <div className="detail-section">
+                                  <h5>상세 분석</h5>
+                                  <p>
+                                    {item.detailContent ||
+                                      '상세 분석 정보가 없습니다.'}
+                                  </p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
-
-                    {isExpanded && (
-                      <div className="analysis-detail">
-                        <div className="detail-section">
-                          <h5>권장 기준</h5>
-                          <p>{item.recommendedText}</p>
-                        </div>
-
-                        <div className="detail-section">
-                          <h5>상세 분석</h5>
-                          <p>
-                            {item.detailContent || '상세 분석 정보가 없습니다.'}
-                          </p>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 );
               })}
