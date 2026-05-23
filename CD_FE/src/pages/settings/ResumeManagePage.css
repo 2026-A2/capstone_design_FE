@@ -308,3 +308,9 @@
   align-items: center;
   justify-content: center;
 }
+
+.resume-header-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}

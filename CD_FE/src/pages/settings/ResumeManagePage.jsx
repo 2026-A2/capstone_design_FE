@@ -178,13 +178,25 @@ export default function ResumeManagePage() {
             </div>
 
             {resumeList.length > 0 && (
-              <button
-                type="button"
-                className="primary-add-button"
-                onClick={() => navigate('/settings/resume/new')}
-              >
-                + 새 자소서 등록
-              </button>
+              <div className="resume-header-buttons">
+                <label className="primary-add-button upload-label">
+                  + TXT 파일 업로드
+                  <input
+                    type="file"
+                    accept=".txt"
+                    hidden
+                    onChange={handleUploadResume}
+                  />
+                </label>
+
+                <button
+                  type="button"
+                  className="primary-add-button"
+                  onClick={() => navigate('/settings/resume/new')}
+                >
+                  + 새 자소서 등록
+                </button>
+              </div>
             )}
           </header>
 
