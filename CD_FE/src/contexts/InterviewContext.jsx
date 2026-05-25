@@ -67,14 +67,19 @@ function InterviewProvider({ children }) {
     }
   };
 
-  const requestInterviewSession = async (sessionQuestions = questions) => {
+  const requestInterviewSession = async ({
+    calibrationRecording,
+  } = {}) => {
     setLoading(true);
     setError('');
 
     try {
       const session = await createInterviewSession({
         questionType,
-        questions: sessionQuestions,
+        questionCount,
+        resumeText,
+        industry,
+        calibrationRecording,
       });
       const sessionQuestionsResponse =
         session.questions || session.question_list || session.data?.questions;

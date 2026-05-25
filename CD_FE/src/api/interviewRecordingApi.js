@@ -5,20 +5,20 @@ const INTERVIEW_API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
   'http://localhost:8000';
 const INTERVIEW_UPLOAD_PATH =
-  import.meta.env.VITE_INTERVIEW_UPLOAD_PATH || '/behavior/analyze/';
+  import.meta.env.VITE_INTERVIEW_UPLOAD_PATH || '/interviews/';
 const INTERVIEW_SESSION_PATH =
-  import.meta.env.VITE_INTERVIEW_SESSION_PATH || '/interview/';
+  import.meta.env.VITE_INTERVIEW_SESSION_PATH || '/interviews/';
 
 const interviewApi = axios.create({
   baseURL: INTERVIEW_API_BASE_URL,
   timeout: 180000,
 });
 
-const getAnalyzeUrl = ({ interviewId, order }) =>
-  `${INTERVIEW_UPLOAD_PATH}${interviewId}/${order}/`;
+const getAnalyzeUrl = ({ interviewId }) =>
+  `${INTERVIEW_UPLOAD_PATH}${interviewId}/questions/`;
 
 const getFinalizeUrl = (interviewId) =>
-  `${INTERVIEW_SESSION_PATH}${interviewId}/finalize/`;
+  `${INTERVIEW_SESSION_PATH}${interviewId}/report/`;
 
 const logUploadSuccess = ({ interviewId, order, url, questionText, response }) => {
   console.info('[interview upload:success]', {
@@ -87,21 +87,43 @@ const getApiInterviewType = (questionType) =>
 
 export const createInterviewSession = async ({
   questionType,
-  questions,
+  questionCount,
+  resumeText,
+  industry,
+  calibrationRecording,
 }) => {
-  const payload = {
-    interview_type: getApiInterviewType(questionType),
-    questions: questions.map((question) =>
-      typeof question === 'string' ? question : question.question_text,
-    ),
-  };
+  const formData = new FormData();
+  const interviewType = getApiInterviewType(questionType);
+
+  formData.append('interview_type', interviewType);
+  formData.append('question_count', String(Number(questionCount) || 5));
+
+  if (interviewType === 'RESUME') {
+    formData.append('resume_text', resumeText || '');
+  } else {
+    formData.append('job_category', industry || '');
+  }
+
+  if (calibrationRecording) {
+    formData.append(
+      'video_file',
+      calibrationRecording,
+      calibrationRecording.name || 'calibration.webm',
+    );
+  }
 
   try {
-    const response = await interviewApi.post(INTERVIEW_SESSION_PATH, payload);
+    const response = await interviewApi.post(INTERVIEW_SESSION_PATH, formData);
 
     logSessionSuccess({
       url: INTERVIEW_SESSION_PATH,
-      payload,
+      payload: {
+        interview_type: interviewType,
+        question_count: Number(questionCount) || 5,
+        resume_text: interviewType === 'RESUME' ? resumeText : undefined,
+        job_category: interviewType === 'JOB' ? industry : undefined,
+        video_file: calibrationRecording?.name,
+      },
       response,
     });
 
@@ -112,7 +134,13 @@ export const createInterviewSession = async ({
   } catch (error) {
     logSessionFailure({
       url: INTERVIEW_SESSION_PATH,
-      payload,
+      payload: {
+        interview_type: interviewType,
+        question_count: Number(questionCount) || 5,
+        resume_text: interviewType === 'RESUME' ? resumeText : undefined,
+        job_category: interviewType === 'JOB' ? industry : undefined,
+        video_file: calibrationRecording?.name,
+      },
       error,
     });
 
@@ -122,12 +150,14 @@ export const createInterviewSession = async ({
 
 export const buildInterviewVideoFormData = ({
   recording,
+  order,
   questionText,
 }) => {
   const formData = new FormData();
   const filename = recording?.name || 'interview.webm';
 
   formData.append('video_file', recording, filename);
+  formData.append('question_order', String(order));
   formData.append('question_text', questionText || '');
 
   return formData;
@@ -139,7 +169,7 @@ export const uploadInterviewVideo = async ({
   order,
   questionText,
 }) => {
-  const formData = buildInterviewVideoFormData({ recording, questionText });
+  const formData = buildInterviewVideoFormData({ recording, order, questionText });
   const url = getAnalyzeUrl({ interviewId, order });
 
   try {
