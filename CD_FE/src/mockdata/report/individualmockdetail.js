@@ -1,6 +1,20 @@
 export const individualReportsDetail = [
   {
     id: 1,
+    title: '1회차 면접 리포트',
+    detail: {
+      eyeContactRate: 59,
+      speechRate: 200,
+      voiceVolume: -15,
+      silenceCount: 2,
+      fillerCount: 5,
+      smileRate: 42,
+      blinkCount: 18,
+      endingBlurCount: 26,
+      nodCount: 82,
+      shoulderTilt: 77,
+      bodyShake: 3,
+    },
     categories: [
       {
         id: 'all',
@@ -81,6 +95,20 @@ export const individualReportsDetail = [
 
   {
     id: 2,
+    title: '2회차 면접 리포트',
+    detail: {
+      eyeContactRate: 68,
+      speechRate: 230,
+      voiceVolume: -25,
+      silenceCount: 5,
+      fillerCount: 7,
+      smileRate: 51,
+      blinkCount: 15,
+      endingBlurCount: 22,
+      nodCount: 90,
+      shoulderTilt: 82,
+      bodyShake: 2,
+    },
     categories: [
       {
         id: 'all',
@@ -161,6 +189,20 @@ export const individualReportsDetail = [
 
   {
     id: 3,
+    title: '3회차 면접 리포트',
+    detail: {
+      eyeContactRate: 74,
+      speechRate: 280,
+      voiceVolume: -18,
+      silenceCount: 7,
+      fillerCount: 1,
+      smileRate: 58,
+      blinkCount: 13,
+      endingBlurCount: 19,
+      nodCount: 77,
+      shoulderTilt: 70,
+      bodyShake: 1,
+    },
     categories: [
       {
         id: 'all',

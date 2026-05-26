@@ -10,8 +10,18 @@ export default function TotalGazeReportPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const trends = await getReportTrends();
-      setEyeContactData(trends.eyeContactTrend || []);
+      try {
+        const response = await getReportTrends();
+
+        console.log('시선 처리 추세 응답:', response);
+
+        const trends = response?.data || response?.results || response || {};
+
+        setEyeContactData(trends.eyeContactTrend || []);
+      } catch (error) {
+        console.error('시선 처리 추세 조회 실패:', error);
+        setEyeContactData([]);
+      }
     };
 
     fetchData();

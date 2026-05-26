@@ -20,8 +20,18 @@ export default function TotalSilencePage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const trends = await getReportTrends();
-      setSilenceData(trends.silenceTrend || []);
+      try {
+        const response = await getReportTrends();
+
+        console.log('침묵 구간 추세 응답:', response);
+
+        const trends = response?.data || response?.results || response || {};
+
+        setSilenceData(trends.silenceTrend || []);
+      } catch (error) {
+        console.error('침묵 구간 추세 조회 실패:', error);
+        setSilenceData([]);
+      }
     };
 
     fetchData();

@@ -9,8 +9,18 @@ export default function TotalSmilePage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const trends = await getReportTrends();
-      setSmileData(trends.smileTrend || []);
+      try {
+        const response = await getReportTrends();
+
+        console.log('미소율 추세 응답:', response);
+
+        const trends = response?.data || response?.results || response || {};
+
+        setSmileData(trends.smileTrend || []);
+      } catch (error) {
+        console.error('미소율 추세 조회 실패:', error);
+        setSmileData([]);
+      }
     };
 
     fetchData();

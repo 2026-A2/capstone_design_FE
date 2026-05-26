@@ -20,8 +20,18 @@ export default function TotalFillerPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const trends = await getReportTrends();
-      setFillerData(trends.fillerTrend || []);
+      try {
+        const response = await getReportTrends();
+
+        console.log('필러 사용 추세 응답:', response);
+
+        const trends = response?.data || response?.results || response || {};
+
+        setFillerData(trends.fillerTrend || []);
+      } catch (error) {
+        console.error('필러 사용 추세 조회 실패:', error);
+        setFillerData([]);
+      }
     };
 
     fetchData();

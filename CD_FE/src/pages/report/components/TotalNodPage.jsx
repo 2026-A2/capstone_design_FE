@@ -10,8 +10,18 @@ export default function TotalNodPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const trends = await getReportTrends();
-      setNodData(trends.nodTrend || []);
+      try {
+        const response = await getReportTrends();
+
+        console.log('고개 끄덕임 추세 응답:', response);
+
+        const trends = response?.data || response?.results || response || {};
+
+        setNodData(trends.nodTrend || []);
+      } catch (error) {
+        console.error('고개 끄덕임 추세 조회 실패:', error);
+        setNodData([]);
+      }
     };
 
     fetchData();

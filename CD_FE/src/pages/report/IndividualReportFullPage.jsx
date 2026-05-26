@@ -1,10 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import './IndividualReportFullPage.css';
-import {
-  getIndividualReportSummary,
-  getIndividualReportDetail,
-} from '../../api/reportApi';
+import { getIndividualReportDetail } from '../../api/reportApi';
 
 export default function IndividualReportFullPage() {
   const navigate = useNavigate();
@@ -16,18 +13,31 @@ export default function IndividualReportFullPage() {
 
   useEffect(() => {
     const fetchReport = async () => {
-      const summaryData = await getIndividualReportSummary(id);
-      const detailData = await getIndividualReportDetail(id);
+      try {
+        const detailData = await getIndividualReportDetail(id);
 
-      setReport(
-        summaryData || {
+        console.log('상세 리포트 응답:', detailData);
+
+        setReport(
+          detailData || {
+            id,
+            title: '리포트 정보 없음',
+            detail: {},
+          },
+        );
+
+        setDetailReport(detailData || null);
+      } catch (error) {
+        console.error('상세 리포트 조회 실패:', error);
+
+        setReport({
           id,
           title: '리포트 정보 없음',
           detail: {},
-        },
-      );
+        });
 
-      setDetailReport(detailData || null);
+        setDetailReport(null);
+      }
     };
 
     fetchReport();
@@ -251,7 +261,7 @@ export default function IndividualReportFullPage() {
   };
   const handleDownloadReport = () => {
     const categories = ['시선처리', '발화', '표정', '습관', '자세'];
-    
+
     let reportText = `${report.title}\n\n[분석 결과 상세]\n\n`;
 
     categories.forEach((category) => {

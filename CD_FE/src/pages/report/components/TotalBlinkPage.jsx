@@ -9,8 +9,18 @@ export default function TotalBlinkPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const trends = await getReportTrends();
-      setBlinkData(trends.blinkTrend || []);
+      try {
+        const response = await getReportTrends();
+
+        console.log('눈 깜빡임 추세 응답:', response);
+
+        const trends = response?.data || response?.results || response || {};
+
+        setBlinkData(trends.blinkTrend || []);
+      } catch (error) {
+        console.error('눈 깜빡임 추세 조회 실패:', error);
+        setBlinkData([]);
+      }
     };
 
     fetchData();

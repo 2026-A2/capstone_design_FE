@@ -1,10 +1,7 @@
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import './IndividualReportDetailPage.css';
 import { useEffect, useState } from 'react';
-import {
-  getIndividualReportSummary,
-  getIndividualReportDetail,
-} from '../../api/reportApi';
+import { getIndividualReportDetail } from '../../api/reportApi';
 
 export default function IndividualReportDetailPage() {
   const navigate = useNavigate();
@@ -16,19 +13,32 @@ export default function IndividualReportDetailPage() {
 
   useEffect(() => {
     const fetchReport = async () => {
-      const summaryData =
-        location.state || (await getIndividualReportSummary(id));
-      const detailData = await getIndividualReportDetail(id);
+      try {
+        const detailData = await getIndividualReportDetail(id);
 
-      setReport(
-        summaryData || {
+        console.log('요약 리포트 상세 응답:', detailData);
+
+        const reportData = location.state ||
+          detailData || {
+            id,
+            title: '리포트 정보 없음',
+            detail: {},
+          };
+
+        setReport(reportData);
+        setDetailReport(detailData || null);
+      } catch (error) {
+        console.error('요약 리포트 조회 실패:', error);
+
+        const fallbackReport = location.state || {
           id,
           title: '리포트 정보 없음',
           detail: {},
-        },
-      );
+        };
 
-      setDetailReport(detailData || null);
+        setReport(fallbackReport);
+        setDetailReport(null);
+      }
     };
 
     fetchReport();

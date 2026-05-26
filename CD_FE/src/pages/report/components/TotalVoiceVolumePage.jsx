@@ -10,8 +10,18 @@ export default function TotalVoiceVolumePage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const trends = await getReportTrends();
-      setVoiceVolumeData(trends.voiceVolumeTrend || []);
+      try {
+        const response = await getReportTrends();
+
+        console.log('음성 크기 추세 응답:', response);
+
+        const trends = response?.data || response?.results || response || {};
+
+        setVoiceVolumeData(trends.voiceVolumeTrend || []);
+      } catch (error) {
+        console.error('음성 크기 추세 조회 실패:', error);
+        setVoiceVolumeData([]);
+      }
     };
 
     fetchData();

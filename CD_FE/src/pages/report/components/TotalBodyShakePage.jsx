@@ -19,8 +19,18 @@ export default function TotalBodyShakePage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const trends = await getReportTrends();
-      setBodyShakeData(trends.bodyShakeTrend || []);
+      try {
+        const response = await getReportTrends();
+
+        console.log('몸 흔들림 추세 응답:', response);
+
+        const trends = response?.data || response?.results || response || {};
+
+        setBodyShakeData(trends.bodyShakeTrend || []);
+      } catch (error) {
+        console.error('몸 흔들림 추세 조회 실패:', error);
+        setBodyShakeData([]);
+      }
     };
 
     fetchData();

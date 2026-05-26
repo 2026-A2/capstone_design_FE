@@ -20,13 +20,22 @@ export default function TotalEndingBlurPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const trends = await getReportTrends();
-      setEndingBlurData(trends.endingBlurTrend || []);
+      try {
+        const response = await getReportTrends();
+
+        console.log('문장 끝 흐릿함 추세 응답:', response);
+
+        const trends = response?.data || response?.results || response || {};
+
+        setEndingBlurData(trends.endingBlurTrend || []);
+      } catch (error) {
+        console.error('문장 끝 흐릿함 추세 조회 실패:', error);
+        setEndingBlurData([]);
+      }
     };
 
     fetchData();
   }, []);
-
   const currentStep = 8;
   const totalStep = 11;
   const progressPercent = (currentStep / totalStep) * 100;

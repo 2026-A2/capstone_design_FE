@@ -20,43 +20,38 @@ import {
 
 const USE_MOCK = true;
 
-// [3.3] 내 면접 기록 목록 조회
+// [4] 전체 면접 리포트 목록 조회
 export const getIndividualReports = async () => {
   if (USE_MOCK) {
     return individualReports;
   }
 
-  const response = await axiosInstance.get('/interview/list/');
+  const response = await axiosInstance.get('/interviews/');
   return response.data;
 };
 
 // 개별 리포트 요약 조회
-// 현재 Swagger에는 summary 전용 엔드포인트가 따로 안 보이므로
-// 우선 개별 리포트 상세 API를 호출해서 사용
+// Swagger에 summary 전용 API가 없으므로 상세 리포트 API를 사용
 export const getIndividualReportSummary = async (id) => {
   if (USE_MOCK) {
     return individualReports.find((report) => report.id === Number(id));
   }
 
-  const response = await axiosInstance.get(
-    `/behavior/report/individual/${id}/`,
-  );
+  const response = await axiosInstance.get(`/interviews/${id}/report/`);
   return response.data;
 };
 
-// [3.1] 개별 리포트 상세 조회
+// [3] 방금 마친 면접 결과 상세 리포트 조회
 export const getIndividualReportDetail = async (id) => {
   if (USE_MOCK) {
     return individualReportsDetail.find((report) => report.id === Number(id));
   }
 
-  const response = await axiosInstance.get(
-    `/behavior/report/individual/${id}/`,
-  );
+  const response = await axiosInstance.get(`/interviews/${id}/report/`);
   return response.data;
 };
 
-// [3.2] 누적 점수 추이 조회
+// [5] 회차별 변화 트렌드 데이터 조회
 export const getReportTrends = async () => {
   if (USE_MOCK) {
     return {
@@ -74,6 +69,6 @@ export const getReportTrends = async () => {
     };
   }
 
-  const response = await axiosInstance.get('/behavior/report/cumulative/');
+  const response = await axiosInstance.get('/interviews/trends/');
   return response.data;
 };

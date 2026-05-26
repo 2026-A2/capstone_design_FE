@@ -53,15 +53,30 @@ export default function IndividualReportPage() {
 
   useEffect(() => {
     const fetchReports = async () => {
-      const reports = await getIndividualReports();
-      const savedDeletedSessions = getDeletedSessions();
+      try {
+        const response = await getIndividualReports();
 
-      const visibleReports = reports.filter(
-        (report) => !savedDeletedSessions.includes(report.session ?? report.id),
-      );
+        console.log('리포트 목록 응답:', response);
 
-      setReportList(visibleReports);
-      setDeletedSessions(savedDeletedSessions);
+        const reports = Array.isArray(response)
+          ? response
+          : response?.data || response?.results || response?.interviews || [];
+
+        const savedDeletedSessions = getDeletedSessions();
+
+        const visibleReports = reports.filter(
+          (report) =>
+            !savedDeletedSessions.includes(report.session ?? report.id),
+        );
+
+        setReportList(visibleReports);
+        setDeletedSessions(savedDeletedSessions);
+      } catch (error) {
+        console.error('리포트 목록 조회 실패:', error);
+
+        setReportList([]);
+        setDeletedSessions(getDeletedSessions());
+      }
     };
 
     fetchReports();
