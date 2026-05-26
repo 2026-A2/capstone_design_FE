@@ -5,43 +5,121 @@ export default function TotalReportMenuPage() {
   const navigate = useNavigate();
 
   const analysisItems = [
-    { title: '시선처리', path: '/report/total/eye-contact' },
-    { title: '발화속도', path: '/report/total/speech-rate' },
-    { title: '음성크기', path: '/report/total/voice-volume' },
-    { title: '침묵구간', path: '/report/total/silence' },
-    { title: '필러어', path: '/report/total/filler' },
-    { title: '미소율', path: '/report/total/smile-rate' },
-    { title: '눈 깜빡임', path: '/report/total/blink' },
-    { title: '말끝흐림', path: '/report/total/ending-blur' },
-    { title: '고개끄떡임', path: '/report/total/nod' },
-    { title: '어깨기울기', path: '/report/total/shoulder-tilt' },
-    { title: '몸통흔들림', path: '/report/total/body-shake' },
+    {
+      title: '시선처리',
+      path: '/report/total/eye-contact',
+      group: 'visual',
+    },
+    {
+      title: '발화속도',
+      path: '/report/total/speech-rate',
+      group: 'speech-rate',
+    },
+    {
+      title: '음성크기',
+      path: '/report/total/voice-volume',
+      group: 'voice-volume',
+    },
+    {
+      title: '침묵구간',
+      path: '/report/total/silence',
+      group: 'silence',
+    },
+    {
+      title: '필러어',
+      path: '/report/total/filler',
+      group: 'filler',
+    },
+    {
+      title: '미소율',
+      path: '/report/total/smile-rate',
+      group: 'expression',
+    },
+    {
+      title: '눈 깜빡임',
+      path: '/report/total/blink',
+      group: 'habit',
+    },
+    {
+      title: '말끝흐림',
+      path: '/report/total/ending-blur',
+      group: 'ending-blur',
+    },
+    {
+      title: '고개끄떡임',
+      path: '/report/total/nod',
+      group: 'habit',
+    },
+    {
+      title: '어깨기울기',
+      path: '/report/total/shoulder-tilt',
+      group: 'posture',
+    },
+    {
+      title: '몸통흔들림',
+      path: '/report/total/body-shake',
+      group: 'posture',
+    },
   ];
 
   return (
     <div className="total-menu-page">
       <div className="total-menu-container">
-        <button className="total-menu-back" onClick={() => navigate('/report')}>
-          ← 이전
-        </button>
+        <div className="total-menu-hero">
+          <button
+            className="total-menu-back"
+            type="button"
+            onClick={() => navigate('/report')}
+          >
+            ← 이전
+          </button>
 
-        <h1>전체 분석 보기</h1>
-        <p className="total-menu-desc">
-          누적 면접 데이터를 바탕으로 아래 순서대로 분석 결과를 확인할 수
-          있습니다.
-          <br />각 항목을 클릭하면 해당 분석 페이지로 바로 이동할 수 있습니다.
-        </p>
+          <div className="total-menu-heading">
+            <span className="total-menu-eyebrow">Cumulative Report</span>
+            <h1>전체 분석 보기</h1>
+            <p className="total-menu-desc">
+              누적 면접 데이터를 바탕으로 아래 순서대로 분석 결과를 확인할 수
+              있습니다.
+              <br />각 항목을 클릭하면 해당 분석 페이지로 바로 이동할 수
+              있습니다.
+            </p>
+          </div>
+
+          <div className="total-menu-summary">
+            <div>
+              <strong>{analysisItems.length}</strong>
+              <span>분석 항목</span>
+            </div>
+            <div>
+              <strong>5</strong>
+              <span>분석 영역</span>
+            </div>
+            <div>
+              <strong>01</strong>
+              <span>권장 시작점</span>
+            </div>
+          </div>
+        </div>
 
         <div className="total-menu-grid">
           {analysisItems.map((item, index) => (
-            <div
+            <button
+              type="button"
               key={item.title}
-              className="total-menu-card"
+              className={`total-menu-card ${item.group}`}
               onClick={() => navigate(item.path)}
             >
-              <div className="total-menu-number">{index + 1}</div>
-              <div className="total-menu-title">{item.title}</div>
-            </div>
+              <div className="total-menu-card-top">
+                <div className="total-menu-number">
+                  {String(index + 1).padStart(2, '0')}
+                </div>
+                <span className="total-menu-arrow">→</span>
+              </div>
+
+              <div>
+                <div className="total-menu-title">{item.title}</div>
+              </div>
+            </button>
           ))}
         </div>
 
