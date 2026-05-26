@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import './IndividualReportFullPage.css';
 import { getIndividualReportDetail } from '../../api/reportApi';
 
+const REPORT_CATEGORIES = ['시선처리', '발화', '표정', '습관', '자세'];
+
 export default function IndividualReportFullPage() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -104,6 +106,23 @@ export default function IndividualReportFullPage() {
         return '#F44336';
       default:
         return '#e0e0e0';
+    }
+  };
+
+  const getStatusTone = (status) => {
+    switch (status) {
+      case 'good':
+        return 'good';
+      case 'warning':
+      case 'voice-high':
+      case 'voice-low':
+        return 'warning';
+      case 'bad':
+      case 'voice-very-high':
+      case 'voice-very-low':
+        return 'bad';
+      default:
+        return 'neutral';
     }
   };
 
@@ -253,14 +272,104 @@ export default function IndividualReportFullPage() {
     };
   });
 
+  const clampPercent = (value) => Math.min(Math.max(value, 0), 100);
+
+  const getMetricScale = (key) => {
+    switch (key) {
+      case 'speechRate':
+        return { min: 0, max: 320, goodMin: 200, goodMax: 260 };
+      case 'voiceVolume':
+        return { min: -60, max: 0, goodMin: -35, goodMax: -20 };
+      case 'silenceCount':
+      case 'fillerCount':
+        return { min: 0, max: 10, goodMin: 0, goodMax: 3 };
+      case 'blinkCount':
+        return { min: 0, max: 30, goodMin: 15, goodMax: 20 };
+      case 'bodyShake':
+        return { min: 0, max: 5, goodMin: 0, goodMax: 1 };
+      case 'eyeContactRate':
+        return { min: 0, max: 100, goodMin: 60, goodMax: 100 };
+      case 'smileRate':
+        return { min: 0, max: 100, goodMin: 50, goodMax: 100 };
+      case 'endingBlurCount':
+        return { min: 0, max: 100, goodMin: 0, goodMax: 25 };
+      case 'nodCount':
+      case 'shoulderTilt':
+        return { min: 0, max: 100, goodMin: 80, goodMax: 100 };
+      default:
+        return { min: 0, max: 100, goodMin: 0, goodMax: 100 };
+    }
+  };
+
+  const getMetricGauge = (item) => {
+    const value = Number(item.value);
+    const scale = getMetricScale(item.key);
+    const scaleSize = scale.max - scale.min;
+    const toPercent = (targetValue) =>
+      clampPercent(((targetValue - scale.min) / scaleSize) * 100);
+
+    const goodStart = toPercent(scale.goodMin);
+    const goodEnd = toPercent(scale.goodMax);
+
+    return {
+      marker: Number.isNaN(value) ? 0 : toPercent(value),
+      rangeStart: goodStart,
+      rangeWidth: Math.max(goodEnd - goodStart, 2),
+      minLabel: `${scale.min}${item.unit}`,
+      maxLabel: `${scale.max}${item.unit}`,
+    };
+  };
+
+  const goodCount = analysisItems.filter(
+    (item) => getStatusTone(item.status) === 'good',
+  ).length;
+  const warningCount = analysisItems.filter(
+    (item) => getStatusTone(item.status) === 'warning',
+  ).length;
+  const badCount = analysisItems.filter(
+    (item) => getStatusTone(item.status) === 'bad',
+  ).length;
+
+  const categorySummaries = REPORT_CATEGORIES.map((category) => {
+    const categoryItems = analysisItems.filter(
+      (item) => item.category === category,
+    );
+    const needsCheck = categoryItems.filter(
+      (item) => getStatusTone(item.status) !== 'good',
+    ).length;
+
+    return {
+      category,
+      count: categoryItems.length,
+      needsCheck,
+    };
+  }).filter((category) => category.count > 0);
+
   const toggleItemExpand = (itemIndex) => {
     setExpandedItems((prev) => ({
       ...prev,
       [itemIndex]: !prev[itemIndex],
     }));
   };
+
+  const toggleAllItems = () => {
+    const isAllExpanded = analysisItems.every((_, index) => expandedItems[index]);
+
+    if (isAllExpanded) {
+      setExpandedItems({});
+      return;
+    }
+
+    setExpandedItems(
+      analysisItems.reduce((acc, _, index) => {
+        acc[index] = true;
+        return acc;
+      }, {}),
+    );
+  };
+
   const handleDownloadReport = () => {
-    const categories = ['시선처리', '발화', '표정', '습관', '자세'];
+    const categories = REPORT_CATEGORIES;
 
     let reportText = `${report.title}\n\n[분석 결과 상세]\n\n`;
 
@@ -324,13 +433,53 @@ export default function IndividualReportFullPage() {
               <span className="score-label">Interview Report</span>
               <h2>{report.title}</h2>
             </div>
+
+            <div className="score-summary">
+              <div className="summary-pill good">
+                <span>{goodCount}</span>
+                <p>적정</p>
+              </div>
+              <div className="summary-pill warning">
+                <span>{warningCount}</span>
+                <p>주의</p>
+              </div>
+              <div className="summary-pill bad">
+                <span>{badCount}</span>
+                <p>체크 필요</p>
+              </div>
+            </div>
           </div>
 
           <div className="analysis-container">
-            <h3 className="analysis-title">분석 결과 상세</h3>
+            <div className="analysis-title-row">
+              <h3 className="analysis-title">분석 결과 상세</h3>
+
+              <button
+                className="toggle-all-button"
+                type="button"
+                onClick={toggleAllItems}
+              >
+                {analysisItems.every((_, index) => expandedItems[index])
+                  ? '전체 접기'
+                  : '전체 펼치기'}
+              </button>
+            </div>
+
+            <div className="category-overview">
+              {categorySummaries.map((item) => (
+                <div className="category-chip" key={item.category}>
+                  <strong>{item.category}</strong>
+                  <span>
+                    {item.needsCheck > 0
+                      ? `${item.needsCheck}개 확인 필요`
+                      : '모두 적정'}
+                  </span>
+                </div>
+              ))}
+            </div>
 
             <div className="analysis-items">
-              {['시선처리', '발화', '표정', '습관', '자세'].map((category) => {
+              {REPORT_CATEGORIES.map((category) => {
                 const categoryItems = analysisItems.filter(
                   (item) => item.category === category,
                 );
@@ -341,13 +490,15 @@ export default function IndividualReportFullPage() {
                   <div key={category} className="analysis-category">
                     <h4 className="category-title">{category}</h4>
                     <div className="category-items">
-                      {categoryItems.map((item, itemIndex) => {
+                      {categoryItems.map((item) => {
                         const globalIndex = analysisItems.indexOf(item);
                         const isExpanded = expandedItems[globalIndex];
+                        const metricGauge = getMetricGauge(item);
 
                         return (
                           <div key={globalIndex} className="analysis-card">
-                            <div
+                            <button
+                              type="button"
                               className="analysis-header"
                               onClick={() => toggleItemExpand(globalIndex)}
                               style={{
@@ -393,19 +544,35 @@ export default function IndividualReportFullPage() {
                                   </span>
                                 </div>
 
-                                <button className="expand-btn">
+                                <span className="expand-btn">
                                   {isExpanded ? '▼' : '▶'}
-                                </button>
+                                </span>
+                              </div>
+                            </button>
+
+                            <div className="metric-track-wrap">
+                              <div
+                                className="metric-track"
+                                style={{
+                                  '--range-start': `${metricGauge.rangeStart}%`,
+                                  '--range-width': `${metricGauge.rangeWidth}%`,
+                                  '--marker-left': `${metricGauge.marker}%`,
+                                  '--marker-color': getStatusColor(item.status),
+                                }}
+                              >
+                                <span className="metric-good-range" />
+                                <span className="metric-marker" />
+                              </div>
+
+                              <div className="metric-labels">
+                                <span>{metricGauge.minLabel}</span>
+                                <strong>{item.recommendedText}</strong>
+                                <span>{metricGauge.maxLabel}</span>
                               </div>
                             </div>
 
                             {isExpanded && (
                               <div className="analysis-detail">
-                                <div className="detail-section">
-                                  <h5>권장 기준</h5>
-                                  <p>{item.recommendedText}</p>
-                                </div>
-
                                 <div className="detail-section">
                                   <h5>상세 분석</h5>
                                   <p>

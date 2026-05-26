@@ -20,6 +20,65 @@ const TREND_KEYS = [
   'bodyShakeTrend',
 ];
 
+const FILTER_LABELS = {
+  all: '전체',
+  resume: '자소서 기반 면접',
+  industry: '산업 기반 면접',
+};
+
+const ANALYSIS_METRICS = [
+  { key: 'eyeContactRate', label: '시선' },
+  { key: 'speechRate', label: '발화' },
+  { key: 'voiceVolume', label: '음성' },
+  { key: 'silenceCount', label: '침묵' },
+  { key: 'fillerCount', label: '필러' },
+  { key: 'smileRate', label: '표정' },
+  { key: 'blinkCount', label: '습관' },
+  { key: 'endingBlurCount', label: '끝맺음' },
+  { key: 'nodCount', label: '반응' },
+  { key: 'shoulderTilt', label: '자세' },
+  { key: 'bodyShake', label: '흔들림' },
+];
+
+const getItemStatus = (key, value) => {
+  if (value === undefined || value === null) return 'neutral';
+
+  switch (key) {
+    case 'eyeContactRate':
+      return value >= 60 ? 'good' : 'bad';
+    case 'speechRate':
+      return value >= 200 && value <= 260 ? 'good' : 'bad';
+    case 'silenceCount':
+      if (value <= 3) return 'good';
+      if (value <= 6) return 'warning';
+      return 'bad';
+    case 'fillerCount':
+      if (value <= 3) return 'good';
+      if (value <= 6) return 'warning';
+      return 'bad';
+    case 'voiceVolume':
+      if (value >= -10) return 'bad';
+      if (value >= -20) return 'warning';
+      if (value >= -35) return 'good';
+      if (value >= -50) return 'warning';
+      return 'bad';
+    case 'smileRate':
+      return value >= 50 ? 'good' : 'bad';
+    case 'blinkCount':
+      return value >= 15 && value <= 20 ? 'good' : 'bad';
+    case 'endingBlurCount':
+      return value <= 25 ? 'good' : 'bad';
+    case 'nodCount':
+      return value >= 80 && value <= 100 ? 'good' : 'bad';
+    case 'shoulderTilt':
+      return value >= 80 && value <= 100 ? 'good' : 'bad';
+    case 'bodyShake':
+      return value <= 1 ? 'good' : 'bad';
+    default:
+      return 'neutral';
+  }
+};
+
 const getDeletedStorage = () => {
   try {
     const deletedStorage = JSON.parse(
@@ -110,6 +169,43 @@ export default function IndividualReportPage() {
       return typeMatched && searchMatched;
     });
   }, [reportList, selectedType, searchText, deletedSessions]);
+
+  const getReportAnalysisSummary = (report) => {
+    const metricStatuses = ANALYSIS_METRICS.map((metric) => ({
+      ...metric,
+      status: getItemStatus(metric.key, report.detail?.[metric.key]),
+      value: report.detail?.[metric.key],
+    })).filter((metric) => metric.status !== 'neutral');
+
+    const goodCount = metricStatuses.filter(
+      (metric) => metric.status === 'good',
+    ).length;
+    const warningCount = metricStatuses.filter(
+      (metric) => metric.status === 'warning',
+    ).length;
+    const badCount = metricStatuses.filter(
+      (metric) => metric.status === 'bad',
+    ).length;
+
+    return {
+      total: metricStatuses.length,
+      goodCount,
+      warningCount,
+      badCount,
+    };
+  };
+
+  const getReportDescription = (report) => {
+    const analysisSummary = getReportAnalysisSummary(report);
+
+    if (analysisSummary.total === 0) {
+      return '상세 분석 결과를 확인할 수 있습니다.';
+    }
+
+    const checkCount = analysisSummary.warningCount + analysisSummary.badCount;
+
+    return `전체 ${analysisSummary.total}개 분석 항목 · 적정 ${analysisSummary.goodCount}개 · 개선 필요 ${checkCount}개`;
+  };
 
   const saveDeletedStorage = (nextStorage) => {
     localStorage.setItem(DELETED_STORAGE_KEY, JSON.stringify(nextStorage));
@@ -249,19 +345,32 @@ export default function IndividualReportPage() {
 
           <div>
             <h1>개별 리포트 보기</h1>
-            <p>면접 회차별 분석 결과를 선택해서 자세히 확인하세요.</p>
+            <p>면접 회차별 분석 결과를 선택해 자세히 확인하세요.</p>
           </div>
         </div>
 
         <div className="individual-report-box">
           <div className="individual-filter-area">
-            <input
-              className="individual-search-input"
-              type="text"
-              placeholder="회차명 · 날짜 · 키워드로 검색"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-            />
+            <div className="individual-search-wrap">
+              <span className="individual-search-icon">⌕</span>
+              <input
+                className="individual-search-input"
+                type="text"
+                placeholder="회차명 · 날짜 · 키워드로 검색"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+              />
+
+              {searchText && (
+                <button
+                  className="clear-search-button"
+                  type="button"
+                  onClick={() => setSearchText('')}
+                >
+                  ×
+                </button>
+              )}
+            </div>
 
             <div className="report-action-row">
               <div className="filter-buttons-wrapper">
@@ -288,6 +397,12 @@ export default function IndividualReportPage() {
               </div>
 
               <div className="action-buttons-wrapper">
+                {selectedIds.length > 0 && (
+                  <span className="selected-count">
+                    {selectedIds.length}개 선택됨
+                  </span>
+                )}
+
                 <button type="button" onClick={handleDeleteSelected}>
                   선택 삭제
                 </button>
@@ -307,47 +422,72 @@ export default function IndividualReportPage() {
           </div>
 
           <div className="individual-report-list">
-            {filteredReports.length > 0 ? (
-              filteredReports.map((report, index) => (
-                <div
-                  key={report.id || index}
-                  className="individual-report-card"
-                  onClick={() =>
-                    navigate(`/report/individual/detail/${report.id}`, {
-                      state: report,
-                    })
-                  }
-                >
-                  <div className="report-card-left">
-                    <input
-                      type="checkbox"
-                      className="report-checkbox"
-                      checked={selectedIds.includes(report.id)}
-                      onChange={() => handleSelect(report.id)}
-                      onClick={(e) => e.stopPropagation()}
-                    />
+            <div className="individual-list-summary">
+              <span>총 {filteredReports.length}개 리포트</span>
+              <span>{FILTER_LABELS[selectedType]}</span>
+            </div>
 
-                    <div className="report-number">
-                      {report.session ?? index + 1}
+            {filteredReports.length > 0 ? (
+              filteredReports.map((report, index) => {
+                const analysisSummary = getReportAnalysisSummary(report);
+
+                return (
+                  <div
+                    key={report.id || index}
+                    className="individual-report-card"
+                    onClick={() =>
+                      navigate(`/report/individual/detail/full/${report.id}`, {
+                        state: report,
+                      })
+                    }
+                  >
+                    <div className="report-card-left">
+                      <input
+                        type="checkbox"
+                        className="report-checkbox"
+                        checked={selectedIds.includes(report.id)}
+                        onChange={() => handleSelect(report.id)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+
+                      <div className="report-number">
+                        {report.session ?? index + 1}
+                      </div>
+
+                      <div className="report-card-content">
+                        <h2>{report.title || `${index + 1}회차 면접`}</h2>
+                        <p>{getReportDescription(report)}</p>
+
+                        {report.date && (
+                          <div className="report-date">{report.date}</div>
+                        )}
+                      </div>
                     </div>
 
-                    <div className="report-card-content">
-                      <h2>{report.title || `${index + 1}회차 면접`}</h2>
-                      <p>
-                        {report.eyeContact || '-'} ·{' '}
-                        {report.speechSummary || '-'} ·{' '}
-                        {report.expressionSummary || '-'}
-                      </p>
-
-                      {report.date && (
-                        <div className="report-date">{report.date}</div>
+                    <div className="report-card-right">
+                      {analysisSummary.total > 0 ? (
+                        <div className="report-analysis-preview">
+                          <div className="report-score-chips">
+                            <span className="score-chip good">
+                              적정 {analysisSummary.goodCount}
+                            </span>
+                            <span className="score-chip warning">
+                              주의 {analysisSummary.warningCount}
+                            </span>
+                            <span className="score-chip bad">
+                              체크 {analysisSummary.badCount}
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="report-ready-badge">상세 분석</span>
                       )}
+
+                      <span className="detail-link">상세 보기 →</span>
                     </div>
                   </div>
-
-                  <div className="report-card-right">요약 보기 →</div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="empty-report-box">
                 <div className="empty-icon">!</div>
