@@ -19,6 +19,59 @@ const TREND_KEYS = [
   'bodyShakeTrend',
 ];
 
+const ANALYSIS_METRICS = [
+  { key: 'eyeContactRate', label: '시선' },
+  { key: 'speechRate', label: '발화' },
+  { key: 'voiceVolume', label: '음성' },
+  { key: 'silenceCount', label: '침묵' },
+  { key: 'fillerCount', label: '필러' },
+  { key: 'smileRate', label: '표정' },
+  { key: 'blinkCount', label: '습관' },
+  { key: 'endingBlurCount', label: '끝맺음' },
+  { key: 'nodCount', label: '반응' },
+  { key: 'shoulderTilt', label: '자세' },
+  { key: 'bodyShake', label: '흔들림' },
+];
+
+const getItemStatus = (key, value) => {
+  if (value === undefined || value === null) return 'neutral';
+
+  switch (key) {
+    case 'eyeContactRate':
+      return value >= 60 ? 'good' : 'bad';
+    case 'speechRate':
+      return value >= 200 && value <= 260 ? 'good' : 'bad';
+    case 'silenceCount':
+      if (value <= 3) return 'good';
+      if (value <= 6) return 'warning';
+      return 'bad';
+    case 'fillerCount':
+      if (value <= 3) return 'good';
+      if (value <= 6) return 'warning';
+      return 'bad';
+    case 'voiceVolume':
+      if (value >= -10) return 'bad';
+      if (value >= -20) return 'warning';
+      if (value >= -35) return 'good';
+      if (value >= -50) return 'warning';
+      return 'bad';
+    case 'smileRate':
+      return value >= 50 ? 'good' : 'bad';
+    case 'blinkCount':
+      return value >= 15 && value <= 20 ? 'good' : 'bad';
+    case 'endingBlurCount':
+      return value <= 25 ? 'good' : 'bad';
+    case 'nodCount':
+      return value >= 80 && value <= 100 ? 'good' : 'bad';
+    case 'shoulderTilt':
+      return value >= 80 && value <= 100 ? 'good' : 'bad';
+    case 'bodyShake':
+      return value <= 1 ? 'good' : 'bad';
+    default:
+      return 'neutral';
+  }
+};
+
 const getDeletedStorage = () => {
   try {
     return (
@@ -48,6 +101,43 @@ export default function DeletedReportPage() {
 
   const [deletedStorage, setDeletedStorage] = useState(getDeletedStorage);
   const [selectedRestoreIds, setSelectedRestoreIds] = useState([]);
+
+  const getReportAnalysisSummary = (report) => {
+    const metricStatuses = ANALYSIS_METRICS.map((metric) => ({
+      ...metric,
+      status: getItemStatus(metric.key, report.detail?.[metric.key]),
+      value: report.detail?.[metric.key],
+    })).filter((metric) => metric.status !== 'neutral');
+
+    const goodCount = metricStatuses.filter(
+      (metric) => metric.status === 'good',
+    ).length;
+    const warningCount = metricStatuses.filter(
+      (metric) => metric.status === 'warning',
+    ).length;
+    const badCount = metricStatuses.filter(
+      (metric) => metric.status === 'bad',
+    ).length;
+
+    return {
+      total: metricStatuses.length,
+      goodCount,
+      warningCount,
+      badCount,
+    };
+  };
+
+  const getReportDescription = (report) => {
+    const analysisSummary = getReportAnalysisSummary(report);
+
+    if (analysisSummary.total === 0) {
+      return '상세 분석 결과를 확인할 수 있습니다.';
+    }
+
+    const checkCount = analysisSummary.warningCount + analysisSummary.badCount;
+
+    return `전체 ${analysisSummary.total}개 분석 항목 · 적정 ${analysisSummary.goodCount}개 · 개선 필요 ${checkCount}개`;
+  };
 
   const handleSelectRestore = (id) => {
     setSelectedRestoreIds((prev) =>
@@ -155,7 +245,6 @@ export default function DeletedReportPage() {
   return (
     <div className="deleted-report-page">
       <div className="deleted-report-container">
-        {/* ✅ 헤더: 버튼 + 텍스트 가로 배치 */}
         <div className="deleted-report-header">
           <button
             className="deleted-back-button"
@@ -186,35 +275,62 @@ export default function DeletedReportPage() {
 
           {deletedStorage.reports.length > 0 ? (
             <div className="deleted-report-list">
-              {deletedStorage.reports.map((report, index) => (
-                <label key={report.id || index} className="deleted-report-item">
-                  <input
-                    type="checkbox"
-                    checked={selectedRestoreIds.includes(report.id)}
-                    onChange={() => handleSelectRestore(report.id)}
-                  />
+              <div className="deleted-list-summary">
+                <span>총 {deletedStorage.reports.length}개 리포트</span>
+              </div>
 
-                  <div className="deleted-report-number">
-                    {report.session || report.id || index + 1}
+              {deletedStorage.reports.map((report, index) => {
+                const analysisSummary = getReportAnalysisSummary(report);
+
+                return (
+                  <div key={report.id || index} className="deleted-report-card">
+                    <div className="report-card-left">
+                      <input
+                        type="checkbox"
+                        className="report-checkbox"
+                        checked={selectedRestoreIds.includes(report.id)}
+                        onChange={() => handleSelectRestore(report.id)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+
+                      <div className="report-number">
+                        {report.session ?? index + 1}
+                      </div>
+
+                      <div className="report-card-content">
+                        <h2>{report.title || `${index + 1}회차 면접`}</h2>
+                        <p>{getReportDescription(report)}</p>
+
+                        {report.date && (
+                          <div className="report-date">{report.date}</div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="report-card-right">
+                      {analysisSummary.total > 0 ? (
+                        <div className="report-analysis-preview">
+                          <div className="report-score-chips">
+                            <span className="score-chip good">
+                              적정 {analysisSummary.goodCount}
+                            </span>
+                            <span className="score-chip warning">
+                              주의 {analysisSummary.warningCount}
+                            </span>
+                            <span className="score-chip bad">
+                              체크 {analysisSummary.badCount}
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="report-ready-badge">상세 분석</span>
+                      )}
+
+                      <span className="detail-link">복구 →</span>
+                    </div>
                   </div>
-
-                  <div className="deleted-report-content">
-                    <h2>
-                      {report.title ||
-                        `${report.session || index + 1}회차 면접 리포트`}
-                    </h2>
-
-                    <p>
-                      {report.eyeContact || '-'} · {report.speechSummary || '-'}{' '}
-                      · {report.expressionSummary || '-'}
-                    </p>
-
-                    {report.date && (
-                      <div className="deleted-report-date">{report.date}</div>
-                    )}
-                  </div>
-                </label>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="empty-trash-box">
