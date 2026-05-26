@@ -9,7 +9,7 @@ export const individualReports = [
     habitSummary: '고개 움직임이 약간 있음',
     postureSummary: '전반적으로 안정적인 자세',
     detail: {
-      eyeContactRate: 59,
+      eyeContactRate: 61,
       speechRate: 200,
       voiceVolume: -15,
       silenceCount: 2,

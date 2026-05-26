@@ -1,6 +1,5 @@
 import axiosInstance from './axiosInstance';
 
-import { individualReports } from '../mockdata/report/individualMock';
 import { individualReportsDetail } from '../mockdata/report/individualmockdetail';
 import { filterDeletedSessions } from '../pages/report/utils/filterDeletedSessions';
 
@@ -23,7 +22,7 @@ const USE_MOCK = true;
 // [4] 전체 면접 리포트 목록 조회
 export const getIndividualReports = async () => {
   if (USE_MOCK) {
-    return individualReports;
+    return individualReportsDetail;
   }
 
   const response = await axiosInstance.get('/interviews/');
@@ -34,7 +33,7 @@ export const getIndividualReports = async () => {
 // Swagger에 summary 전용 API가 없으므로 상세 리포트 API를 사용
 export const getIndividualReportSummary = async (id) => {
   if (USE_MOCK) {
-    return individualReports.find((report) => report.id === Number(id));
+    return individualReportsDetail.find((report) => report.id === Number(id));
   }
 
   const response = await axiosInstance.get(`/interviews/${id}/report/`);
