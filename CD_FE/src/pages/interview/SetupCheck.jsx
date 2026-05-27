@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useInterview } from '../../contexts/InterviewContext.jsx'
 
-const CALIBRATION_SECONDS = 7
+const CALIBRATION_SECONDS = 10
 const CALIBRATION_VIDEO_CONSTRAINTS = {
   width: { ideal: 640 },
   height: { ideal: 360 },
@@ -47,26 +47,20 @@ function SetupCheck() {
     requestInterviewSession,
   } = useInterview()
   const videoRef = useRef(null)
-  const previewRef = useRef(null)
   const streamRef = useRef(null)
   const recorderRef = useRef(null)
   const recordedChunksRef = useRef([])
   const recordTimerRef = useRef(null)
-  const previewUrlRef = useRef('')
+  const hasRequestedPermissionRef = useRef(false)
+  const audioContextRef = useRef(null)
+  const audioSourceRef = useRef(null)
+  const micAnimationRef = useRef(null)
   const [permissionState, setPermissionState] = useState('idle')
   const [recordingState, setRecordingState] = useState('idle')
   const [recordingSecondsLeft, setRecordingSecondsLeft] = useState(CALIBRATION_SECONDS)
   const [errorMessage, setErrorMessage] = useState('')
   const [calibrationRecording, setCalibrationRecording] = useState(null)
-  const [previewUrl, setPreviewUrl] = useState('')
-
-  const clearPreviewUrl = () => {
-    if (previewUrlRef.current) {
-      URL.revokeObjectURL(previewUrlRef.current)
-      previewUrlRef.current = ''
-    }
-    setPreviewUrl('')
-  }
+  const [micLevel, setMicLevel] = useState(0)
 
   const resetRecording = () => {
     if (recordTimerRef.current) {
@@ -81,17 +75,81 @@ function SetupCheck() {
 
     recorderRef.current = null
     recordedChunksRef.current = []
-    clearPreviewUrl()
     setCalibrationRecording(null)
     setRecordingState('idle')
     setRecordingSecondsLeft(CALIBRATION_SECONDS)
+  }
 
-    if (previewRef.current) {
-      previewRef.current.removeAttribute('src')
+  const stopMicLevelMeter = () => {
+    if (micAnimationRef.current) {
+      window.cancelAnimationFrame(micAnimationRef.current)
+      micAnimationRef.current = null
     }
+
+    if (audioSourceRef.current) {
+      audioSourceRef.current.disconnect()
+      audioSourceRef.current = null
+    }
+
+    if (audioContextRef.current) {
+      audioContextRef.current.close()
+      audioContextRef.current = null
+    }
+
+    setMicLevel(0)
+  }
+
+  const startMicLevelMeter = (stream) => {
+    stopMicLevelMeter()
+
+    if (!stream.getAudioTracks().length) {
+      return
+    }
+
+    const AudioContext = window.AudioContext || window.webkitAudioContext
+
+    if (!AudioContext) {
+      return
+    }
+
+    const audioContext = new AudioContext()
+    const analyser = audioContext.createAnalyser()
+    const source = audioContext.createMediaStreamSource(stream)
+
+    analyser.fftSize = 1024
+    analyser.smoothingTimeConstant = 0.82
+    const samples = new Uint8Array(analyser.fftSize)
+
+    source.connect(analyser)
+    audioContextRef.current = audioContext
+    audioSourceRef.current = source
+
+    const updateMicLevel = () => {
+      analyser.getByteTimeDomainData(samples)
+
+      let sum = 0
+
+      for (let index = 0; index < samples.length; index += 1) {
+        const normalizedSample = (samples[index] - 128) / 128
+        sum += normalizedSample * normalizedSample
+      }
+
+      const rms = Math.sqrt(sum / samples.length)
+      const nextLevel = Math.min(100, Math.round(rms * 320))
+
+      setMicLevel((currentLevel) => (
+        Math.abs(currentLevel - nextLevel) > 1 ? nextLevel : currentLevel
+      ))
+
+      micAnimationRef.current = window.requestAnimationFrame(updateMicLevel)
+    }
+
+    updateMicLevel()
   }
 
   const stopStream = () => {
+    stopMicLevelMeter()
+
     if (!streamRef.current) {
       return
     }
@@ -119,6 +177,7 @@ function SetupCheck() {
         videoRef.current.srcObject = stream
       }
 
+      startMicLevelMeter(stream)
       setPermissionState('granted')
     } catch {
       stopStream()
@@ -204,11 +263,8 @@ function SetupCheck() {
         recordedChunksRef.current,
         recorder.mimeType || mimeType,
       )
-      const previewUrl = URL.createObjectURL(recordedFile)
 
-      previewUrlRef.current = previewUrl
       setCalibrationRecording(recordedFile)
-      setPreviewUrl(previewUrl)
       setRecordingState('recorded')
       setRecordingSecondsLeft(0)
       recordedChunksRef.current = []
@@ -243,6 +299,11 @@ function SetupCheck() {
   }
 
   useEffect(() => {
+    if (!hasRequestedPermissionRef.current) {
+      hasRequestedPermissionRef.current = true
+      handleRequestPermission()
+    }
+
     return () => {
       if (recordTimerRef.current) {
         window.clearInterval(recordTimerRef.current)
@@ -253,100 +314,195 @@ function SetupCheck() {
         recorderRef.current.stop()
       }
 
-      if (previewUrlRef.current) {
-        URL.revokeObjectURL(previewUrlRef.current)
-        previewUrlRef.current = ''
-      }
+      stopMicLevelMeter()
       stopStream()
     }
   }, [])
 
+  useEffect(() => {
+    if (videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current
+    }
+  }, [permissionState])
+
   return (
-    <div className="min-h-screen bg-[#efefef] px-6 py-10">
-      <div className="mx-auto flex w-full max-w-4xl flex-col items-center gap-6 rounded-3xl bg-white p-8 text-center shadow-sm">
-        <div className="space-y-2">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">Camera Check</p>
-          <h1 className="text-3xl font-bold text-gray-900">초기 설정을 시작합니다. 카메라를 보고 웃어보세요!</h1>
-          <p className="text-gray-600">카메라와 마이크 권한을 허용하면 5~10초의 테스트 영상을 녹화해 초기 환경을 확인할 수 있어요.</p>
-          {questions.length > 0 && (
-            <p className="text-sm text-gray-500">면접 질문이 준비되었습니다. 카메라 테스트를 마치면 다음 단계로 이어갈 수 있어요.</p>
-          )}
+    <div className="min-h-screen bg-[#f6f7fa] text-[#1f2948]">
+      <header className="border-b border-[#dde1ea] bg-white">
+        <div className="flex h-[66px] items-center px-6">
+          <button
+            type="button"
+            className="flex items-center gap-2 text-[15px] font-bold text-[#596274] transition hover:text-[#263f98]"
+            onClick={() => navigate('/main')}
+          >
+            <span className="text-2xl leading-none" aria-hidden="true">
+              ‹
+            </span>
+            나가기
+          </button>
+        </div>
+      </header>
+
+      <main className="mx-auto flex w-full max-w-[1450px] flex-col px-6 pb-12 pt-10 sm:px-10">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <section>
+            <h1 className="text-[28px] font-extrabold leading-tight text-[#202945]">
+              면접 환경을 점검할게요
+            </h1>
+            <p className="mt-2 text-sm font-medium text-[#687085]">
+              조명 · 카메라 각도 · 마이크 입력이 모두 정상이어야 정확한 분석이 가능해요.
+            </p>
+          </section>
         </div>
 
-        <div className="grid w-full gap-6 lg:grid-cols-[1.3fr_0.9fr]">
-          <div className="overflow-hidden rounded-2xl border border-gray-200 bg-gray-950">
+        <section className="mt-8 grid gap-7 lg:grid-cols-[minmax(0,1fr)_450px]">
+          <div className="relative flex min-h-[380px] overflow-hidden rounded-[20px] bg-[#1d2b61] sm:min-h-[520px]">
             <video
               ref={videoRef}
               autoPlay
               playsInline
               muted
-              className="aspect-video w-full scale-x-[-1] object-cover"
+              className={`h-full w-full scale-x-[-1] object-cover ${
+                permissionState === 'granted' ? 'block' : 'hidden'
+              }`}
             />
+
+            {permissionState !== 'granted' && (
+              <div className="flex h-full w-full items-center justify-center px-8 text-center text-sm font-bold text-white/75">
+                {permissionState === 'loading'
+                  ? '카메라와 마이크 권한을 요청하는 중입니다...'
+                  : '카메라와 마이크 권한을 허용해주세요.'}
+              </div>
+            )}
+
+            {recordingState === 'recording' && (
+              <div className="absolute left-1/2 top-7 -translate-x-1/2 rounded-full bg-[#1f2948]/80 px-8 py-3 text-sm font-bold text-white">
+                {recordingSecondsLeft}초간 무표정으로 정면을 응시해주세요
+              </div>
+            )}
           </div>
 
-          <div className="flex flex-col justify-between rounded-2xl border border-gray-200 bg-gray-50 p-5 text-left">
-            <div className="space-y-3">
-              <p className="text-sm font-semibold text-gray-900">권한 상태</p>
-              <p className="rounded-xl bg-white px-4 py-3 text-sm text-gray-700">
-                {permissionState === 'idle' && '아직 권한을 요청하지 않았습니다.'}
-                {permissionState === 'loading' && '카메라와 마이크 권한을 요청하는 중입니다...'}
-                {permissionState === 'granted' && recordingState === 'idle' && '권한이 승인되었습니다. 테스트 녹화를 시작해주세요.'}
-                {permissionState === 'granted' && recordingState === 'recording' && `테스트 녹화 중입니다. ${recordingSecondsLeft}초 남았습니다.`}
-                {permissionState === 'granted' && recordingState === 'recorded' && '테스트 영상이 준비되었습니다. 다음 단계로 진행할 수 있어요.'}
-                {permissionState === 'granted' && recordingState === 'unsupported' && '녹화 기능을 사용할 수 없습니다.'}
-                {permissionState === 'granted' && recordingState === 'error' && '테스트 녹화 중 문제가 발생했습니다.'}
-                {permissionState === 'denied' && '권한 요청이 거부되었습니다.'}
+          <aside className="flex flex-col gap-4">
+            <div className="rounded-[16px] border border-[#dfe3ec] bg-white px-6 py-6 shadow-sm">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#e9edff] text-sm font-extrabold text-[#3142aa]">
+                    1
+                  </span>
+                  <h2 className="text-lg font-extrabold text-[#202945]">카메라 연결</h2>
+                </div>
+                <span className={`rounded-full px-4 py-1.5 text-xs font-extrabold ${
+                  permissionState === 'granted'
+                    ? 'bg-[#dff8e8] text-[#20a765]'
+                    : 'bg-[#fff1df] text-[#d97819]'
+                }`}>
+                  {permissionState === 'granted' ? '정상' : '확인 중'}
+                </span>
+              </div>
+              <p className="mt-4 text-sm font-medium leading-6 text-[#687085]">
+                영상이 왼쪽 칸에 보이는지 확인해주세요. 다른 장치로 바꾸려면 시스템 설정에서 선택해주세요.
               </p>
-
-              {errorMessage && <p className="text-sm text-red-600">{errorMessage}</p>}
+              {permissionState === 'denied' && (
+                <button
+                  type="button"
+                  className="mt-4 rounded-[12px] bg-[#263f98] px-5 py-3 text-sm font-extrabold text-white transition hover:bg-[#1f347e]"
+                  onClick={handleRequestPermission}
+                >
+                  권한 다시 요청
+                </button>
+              )}
             </div>
 
-            <div className="mt-6 flex flex-col gap-3">
-              <button
-                type="button"
-                onClick={handleRequestPermission}
-                className="rounded-xl bg-blue-500 px-4 py-3 font-semibold text-white transition hover:bg-blue-600"
-              >
-                {permissionState === 'granted' ? '권한 다시 확인하기' : '카메라/마이크 권한 요청'}
-              </button>
+            <div className="rounded-[16px] border border-[#dfe3ec] bg-white px-6 py-6 shadow-sm">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#e9edff] text-sm font-extrabold text-[#3142aa]">
+                    2
+                  </span>
+                  <h2 className="text-lg font-extrabold text-[#202945]">마이크 입력</h2>
+                </div>
+                <span className={`rounded-full px-4 py-1.5 text-xs font-extrabold ${
+                  permissionState === 'granted' && micLevel > 0
+                    ? 'bg-[#dff8e8] text-[#20a765]'
+                    : permissionState === 'granted'
+                      ? 'bg-[#eef2ff] text-[#4860d6]'
+                      : 'bg-[#fff1df] text-[#d97819]'
+                }`}>
+                  {permissionState === 'granted' && micLevel > 0
+                    ? '입력 중'
+                    : permissionState === 'granted'
+                      ? '대기'
+                      : '확인 중'}
+                </span>
+              </div>
+              <p className="mt-4 text-sm font-medium leading-6 text-[#687085]">
+                한 문장 정도 말씀해보세요. 권장 입력 레벨은 60-80%입니다.
+              </p>
+              <div className="mt-4 h-3 overflow-hidden rounded-full bg-[#f0f2f7]">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-[#21aa70] to-[#e9a326] transition-[width] duration-100 ease-out"
+                  style={{ width: `${micLevel}%` }}
+                />
+              </div>
+              <div className="mt-3 flex justify-between text-xs font-medium text-[#9299ab]">
+                <span>0</span>
+                <span>현재 {micLevel}% · 권장 60-80%</span>
+                <span>100</span>
+              </div>
+            </div>
 
+            <div className="rounded-[16px] border border-[#dfe3ec] bg-white px-6 py-6 shadow-sm">
+              <div className="flex items-center gap-4">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#e9edff] text-sm font-extrabold text-[#3142aa]">
+                  3
+                </span>
+                <h2 className="text-lg font-extrabold text-[#202945]">얼굴 인식</h2>
+              </div>
+              <p className="mt-4 text-sm font-medium leading-6 text-[#687085]">
+                {recordingState === 'recording' && `정면 응시 테스트 중입니다. ${recordingSecondsLeft}초 남았습니다.`}
+                {recordingState === 'recorded' && '환경 점검 영상이 준비되었습니다.'}
+                {recordingState !== 'recording' && recordingState !== 'recorded' && '10초간 무표정으로 정면을 응시해주세요.'}
+              </p>
               <button
                 type="button"
                 onClick={handleStartCalibrationRecording}
                 disabled={permissionState !== 'granted' || recordingState === 'recording'}
-                className="rounded-xl bg-gray-900 px-4 py-3 font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-300"
+                className="mt-4 rounded-[12px] border border-[#dfe3ec] bg-white px-5 py-3 text-sm font-extrabold text-[#202945] transition hover:bg-[#f6f7fa] disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
               >
-                {recordingState === 'recorded' ? '테스트 영상 다시 찍기' : '테스트 영상 녹화'}
-              </button>
-
-              <button
-                type="button"
-                onClick={handleNext}
-                disabled={!calibrationRecording || loading || recordingState === 'recording'}
-                className="rounded-xl border border-gray-300 bg-white px-4 py-3 font-semibold text-gray-800 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400"
-              >
-                {loading ? '면접 준비 중...' : '다음'}
+                {recordingState === 'recorded' ? '다시 점검하기' : '얼굴 인식 점검'}
               </button>
             </div>
-          </div>
-        </div>
+          </aside>
+        </section>
 
-        <div className="w-full">
-          <div className="mx-auto flex min-h-64 w-full max-w-2xl items-center justify-center overflow-hidden rounded-2xl border border-dashed border-gray-300 bg-gray-50">
-            {calibrationRecording ? (
-              <video
-                ref={previewRef}
-                src={previewUrl}
-                controls
-                playsInline
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <p className="px-6 text-sm text-gray-500">권한 승인 후 테스트 영상을 녹화하면 이곳에서 확인할 수 있습니다.</p>
-            )}
-          </div>
+        {errorMessage && (
+          <p className="mt-6 text-center text-sm font-bold text-red-500">{errorMessage}</p>
+        )}
+
+        {questions.length > 0 && (
+          <p className="mt-4 text-center text-sm font-medium text-[#687085]">
+            면접 질문이 준비되었습니다. 환경 점검을 마치면 다음 단계로 이어갈 수 있어요.
+          </p>
+        )}
+
+        <div className="mt-12 flex items-center justify-end gap-4">
+          <button
+            type="button"
+            className="h-[54px] min-w-[116px] rounded-[14px] border border-[#dfe3ec] bg-white px-8 text-base font-extrabold text-[#202945] transition hover:bg-[#f6f7fa]"
+            onClick={() => navigate('/interview/question-count')}
+          >
+            취소
+          </button>
+
+          <button
+            type="button"
+            onClick={handleNext}
+            disabled={!calibrationRecording || loading || recordingState === 'recording'}
+            className="h-[58px] min-w-[192px] rounded-[24px] bg-[#ff665b] px-10 text-[17px] font-extrabold text-white transition hover:bg-[#f05248] focus:outline-none focus:ring-4 focus:ring-red-100 disabled:cursor-not-allowed disabled:bg-slate-300"
+          >
+            {loading ? '면접 준비 중...' : '면접 시작 →'}
+          </button>
         </div>
-      </div>
+      </main>
     </div>
   )
 }
