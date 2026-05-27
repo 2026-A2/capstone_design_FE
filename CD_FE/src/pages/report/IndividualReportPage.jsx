@@ -79,12 +79,12 @@ const getItemStatus = (key, value) => {
       if (value >= 60 && value < 80) return 'warning';
       return 'bad';
     case 'shoulderTilt':
-      if (value >= 80 && value <= 100) return 'good';
-      if (value >= 60 && value < 80) return 'warning';
+      if (value >= 90) return 'good';
+      if (value >= 75 && value < 90) return 'warning';
       return 'bad';
     case 'bodyShake':
       if (value <= 1) return 'good';
-      if (value <= 3) return 'warning';
+      if (value < 3) return 'warning';
       return 'bad';
     default:
       return 'neutral';

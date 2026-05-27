@@ -90,12 +90,12 @@ export default function IndividualReportFullPage() {
         if (value >= 60 && value < 80) return 'warning';
         return 'bad';
       case 'shoulderTilt':
-        if (value >= 80 && value <= 100) return 'good';
-        if (value >= 60 && value < 80) return 'warning';
+        if (value >= 90) return 'good';
+        if (value >= 75 && value < 90) return 'warning';
         return 'bad';
       case 'bodyShake':
         if (value <= 1) return 'good';
-        if (value <= 3) return 'warning';
+        if (value < 3) return 'warning';
         return 'bad';
       default:
         return 'neutral';
@@ -161,6 +161,173 @@ export default function IndividualReportFullPage() {
     }
   };
 
+  const getGuidelineForItem = (key) => {
+    switch (key) {
+      case 'eyeContactRate':
+        return [
+          {
+            level: '적정',
+            range: '≥ 60%',
+            description: '충분한 카메라 응시율',
+          },
+          {
+            level: '주의',
+            range: '50~59%',
+            description: '카메라 응시 개선 권장',
+          },
+          {
+            level: '체크필요',
+            range: '< 50%',
+            description: '카메라 응시 개선 필요',
+          },
+        ];
+      case 'speechRate':
+        return [
+          {
+            level: '적정',
+            range: '200-260 SPM',
+            description: '적절한 발화 속도',
+          },
+          {
+            level: '주의',
+            range: '180-200SPM 또는 260-299 SPM',
+            description: '발화 속도 조정 권장',
+          },
+          {
+            level: '체크필요',
+            range: '< 180 또는 ≥ 300 SPM',
+            description: '발화 속도 개선 필요',
+          },
+        ];
+      case 'voiceVolume':
+        return [
+          {
+            level: '적정',
+            range: '-35 ~ -20 dB',
+            description: '적절한 음성 크기',
+          },
+          {
+            level: '주의',
+            range: '-50 ~ -35 dB 또는 -20 ~ -10 dB',
+            description: '음성 크기 조정 권장',
+          },
+          {
+            level: '체크필요',
+            range: '< -50 dB 또는 ≥ -10 dB',
+            description: '음성 크기 개선 필요',
+          },
+        ];
+      case 'silenceCount':
+        return [
+          {
+            level: '적정',
+            range: '≤ 3회',
+            description: '침묵 구간 적절한 수준',
+          },
+          { level: '주의', range: '4~6회', description: '침묵 구간 개선 권장' },
+          {
+            level: '체크필요',
+            range: '≥ 7회',
+            description: '침묵 구간 개선 필요',
+          },
+        ];
+      case 'fillerCount':
+        return [
+          {
+            level: '적정',
+            range: '≤ 3회',
+            description: '필러어 사용횟수 적절한 수준',
+          },
+          {
+            level: '주의',
+            range: '4~6회',
+            description: '필러어 사용횟수 감소 권장',
+          },
+          {
+            level: '체크필요',
+            range: '≥ 7회',
+            description: '필러어 사용횟수 감소 필요',
+          },
+        ];
+      case 'smileRate':
+        return [
+          { level: '적정', range: '≥ 50%', description: '충분한 미소율' },
+          { level: '주의', range: '30~49%', description: '미소율 개선 권장' },
+          {
+            level: '체크필요',
+            range: '< 30%',
+            description: '미소율 개선 필요',
+          },
+        ];
+      case 'blinkCount':
+        return [
+          {
+            level: '적정',
+            range: '15~20회/분',
+            description: '자연스러운 눈 깜빡임',
+          },
+          {
+            level: '주의',
+            range: '10~14 또는 21~25회/분',
+            description: '눈 깜빡임 횟수 조절 권장',
+          },
+          {
+            level: '체크필요',
+            range: '< 10 또는 > 25회/분',
+            description: '눈 깜빡임 횟수 개선 필요',
+          },
+        ];
+      case 'nodCount':
+        return [
+          {
+            level: '적정',
+            range: '80~100%',
+            description: '고개 끄덕임 적정',
+          },
+          {
+            level: '주의',
+            range: '60~79%',
+            description: '고개 끄덕임 개선 권장',
+          },
+          {
+            level: '체크필요',
+            range: '< 60%',
+            description: '고개 끄덕임 개선 필요',
+          },
+        ];
+      case 'shoulderTilt':
+        return [
+          {
+            level: '적정',
+            range: '≥ 90%',
+            description: '어깨 기울기 적정',
+          },
+          {
+            level: '주의',
+            range: '75~89%',
+            description: '어깨 기울기 개선 권장',
+          },
+          {
+            level: '체크필요',
+            range: '< 75%',
+            description: '어깨 기울기 개선 필요',
+          },
+        ];
+      case 'bodyShake':
+        return [
+          { level: '적정', range: '≤ 1회', description: '안정적인 자세 유지' },
+          { level: '주의', range: '2회', description: '몸 흔들림 감소 권장' },
+          {
+            level: '체크필요',
+            range: '≥ 3회',
+            description: '몸 흔들림 개선 필요',
+          },
+        ];
+      default:
+        return [];
+    }
+  };
+
   const getDetailFromData = (label) => {
     if (!detailReport?.categories) {
       return { description: '', detail: '' };
@@ -215,7 +382,7 @@ export default function IndividualReportFullPage() {
       category: '발화',
     },
     {
-      label: '필러 사용',
+      label: '필러어 사용',
       key: 'fillerCount',
       unit: '회',
       icon: '💬',
@@ -251,7 +418,7 @@ export default function IndividualReportFullPage() {
       key: 'shoulderTilt',
       unit: '%',
       icon: '💪',
-      recommendedText: '80-100% 권장',
+      recommendedText: '90-100% 권장',
       category: '자세',
     },
     {
@@ -298,8 +465,9 @@ export default function IndividualReportFullPage() {
       case 'smileRate':
         return { min: 0, max: 100, goodMin: 50, goodMax: 100 };
       case 'nodCount':
-      case 'shoulderTilt':
         return { min: 0, max: 100, goodMin: 80, goodMax: 100 };
+      case 'shoulderTilt':
+        return { min: 0, max: 100, goodMin: 90, goodMax: 100 };
       default:
         return { min: 0, max: 100, goodMin: 0, goodMax: 100 };
     }
@@ -579,12 +747,39 @@ export default function IndividualReportFullPage() {
 
                             {isExpanded && (
                               <div className="analysis-detail">
-                                <div className="detail-section">
-                                  <h5>상세 분석</h5>
-                                  <p>
-                                    {item.detailContent ||
-                                      '상세 분석 정보가 없습니다.'}
-                                  </p>
+                                <div className="detail-content-wrapper">
+                                  <div className="guideline-box">
+                                    <h5>📋 권장기준</h5>
+                                    <div className="guideline-items">
+                                      {getGuidelineForItem(item.key).map(
+                                        (guideline, idx) => (
+                                          <div
+                                            key={idx}
+                                            className={`guideline-item guideline-${guideline.level.replace(/필요/g, '').trim()}`}
+                                          >
+                                            <div className="guideline-header">
+                                              <span className="guideline-level">
+                                                {guideline.level}
+                                              </span>
+                                              <span className="guideline-range">
+                                                {guideline.range}
+                                              </span>
+                                            </div>
+                                            <p className="guideline-description">
+                                              {guideline.description}
+                                            </p>
+                                          </div>
+                                        ),
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="detail-section">
+                                    <h5>📝 상세 분석</h5>
+                                    <p>
+                                      {item.detailContent ||
+                                        '상세 분석 정보가 없습니다.'}
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
                             )}
