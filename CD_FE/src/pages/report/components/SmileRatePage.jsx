@@ -10,15 +10,13 @@ export default function TotalSmilePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getReportTrends();
+        const trends = await getReportTrends();
 
-        console.log('미소율 추세 응답:', response);
+        console.log('미소율 추세 응답:', trends);
 
-        const trendList = response?.data?.trends || response?.trends || [];
-
-        const chartData = trendList.map((item) => ({
+        const chartData = (trends.smileTrend || []).map((item) => ({
           session: item.date,
-          value: item.smile_ratio,
+          value: item.value,
         }));
 
         setSmileData(chartData);

@@ -11,11 +11,9 @@ export default function TotalSpeechRatePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getReportTrends();
+        const trends = await getReportTrends();
 
-        console.log('발화 속도 추세 응답:', response);
-
-        const trends = response?.data || response?.results || response || {};
+        console.log('발화 속도 추세 응답:', trends);
 
         setSpeechRateData(trends.speechRateTrend || []);
       } catch (error) {

@@ -95,6 +95,13 @@ const getDeletedSessions = () => {
   }
 };
 
+const isSameReportSession = (item, sessions) =>
+  sessions.some(
+    (session) =>
+      String(item.session) === String(session) ||
+      String(item.id) === String(session),
+  );
+
 export default function IndividualReportPage() {
   const navigate = useNavigate();
 
@@ -254,11 +261,11 @@ export default function IndividualReportPage() {
       const data = JSON.parse(localStorage.getItem(key) || '[]');
 
       const deletedTrendItems = data.filter((item) =>
-        sessionsToDelete.includes(item.session),
+        isSameReportSession(item, sessionsToDelete),
       );
 
       const remainedTrendItems = data.filter(
-        (item) => !sessionsToDelete.includes(item.session),
+        (item) => !isSameReportSession(item, sessionsToDelete),
       );
 
       nextDeletedStorage.trends[key] = [
@@ -309,7 +316,7 @@ export default function IndividualReportPage() {
       const data = JSON.parse(localStorage.getItem(key) || '[]');
 
       const deletedTrendItems = data.filter((item) =>
-        sessionsToDelete.includes(item.session),
+        isSameReportSession(item, sessionsToDelete),
       );
 
       nextDeletedStorage.trends[key] = [

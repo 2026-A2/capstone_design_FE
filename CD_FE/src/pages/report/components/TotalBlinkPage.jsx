@@ -10,15 +10,13 @@ export default function TotalBlinkPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getReportTrends();
+        const trends = await getReportTrends();
 
-        console.log('눈 깜빡임 추세 응답:', response);
+        console.log('눈 깜빡임 추세 응답:', trends);
 
-        const trendList = response?.data?.trends || response?.trends || [];
-
-        const chartData = trendList.map((item) => ({
+        const chartData = (trends.blinkTrend || []).map((item) => ({
           session: item.date,
-          value: item.blink_per_min,
+          value: item.value,
         }));
 
         setBlinkData(chartData);

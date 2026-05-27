@@ -21,11 +21,9 @@ export default function TotalFillerPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getReportTrends();
+        const trends = await getReportTrends();
 
-        console.log('필러 사용 추세 응답:', response);
-
-        const trends = response?.data || response?.results || response || {};
+        console.log('필러 사용 추세 응답:', trends);
 
         setFillerData(trends.fillerTrend || []);
       } catch (error) {

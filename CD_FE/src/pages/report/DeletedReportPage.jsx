@@ -92,6 +92,13 @@ const getCurrentReports = () => {
   }
 };
 
+const isSameReportSession = (item, sessions) =>
+  sessions.some(
+    (session) =>
+      String(item.session) === String(session) ||
+      String(item.id) === String(session),
+  );
+
 export default function DeletedReportPage() {
   const navigate = useNavigate();
 
@@ -189,11 +196,11 @@ export default function DeletedReportPage() {
       const deletedTrendData = nextDeletedTrends[key] || [];
 
       const restoreTrendItems = deletedTrendData.filter((item) =>
-        restoreSessions.includes(item.session),
+        isSameReportSession(item, restoreSessions),
       );
 
       const remainedDeletedTrendItems = deletedTrendData.filter(
-        (item) => !restoreSessions.includes(item.session),
+        (item) => !isSameReportSession(item, restoreSessions),
       );
 
       const currentTrendData = JSON.parse(localStorage.getItem(key)) || [];

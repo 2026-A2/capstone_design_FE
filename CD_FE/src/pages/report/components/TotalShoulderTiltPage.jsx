@@ -10,11 +10,9 @@ export default function TotalShoulderTiltPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getReportTrends();
+        const trends = await getReportTrends();
 
-        console.log('어깨 기울기 추세 응답:', response);
-
-        const trends = response?.data || response?.results || response || {};
+        console.log('어깨 기울기 추세 응답:', trends);
 
         setData(trends.shoulderTiltTrend || []);
       } catch (error) {

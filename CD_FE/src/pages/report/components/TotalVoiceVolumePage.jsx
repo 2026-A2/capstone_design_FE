@@ -11,11 +11,9 @@ export default function TotalVoiceVolumePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getReportTrends();
+        const trends = await getReportTrends();
 
-        console.log('음성 크기 추세 응답:', response);
-
-        const trends = response?.data || response?.results || response || {};
+        console.log('음성 크기 추세 응답:', trends);
 
         setVoiceVolumeData(trends.voiceVolumeTrend || []);
       } catch (error) {
@@ -26,7 +24,6 @@ export default function TotalVoiceVolumePage() {
 
     fetchData();
   }, []);
-
   const currentStep = 3;
   const totalStep = 10;
   const progressPercent = (currentStep / totalStep) * 100;

@@ -11,11 +11,9 @@ export default function TotalNodPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getReportTrends();
+        const trends = await getReportTrends();
 
-        console.log('고개 끄덕임 추세 응답:', response);
-
-        const trends = response?.data || response?.results || response || {};
+        console.log('고개 끄덕임 추세 응답:', trends);
 
         setNodData(trends.nodTrend || []);
       } catch (error) {

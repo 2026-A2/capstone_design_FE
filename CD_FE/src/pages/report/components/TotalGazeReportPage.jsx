@@ -11,15 +11,13 @@ export default function TotalGazeReportPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getReportTrends();
+        const trends = await getReportTrends();
 
-        console.log('시선 처리 추세 응답:', response);
+        console.log('시선 처리 추세 응답:', trends);
 
-        const trendList = response?.data?.trends || response?.trends || [];
-
-        const chartData = trendList.map((item) => ({
+        const chartData = (trends.eyeContactTrend || []).map((item) => ({
           session: item.date,
-          value: item.gaze_front_ratio,
+          value: item.value,
         }));
 
         setEyeContactData(chartData);

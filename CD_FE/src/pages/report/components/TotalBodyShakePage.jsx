@@ -20,15 +20,13 @@ export default function TotalBodyShakePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getReportTrends();
+        const trends = await getReportTrends();
 
-        console.log('몸 흔들림 추세 응답:', response);
+        console.log('몸 흔들림 추세 응답:', trends);
 
-        const trendList = response?.data?.trends || response?.trends || [];
-
-        const chartData = trendList.map((item) => ({
+        const chartData = (trends.bodyShakeTrend || []).map((item) => ({
           session: item.date,
-          value: item.body_sway_per_min,
+          value: item.value,
         }));
 
         setBodyShakeData(chartData);
@@ -40,7 +38,6 @@ export default function TotalBodyShakePage() {
 
     fetchData();
   }, []);
-
   const currentStep = 10;
   const totalStep = 10;
   const progressPercent = (currentStep / totalStep) * 100;
