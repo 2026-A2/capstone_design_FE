@@ -15,7 +15,11 @@ import {
   voiceVolumeTrend,
 } from '../mockdata/report/trendMock';
 
-const USE_MOCK = false;
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
+
+const REPORT_LIST_PATH = '/interviews/';
+const REPORT_TRENDS_PATH = '/interviews/trends/';
+const getReportDetailPath = (id) => `/interviews/${id}/report/`;
 
 const INTERVIEW_TYPE_LABELS = {
   RESUME: '자소서 기반 면접',
@@ -40,37 +44,65 @@ const getResponseTrends = (responseData) => {
   return [];
 };
 
+const unwrapReportData = (responseData) =>
+  responseData?.report ||
+  responseData?.data?.report ||
+  responseData?.data ||
+  responseData?.result ||
+  responseData?.interview ||
+  responseData ||
+  {};
+
 const normalizeReport = (data, fallbackId) => {
-  const id = data.interview_id ?? data.id ?? fallbackId;
-  const interviewType = data.interview_type ?? data.interviewType;
-  const date = data.date ?? '';
+  const reportData = unwrapReportData(data);
+  const id = reportData.interview_id ?? reportData.id ?? fallbackId;
+  const interviewType = reportData.interview_type ?? reportData.interviewType;
+  const date = reportData.date ?? '';
   const title =
-    data.title ||
+    reportData.title ||
     `${date ? `${date} ` : ''}${INTERVIEW_TYPE_LABELS[interviewType] || '면접'} 리포트`;
 
   return {
-    ...data,
+    ...reportData,
     id,
     session: id,
     title,
-    type: data.type || INTERVIEW_TYPE_FILTERS[interviewType] || 'resume',
+    type: reportData.type || INTERVIEW_TYPE_FILTERS[interviewType] || 'resume',
     interviewType,
     interviewTypeLabel: INTERVIEW_TYPE_LABELS[interviewType] || interviewType,
     date,
     detail: {
-      eyeContactRate: data.gaze_front_ratio ?? data.detail?.eyeContactRate,
-      speechRate: data.avg_spm ?? data.detail?.speechRate,
-      voiceVolume: data.avg_db ?? data.detail?.voiceVolume,
-      silenceCount: data.total_silence_count ?? data.detail?.silenceCount,
-      fillerCount: data.total_filler_count ?? data.detail?.fillerCount,
-      smileRate: data.smile_ratio ?? data.detail?.smileRate,
-      blinkCount: data.blink_per_min ?? data.detail?.blinkCount,
-      nodCount: data.nod_per_min ?? data.detail?.nodCount,
-      shoulderTilt: data.shoulder_stability ?? data.detail?.shoulderTilt,
-      bodyShake: data.body_sway_per_min ?? data.detail?.bodyShake,
+      eyeContactRate:
+        reportData.gaze_front_ratio ?? reportData.detail?.eyeContactRate,
+      speechRate: reportData.avg_spm ?? reportData.detail?.speechRate,
+      voiceVolume: reportData.avg_db ?? reportData.detail?.voiceVolume,
+      silenceCount:
+        reportData.total_silence_count ?? reportData.detail?.silenceCount,
+      fillerCount:
+        reportData.total_filler_count ?? reportData.detail?.fillerCount,
+      smileRate: reportData.smile_ratio ?? reportData.detail?.smileRate,
+      blinkCount: reportData.blink_per_min ?? reportData.detail?.blinkCount,
+      nodCount: reportData.nod_per_min ?? reportData.detail?.nodCount,
+      shoulderTilt:
+        reportData.shoulder_stability ?? reportData.detail?.shoulderTilt,
+      bodyShake: reportData.body_sway_per_min ?? reportData.detail?.bodyShake,
     },
-    categories: data.categories || [],
+    categories: reportData.categories || [],
   };
+};
+
+const hasReportMetrics = (report) =>
+  Object.values(report.detail || {}).some(
+    (value) => value !== undefined && value !== null,
+  );
+
+const getTrendReportById = async (id) => {
+  const trendsResponse = await axiosInstance.get(REPORT_TRENDS_PATH);
+  const trendItem = getResponseTrends(trendsResponse.data).find(
+    (item) => String(item.interview_id ?? item.id) === String(id),
+  );
+
+  return trendItem ? normalizeReport(trendItem, id) : null;
 };
 
 export const getIndividualReports = async () => {
@@ -78,7 +110,7 @@ export const getIndividualReports = async () => {
     return filterDeletedSessions(individualReports);
   }
 
-  const response = await axiosInstance.get('/reports/trends');
+  const response = await axiosInstance.get(REPORT_LIST_PATH);
   return filterDeletedSessions(
     getResponseTrends(response.data).map((item, index) =>
       normalizeReport(item, index + 1),
@@ -102,7 +134,7 @@ export const getReportTrends = async () => {
     };
   }
 
-  const response = await axiosInstance.get('/reports/trends');
+  const response = await axiosInstance.get(REPORT_TRENDS_PATH);
   const trends = getResponseTrends(response.data);
 
   const toChartItem = (item, value, extra = {}) => ({
@@ -177,18 +209,25 @@ export const getIndividualReportDetail = async (id) => {
   }
 
   try {
-    const response = await axiosInstance.get(`/reports/${id}`);
-    return normalizeReport(response.data || {}, id);
-  } catch (error) {
-    const trendsResponse = await axiosInstance.get('/reports/trends');
-    const trendItem = getResponseTrends(trendsResponse.data).find(
-      (item) => String(item.interview_id ?? item.id) === String(id),
-    );
+    const response = await axiosInstance.get(getReportDetailPath(id));
+    const detailReport = normalizeReport(response.data || {}, id);
 
-    if (!trendItem) {
+    if (hasReportMetrics(detailReport)) {
+      return detailReport;
+    }
+
+    const trendReport = await getTrendReportById(id);
+
+    return trendReport
+      ? normalizeReport({ ...trendReport, ...unwrapReportData(response.data) }, id)
+      : detailReport;
+  } catch (error) {
+    const trendReport = await getTrendReportById(id);
+
+    if (!trendReport) {
       throw error;
     }
 
-    return normalizeReport(trendItem, id);
+    return trendReport;
   }
 };
