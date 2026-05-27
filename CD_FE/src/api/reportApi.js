@@ -1,5 +1,4 @@
 import axiosInstance from './axiosInstance';
-import { individualReports } from '../mockdata/report/individualMock';
 import { individualReportsDetail } from '../mockdata/report/individualmockdetail';
 import { filterDeletedSessions } from '../pages/report/utils/filterDeletedSessions';
 import {
@@ -15,7 +14,33 @@ import {
   voiceVolumeTrend,
 } from '../mockdata/report/trendMock';
 
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
+const MOCK_STORAGE_KEY = 'USE_MOCK';
+
+// 초기값: 환경 변수에서 읽거나 true 기본값
+const initializeMockMode = () => {
+  const stored = localStorage.getItem(MOCK_STORAGE_KEY);
+  if (stored !== null) {
+    return stored === 'true';
+  }
+  // 환경 변수에서 초기값 설정 (기본값: true)
+  return import.meta.env.VITE_USE_MOCK !== 'false';
+};
+
+export const getUseMock = () => {
+  const stored = localStorage.getItem(MOCK_STORAGE_KEY);
+  if (stored !== null) {
+    return stored === 'true';
+  }
+  return true;
+};
+
+export const setUseMock = (value) => {
+  localStorage.setItem(MOCK_STORAGE_KEY, String(value));
+  console.log(`[Mock Mode] ${value ? 'Mock 데이터 사용' : 'API 데이터 사용'}`);
+};
+
+// 초기화
+initializeMockMode();
 
 const REPORT_LIST_PATH = '/interviews/';
 const REPORT_TRENDS_PATH = '/interviews/trends/';
@@ -36,13 +61,16 @@ const INTERVIEW_TYPE_FILTERS = {
 const getResponseTrends = (responseData) => {
   if (Array.isArray(responseData)) return responseData;
   if (Array.isArray(responseData?.trends)) return responseData.trends;
-  if (Array.isArray(responseData?.data?.trends)) return responseData.data.trends;
+  if (Array.isArray(responseData?.data?.trends))
+    return responseData.data.trends;
   if (Array.isArray(responseData?.data)) return responseData.data;
   if (Array.isArray(responseData?.results)) return responseData.results;
   if (Array.isArray(responseData?.interviews)) return responseData.interviews;
 
   return [];
 };
+
+const getReportId = (item) => item?.interview_id ?? item?.id ?? item?.session;
 
 const unwrapReportData = (responseData) =>
   responseData?.report ||
@@ -62,6 +90,35 @@ const normalizeReport = (data, fallbackId) => {
     reportData.title ||
     `${date ? `${date} ` : ''}${INTERVIEW_TYPE_LABELS[interviewType] || '면접'} 리포트`;
 
+  // API 응답 데이터 로깅 (디버깅용)
+  if (getUseMock() === false) {
+    console.log('[API 응답 데이터]', {
+      id,
+      rawData: reportData,
+      gaze_front_ratio: reportData.gaze_front_ratio,
+      avg_spm: reportData.avg_spm,
+      avg_db: reportData.avg_db,
+      detail: reportData.detail,
+    });
+  }
+
+  const detailData = {
+    eyeContactRate:
+      reportData.gaze_front_ratio ?? reportData.detail?.eyeContactRate,
+    speechRate: reportData.avg_spm ?? reportData.detail?.speechRate,
+    voiceVolume: reportData.avg_db ?? reportData.detail?.voiceVolume,
+    silenceCount:
+      reportData.total_silence_count ?? reportData.detail?.silenceCount,
+    fillerCount:
+      reportData.total_filler_count ?? reportData.detail?.fillerCount,
+    smileRate: reportData.smile_ratio ?? reportData.detail?.smileRate,
+    blinkCount: reportData.blink_per_min ?? reportData.detail?.blinkCount,
+    nodCount: reportData.nod_per_min ?? reportData.detail?.nodCount,
+    shoulderTilt:
+      reportData.shoulder_stability ?? reportData.detail?.shoulderTilt,
+    bodyShake: reportData.body_sway_per_min ?? reportData.detail?.bodyShake,
+  };
+
   return {
     ...reportData,
     id,
@@ -71,22 +128,7 @@ const normalizeReport = (data, fallbackId) => {
     interviewType,
     interviewTypeLabel: INTERVIEW_TYPE_LABELS[interviewType] || interviewType,
     date,
-    detail: {
-      eyeContactRate:
-        reportData.gaze_front_ratio ?? reportData.detail?.eyeContactRate,
-      speechRate: reportData.avg_spm ?? reportData.detail?.speechRate,
-      voiceVolume: reportData.avg_db ?? reportData.detail?.voiceVolume,
-      silenceCount:
-        reportData.total_silence_count ?? reportData.detail?.silenceCount,
-      fillerCount:
-        reportData.total_filler_count ?? reportData.detail?.fillerCount,
-      smileRate: reportData.smile_ratio ?? reportData.detail?.smileRate,
-      blinkCount: reportData.blink_per_min ?? reportData.detail?.blinkCount,
-      nodCount: reportData.nod_per_min ?? reportData.detail?.nodCount,
-      shoulderTilt:
-        reportData.shoulder_stability ?? reportData.detail?.shoulderTilt,
-      bodyShake: reportData.body_sway_per_min ?? reportData.detail?.bodyShake,
-    },
+    detail: detailData,
     categories: reportData.categories || [],
   };
 };
@@ -106,20 +148,53 @@ const getTrendReportById = async (id) => {
 };
 
 export const getIndividualReports = async () => {
-  if (USE_MOCK) {
-    return filterDeletedSessions(individualReports);
+  if (getUseMock()) {
+    console.log('[Mock 모드] Mock 데이터 로드');
+    return filterDeletedSessions(individualReportsDetail);
   }
 
-  const response = await axiosInstance.get(REPORT_LIST_PATH);
-  return filterDeletedSessions(
-    getResponseTrends(response.data).map((item, index) =>
-      normalizeReport(item, index + 1),
-    ),
+  console.log('[API 모드] API에서 리포트 목록 조회 중...');
+  const [listResponse, trendsResponse] = await Promise.all([
+    axiosInstance.get(REPORT_LIST_PATH),
+    axiosInstance.get(REPORT_TRENDS_PATH),
+  ]);
+
+  console.log('[API 응답 - 목록 원본]', listResponse.data);
+  console.log('[API 응답 - 추세 원본]', trendsResponse.data);
+
+  const trendItems = getResponseTrends(trendsResponse.data);
+  const trendMap = new Map(
+    trendItems.map((item) => [String(getReportId(item)), item]),
   );
+
+  const normalizedReports = getResponseTrends(listResponse.data).map(
+    (item, index) => {
+      const trendItem = trendMap.get(String(getReportId(item))) || {};
+
+      return normalizeReport(
+        {
+          ...item,
+          ...trendItem,
+          title: item.title ?? trendItem.title,
+          date: item.date ?? trendItem.date,
+          interview_type: item.interview_type ?? trendItem.interview_type,
+          detail: {
+            ...item.detail,
+            ...trendItem.detail,
+          },
+        },
+        index + 1,
+      );
+    },
+  );
+
+  console.log('[정규화된 리포트]', normalizedReports);
+
+  return filterDeletedSessions(normalizedReports);
 };
 
 export const getReportTrends = async () => {
-  if (USE_MOCK) {
+  if (getUseMock()) {
     return {
       speechRateTrend: filterDeletedSessions(speechRateTrend),
       voiceVolumeTrend: filterDeletedSessions(voiceVolumeTrend),
@@ -202,26 +277,43 @@ export const getReportTrends = async () => {
 };
 
 export const getIndividualReportDetail = async (id) => {
-  if (USE_MOCK) {
+  if (getUseMock()) {
+    console.log('[Mock 모드] 상세 리포트 로드 - ID:', id);
     return individualReportsDetail.find(
       (report) => String(report.id) === String(id),
     );
   }
 
   try {
+    console.log('[API 모드] 상세 리포트 조회 중 - ID:', id);
     const response = await axiosInstance.get(getReportDetailPath(id));
+
+    console.log('[API 응답 - 상세 리포트 원본]', response.data);
+
     const detailReport = normalizeReport(response.data || {}, id);
+
+    console.log('[정규화된 상세 리포트]', {
+      id: detailReport.id,
+      title: detailReport.title,
+      detail: detailReport.detail,
+      hasMetrics: hasReportMetrics(detailReport),
+    });
 
     if (hasReportMetrics(detailReport)) {
       return detailReport;
     }
 
+    console.log('[메트릭 없음] Trend 데이터로 보충 시도');
     const trendReport = await getTrendReportById(id);
 
     return trendReport
-      ? normalizeReport({ ...trendReport, ...unwrapReportData(response.data) }, id)
+      ? normalizeReport(
+          { ...trendReport, ...unwrapReportData(response.data) },
+          id,
+        )
       : detailReport;
   } catch (error) {
+    console.error('[API 오류] 상세 리포트 조회 실패:', error);
     const trendReport = await getTrendReportById(id);
 
     if (!trendReport) {

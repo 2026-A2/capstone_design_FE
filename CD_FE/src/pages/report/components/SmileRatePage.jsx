@@ -15,7 +15,7 @@ export default function TotalSmilePage() {
         console.log('미소율 추세 응답:', trends);
 
         const chartData = (trends.smileTrend || []).map((item) => ({
-          session: item.date,
+          session: item.date ?? item.session,
           value: item.value,
         }));
 

@@ -25,7 +25,7 @@ export default function TotalBodyShakePage() {
         console.log('몸 흔들림 추세 응답:', trends);
 
         const chartData = (trends.bodyShakeTrend || []).map((item) => ({
-          session: item.date,
+          session: item.date ?? item.session,
           value: item.value,
         }));
 

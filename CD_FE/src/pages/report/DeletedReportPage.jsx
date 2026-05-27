@@ -32,13 +32,19 @@ const ANALYSIS_METRICS = [
 ];
 
 const getItemStatus = (key, value) => {
-  if (value === undefined || value === null) return 'neutral';
+  if (value === undefined || value === null || Number.isNaN(value)) {
+    return 'neutral';
+  }
 
   switch (key) {
     case 'eyeContactRate':
-      return value >= 60 ? 'good' : 'bad';
+      if (value >= 60) return 'good';
+      if (value >= 50) return 'warning';
+      return 'bad';
     case 'speechRate':
-      return value >= 200 && value <= 260 ? 'good' : 'bad';
+      if (value >= 200 && value <= 260) return 'good';
+      if (value >= 180 && value <= 300) return 'warning';
+      return 'bad';
     case 'silenceCount':
       if (value <= 3) return 'good';
       if (value <= 6) return 'warning';
@@ -54,15 +60,25 @@ const getItemStatus = (key, value) => {
       if (value >= -50) return 'warning';
       return 'bad';
     case 'smileRate':
-      return value >= 50 ? 'good' : 'bad';
+      if (value >= 50) return 'good';
+      if (value >= 30) return 'warning';
+      return 'bad';
     case 'blinkCount':
-      return value >= 15 && value <= 20 ? 'good' : 'bad';
+      if (value >= 15 && value <= 20) return 'good';
+      if (value >= 10 && value <= 25) return 'warning';
+      return 'bad';
     case 'nodCount':
-      return value >= 80 && value <= 100 ? 'good' : 'bad';
+      if (value >= 80 && value <= 100) return 'good';
+      if (value >= 60 && value < 80) return 'warning';
+      return 'bad';
     case 'shoulderTilt':
-      return value >= 80 && value <= 100 ? 'good' : 'bad';
+      if (value >= 80 && value <= 100) return 'good';
+      if (value >= 60 && value < 80) return 'warning';
+      return 'bad';
     case 'bodyShake':
-      return value <= 1 ? 'good' : 'bad';
+      if (value <= 1) return 'good';
+      if (value <= 3) return 'warning';
+      return 'bad';
     default:
       return 'neutral';
   }

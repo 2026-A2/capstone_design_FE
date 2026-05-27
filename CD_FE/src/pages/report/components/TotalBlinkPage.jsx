@@ -15,7 +15,7 @@ export default function TotalBlinkPage() {
         console.log('눈 깜빡임 추세 응답:', trends);
 
         const chartData = (trends.blinkTrend || []).map((item) => ({
-          session: item.date,
+          session: item.date ?? item.session,
           value: item.value,
         }));
 

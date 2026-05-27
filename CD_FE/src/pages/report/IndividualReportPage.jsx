@@ -39,13 +39,19 @@ const ANALYSIS_METRICS = [
 ];
 
 const getItemStatus = (key, value) => {
-  if (value === undefined || value === null) return 'neutral';
+  // undefined, null, 그리고 NaN은 neutral로 처리
+  if (value === undefined || value === null || Number.isNaN(value))
+    return 'neutral';
 
   switch (key) {
     case 'eyeContactRate':
-      return value >= 60 ? 'good' : 'bad';
+      if (value >= 60) return 'good';
+      if (value >= 50) return 'warning';
+      return 'bad';
     case 'speechRate':
-      return value >= 200 && value <= 260 ? 'good' : 'bad';
+      if (value >= 200 && value <= 260) return 'good';
+      if (value >= 180 && value <= 300) return 'warning';
+      return 'bad';
     case 'silenceCount':
       if (value <= 3) return 'good';
       if (value <= 6) return 'warning';
@@ -61,15 +67,25 @@ const getItemStatus = (key, value) => {
       if (value >= -50) return 'warning';
       return 'bad';
     case 'smileRate':
-      return value >= 50 ? 'good' : 'bad';
+      if (value >= 50) return 'good';
+      if (value >= 30) return 'warning';
+      return 'bad';
     case 'blinkCount':
-      return value >= 15 && value <= 20 ? 'good' : 'bad';
+      if (value >= 15 && value <= 20) return 'good';
+      if (value >= 10 && value <= 25) return 'warning';
+      return 'bad';
     case 'nodCount':
-      return value >= 80 && value <= 100 ? 'good' : 'bad';
+      if (value >= 80 && value <= 100) return 'good';
+      if (value >= 60 && value < 80) return 'warning';
+      return 'bad';
     case 'shoulderTilt':
-      return value >= 80 && value <= 100 ? 'good' : 'bad';
+      if (value >= 80 && value <= 100) return 'good';
+      if (value >= 60 && value < 80) return 'warning';
+      return 'bad';
     case 'bodyShake':
-      return value <= 1 ? 'good' : 'bad';
+      if (value <= 1) return 'good';
+      if (value <= 3) return 'warning';
+      return 'bad';
     default:
       return 'neutral';
   }
@@ -174,6 +190,14 @@ export default function IndividualReportPage() {
   }, [reportList, selectedType, searchText, deletedSessions]);
 
   const getReportAnalysisSummary = (report) => {
+    // API 데이터 디버깅: detail 필드 로깅
+    if (
+      !report.detail ||
+      Object.values(report.detail).every((v) => v === undefined || v === null)
+    ) {
+      console.warn('[분석 요약] detail 필드 누락 또는 모두 undefined:', report);
+    }
+
     const metricStatuses = ANALYSIS_METRICS.map((metric) => ({
       ...metric,
       status: getItemStatus(metric.key, report.detail?.[metric.key]),
@@ -201,7 +225,19 @@ export default function IndividualReportPage() {
   const getReportDescription = (report) => {
     const analysisSummary = getReportAnalysisSummary(report);
 
+    // 디버깅: 요약 정보 로깅
+    console.log(`[${report.title}] 분석 요약:`, analysisSummary);
+
     if (analysisSummary.total === 0) {
+      // detail이 아예 없으면 기본값으로 계산 시도
+      if (
+        !report.detail ||
+        Object.values(report.detail).every((v) => v === undefined || v === null)
+      ) {
+        console.warn(`[${report.title}] detail 데이터 없음 - 기본값 사용`);
+        // 기본 분석 결과 반환 (실제 API 응답 후 수정 필요)
+        return '분석 데이터를 로드 중입니다.';
+      }
       return '상세 분석 결과를 확인할 수 있습니다.';
     }
 
