@@ -40,11 +40,7 @@ export default function TotalReportMenuPage() {
       path: '/report/total/blink',
       group: 'habit',
     },
-    {
-      title: '말끝흐림',
-      path: '/report/total/ending-blur',
-      group: 'ending-blur',
-    },
+
     {
       title: '고개끄떡임',
       path: '/report/total/nod',

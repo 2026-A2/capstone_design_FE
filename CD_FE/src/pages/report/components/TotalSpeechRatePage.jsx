@@ -27,7 +27,7 @@ export default function TotalSpeechRatePage() {
     fetchData();
   }, []);
   const currentStep = 2;
-  const totalStep = 11;
+  const totalStep = 10;
   const progressPercent = (currentStep / totalStep) * 100;
 
   return (

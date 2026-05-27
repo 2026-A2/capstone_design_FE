@@ -14,9 +14,14 @@ export default function TotalBlinkPage() {
 
         console.log('눈 깜빡임 추세 응답:', response);
 
-        const trends = response?.data || response?.results || response || {};
+        const trendList = response?.data?.trends || response?.trends || [];
 
-        setBlinkData(trends.blinkTrend || []);
+        const chartData = trendList.map((item) => ({
+          session: item.date,
+          value: item.blink_per_min,
+        }));
+
+        setBlinkData(chartData);
       } catch (error) {
         console.error('눈 깜빡임 추세 조회 실패:', error);
         setBlinkData([]);
@@ -27,7 +32,7 @@ export default function TotalBlinkPage() {
   }, []);
 
   const currentStep = 7;
-  const totalStep = 11;
+  const totalStep = 10;
   const progressPercent = (currentStep / totalStep) * 100;
 
   return (
@@ -95,7 +100,7 @@ export default function TotalBlinkPage() {
         <button
           type="button"
           style={styles.nextButton}
-          onClick={() => navigate('/report/total/ending-blur')}
+          onClick={() => navigate('/report/total/nod')}
         >
           다음
         </button>

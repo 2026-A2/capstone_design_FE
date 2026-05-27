@@ -15,9 +15,14 @@ export default function TotalGazeReportPage() {
 
         console.log('시선 처리 추세 응답:', response);
 
-        const trends = response?.data || response?.results || response || {};
+        const trendList = response?.data?.trends || response?.trends || [];
 
-        setEyeContactData(trends.eyeContactTrend || []);
+        const chartData = trendList.map((item) => ({
+          session: item.date,
+          value: item.gaze_front_ratio,
+        }));
+
+        setEyeContactData(chartData);
       } catch (error) {
         console.error('시선 처리 추세 조회 실패:', error);
         setEyeContactData([]);
@@ -28,7 +33,7 @@ export default function TotalGazeReportPage() {
   }, []);
 
   const currentStep = 1;
-  const totalStep = 11;
+  const totalStep = 10;
   const progressPercent = (currentStep / totalStep) * 100;
 
   return (

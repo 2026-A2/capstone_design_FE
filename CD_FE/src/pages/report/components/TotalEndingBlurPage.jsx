@@ -37,7 +37,7 @@ export default function TotalEndingBlurPage() {
     fetchData();
   }, []);
   const currentStep = 8;
-  const totalStep = 11;
+  const totalStep = 10;
   const progressPercent = (currentStep / totalStep) * 100;
 
   return (

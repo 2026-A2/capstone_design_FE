@@ -24,9 +24,14 @@ export default function TotalBodyShakePage() {
 
         console.log('몸 흔들림 추세 응답:', response);
 
-        const trends = response?.data || response?.results || response || {};
+        const trendList = response?.data?.trends || response?.trends || [];
 
-        setBodyShakeData(trends.bodyShakeTrend || []);
+        const chartData = trendList.map((item) => ({
+          session: item.date,
+          value: item.body_sway_per_min,
+        }));
+
+        setBodyShakeData(chartData);
       } catch (error) {
         console.error('몸 흔들림 추세 조회 실패:', error);
         setBodyShakeData([]);
@@ -36,8 +41,8 @@ export default function TotalBodyShakePage() {
     fetchData();
   }, []);
 
-  const currentStep = 11;
-  const totalStep = 11;
+  const currentStep = 10;
+  const totalStep = 10;
   const progressPercent = (currentStep / totalStep) * 100;
 
   const getBarColor = (value) => {

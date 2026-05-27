@@ -38,7 +38,7 @@ export default function TotalSilencePage() {
   }, []);
 
   const currentStep = 4;
-  const totalStep = 11;
+  const totalStep = 10;
   const progressPercent = (currentStep / totalStep) * 100;
 
   return (

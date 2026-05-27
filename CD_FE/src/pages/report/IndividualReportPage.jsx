@@ -14,7 +14,6 @@ const TREND_KEYS = [
   'fillerTrend',
   'smileTrend',
   'blinkTrend',
-  'endingBlurTrend',
   'nodTrend',
   'shoulderTiltTrend',
   'bodyShakeTrend',
@@ -34,7 +33,6 @@ const ANALYSIS_METRICS = [
   { key: 'fillerCount', label: '필러' },
   { key: 'smileRate', label: '표정' },
   { key: 'blinkCount', label: '습관' },
-  { key: 'endingBlurCount', label: '끝맺음' },
   { key: 'nodCount', label: '반응' },
   { key: 'shoulderTilt', label: '자세' },
   { key: 'bodyShake', label: '흔들림' },
@@ -66,8 +64,6 @@ const getItemStatus = (key, value) => {
       return value >= 50 ? 'good' : 'bad';
     case 'blinkCount':
       return value >= 15 && value <= 20 ? 'good' : 'bad';
-    case 'endingBlurCount':
-      return value <= 25 ? 'good' : 'bad';
     case 'nodCount':
       return value >= 80 && value <= 100 ? 'good' : 'bad';
     case 'shoulderTilt':

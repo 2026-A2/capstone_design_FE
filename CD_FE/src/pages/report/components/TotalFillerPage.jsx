@@ -37,7 +37,7 @@ export default function TotalFillerPage() {
     fetchData();
   }, []);
   const currentStep = 5;
-  const totalStep = 11;
+  const totalStep = 10;
   const progressPercent = (currentStep / totalStep) * 100;
 
   return (

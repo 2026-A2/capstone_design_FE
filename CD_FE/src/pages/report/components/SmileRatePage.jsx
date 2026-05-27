@@ -14,9 +14,14 @@ export default function TotalSmilePage() {
 
         console.log('미소율 추세 응답:', response);
 
-        const trends = response?.data || response?.results || response || {};
+        const trendList = response?.data?.trends || response?.trends || [];
 
-        setSmileData(trends.smileTrend || []);
+        const chartData = trendList.map((item) => ({
+          session: item.date,
+          value: item.smile_ratio,
+        }));
+
+        setSmileData(chartData);
       } catch (error) {
         console.error('미소율 추세 조회 실패:', error);
         setSmileData([]);
@@ -27,7 +32,7 @@ export default function TotalSmilePage() {
   }, []);
 
   const currentStep = 6;
-  const totalStep = 11;
+  const totalStep = 10;
   const progressPercent = (currentStep / totalStep) * 100;
 
   return (

@@ -75,8 +75,6 @@ export default function IndividualReportFullPage() {
         return value >= 50 ? 'good' : 'bad';
       case 'blinkCount':
         return value >= 15 && value <= 20 ? 'good' : 'bad';
-      case 'endingBlurCount':
-        return value <= 25 ? 'good' : 'bad';
       case 'nodCount':
         return value >= 80 && value <= 100 ? 'good' : 'bad';
       case 'shoulderTilt':
@@ -225,14 +223,6 @@ export default function IndividualReportFullPage() {
       category: '습관',
     },
     {
-      label: '문장 끝 흐릿함',
-      key: 'endingBlurCount',
-      unit: '%',
-      icon: '📉',
-      recommendedText: '0-25% 권장',
-      category: '발화',
-    },
-    {
       label: '고개 끄덕임',
       key: 'nodCount',
       unit: '%',
@@ -291,8 +281,6 @@ export default function IndividualReportFullPage() {
         return { min: 0, max: 100, goodMin: 60, goodMax: 100 };
       case 'smileRate':
         return { min: 0, max: 100, goodMin: 50, goodMax: 100 };
-      case 'endingBlurCount':
-        return { min: 0, max: 100, goodMin: 0, goodMax: 25 };
       case 'nodCount':
       case 'shoulderTilt':
         return { min: 0, max: 100, goodMin: 80, goodMax: 100 };
@@ -353,7 +341,9 @@ export default function IndividualReportFullPage() {
   };
 
   const toggleAllItems = () => {
-    const isAllExpanded = analysisItems.every((_, index) => expandedItems[index]);
+    const isAllExpanded = analysisItems.every(
+      (_, index) => expandedItems[index],
+    );
 
     if (isAllExpanded) {
       setExpandedItems({});

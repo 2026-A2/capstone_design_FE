@@ -28,7 +28,7 @@ export default function TotalVoiceVolumePage() {
   }, []);
 
   const currentStep = 3;
-  const totalStep = 11;
+  const totalStep = 10;
   const progressPercent = (currentStep / totalStep) * 100;
 
   return (

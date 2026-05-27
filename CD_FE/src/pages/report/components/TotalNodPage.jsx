@@ -30,8 +30,8 @@ export default function TotalNodPage() {
     date: item.session,
     value: item.value,
   }));
-  const currentStep = 9;
-  const totalStep = 11;
+  const currentStep = 8;
+  const totalStep = 10;
   const progressPercent = (currentStep / totalStep) * 100;
 
   return (
@@ -84,7 +84,7 @@ export default function TotalNodPage() {
       <div style={styles.buttonWrap}>
         <button
           style={styles.prevButton}
-          onClick={() => navigate('/report/total/ending-blur')}
+          onClick={() => navigate('/report/total/blink')}
         >
           이전
         </button>

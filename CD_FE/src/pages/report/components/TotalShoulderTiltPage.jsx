@@ -26,8 +26,8 @@ export default function TotalShoulderTiltPage() {
     fetchData();
   }, []);
 
-  const currentStep = 10;
-  const totalStep = 11;
+  const currentStep = 9;
+  const totalStep = 10;
   const progressPercent = (currentStep / totalStep) * 100;
 
   const chartBoxStyle = {
