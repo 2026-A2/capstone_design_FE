@@ -61,10 +61,10 @@ export default function TotalVoiceVolumePage() {
       <InterviewTrendChart
         data={voiceVolumeData}
         xKey="session"
-        dataKey="avgVoiceVolume"
+        dataKey="value"
         lines={[
           {
-            dataKey: 'avgVoiceVolume',
+            dataKey: 'value',
             name: '평균 음성 크기',
             stroke: '#2563eb',
           },
