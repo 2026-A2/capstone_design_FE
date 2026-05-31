@@ -26,16 +26,32 @@ export const normalizeResume = (resume) => {
   };
 };
 
-export const getResumes = async () => {
-  const response = await axiosInstance.get('/resumes/');
-
-  return unwrapResumeList(response.data).map(normalizeResume);
-};
-
 export const getResume = async (resumeId) => {
   const response = await axiosInstance.get(`/resumes/${resumeId}/`);
 
   return normalizeResume(response.data);
+};
+
+export const getResumes = async () => {
+  const response = await axiosInstance.get('/resumes/');
+  const resumes = unwrapResumeList(response.data).map(normalizeResume);
+
+  const detailedResults = await Promise.allSettled(
+    resumes.map((resume) => getResume(resume.id)),
+  );
+
+  return resumes.map((resume, index) => {
+    const result = detailedResults[index];
+
+    if (result.status !== 'fulfilled') {
+      return resume;
+    }
+
+    return {
+      ...resume,
+      ...result.value,
+    };
+  });
 };
 
 export const createResume = async ({ title, content }) => {
