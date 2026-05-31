@@ -1,9 +1,7 @@
 import axios from 'axios';
 
 const INTERVIEW_API_BASE_URL =
-  import.meta.env.VITE_INTERVIEW_API_BASE_URL ||
-  import.meta.env.VITE_API_BASE_URL ||
-  'http://localhost:8000';
+  import.meta.env.VITE_INTERVIEW_API_BASE_URL || 'http://localhost:8000';
 const INTERVIEW_UPLOAD_PATH =
   import.meta.env.VITE_INTERVIEW_UPLOAD_PATH || '/interviews/';
 const INTERVIEW_SESSION_PATH =

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { createResume } from '../../api/resumeApi';
 import { useInterview } from '../../contexts/InterviewContext.jsx';
 import './ResumeFormPage.css';
 
@@ -26,8 +27,14 @@ export default function ResumeFormPage() {
     if (uploadedContent) return String(uploadedContent).slice(0, 300);
     return '';
   });
+  const [saveState, setSaveState] = useState('idle');
+  const [saveError, setSaveError] = useState('');
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (saveState === 'loading') {
+      return;
+    }
+
     if (title.trim().length === 0) {
       alert('자소서 제목을 입력해주세요.');
       return;
@@ -39,6 +46,8 @@ export default function ResumeFormPage() {
     }
 
     const now = new Date().toISOString();
+    setSaveState('loading');
+    setSaveError('');
 
     if (isEditMode) {
       setSavedResumes((prev) =>
@@ -59,19 +68,37 @@ export default function ResumeFormPage() {
       return;
     }
 
-    const newResume = {
-      id: crypto.randomUUID(),
-      title: title.trim(),
-      content: content.trim(),
-      createdAt: now,
-      updatedAt: now,
-      isDefault: savedResumes.length === 0,
-    };
+    try {
+      const createdResume = await createResume({
+        title: title.trim(),
+        content: content.trim(),
+      });
 
-    setSavedResumes((prev) => [newResume, ...prev]);
+      console.info('[resume create:success]', createdResume);
 
-    alert('자소서가 등록되었습니다.');
-    navigate('/settings/resume');
+      const newResume = {
+        ...createdResume,
+        id: createdResume.id ?? createdResume.resume_id ?? crypto.randomUUID(),
+        title: createdResume.title ?? title.trim(),
+        content: createdResume.content ?? content.trim(),
+        createdAt: createdResume.createdAt ?? createdResume.created_at ?? now,
+        updatedAt: createdResume.updatedAt ?? createdResume.updated_at ?? now,
+        isDefault: savedResumes.length === 0,
+      };
+
+      setSavedResumes((prev) => [newResume, ...prev]);
+
+      alert('자소서가 등록되었습니다.');
+      navigate('/settings/resume');
+    } catch (error) {
+      console.error('[resume create:failure]', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message,
+      });
+      setSaveState('error');
+      setSaveError('자소서 등록에 실패했습니다. 서버 연결 상태를 확인해주세요.');
+    }
   };
 
   if (isEditMode && !targetResume) {
@@ -112,6 +139,12 @@ export default function ResumeFormPage() {
         </div>
 
         <div className="resume-form-card">
+          {saveError && (
+            <p className="mb-4 text-sm font-semibold text-red-600">
+              {saveError}
+            </p>
+          )}
+
           <label className="resume-form-label">
             자소서 제목
             <input
@@ -149,10 +182,16 @@ export default function ResumeFormPage() {
               className="resume-form-save-button"
               onClick={handleSave}
               disabled={
-                title.trim().length === 0 || content.trim().length === 0
+                saveState === 'loading' ||
+                title.trim().length === 0 ||
+                content.trim().length === 0
               }
             >
-              {isEditMode ? '수정 저장' : '등록'}
+              {saveState === 'loading'
+                ? '저장 중...'
+                : isEditMode
+                  ? '수정 저장'
+                  : '등록'}
             </button>
           </div>
         </div>
