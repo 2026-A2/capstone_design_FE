@@ -33,6 +33,13 @@ export default function InterviewTrendChart({
       name: yLabel,
     },
   ];
+  const standardAreaLabel = {
+    value: '적정 기준 영역',
+    position: 'insideTopRight',
+    fill: '#334155',
+    fontSize: 12,
+    fontWeight: 700,
+  };
 
   return (
     <div style={styles.chartBox}>
@@ -70,6 +77,7 @@ export default function InterviewTrendChart({
               y2={maxValue}
               fill={highlightAboveColor}
               fillOpacity={1}
+              label={standardAreaLabel}
             />
           )}
 
@@ -88,9 +96,30 @@ export default function InterviewTrendChart({
                 y2={standardMax}
                 fill="#2563eb"
                 fillOpacity={0.1}
+                label={standardAreaLabel}
               />
-              <ReferenceLine y={standardMin} strokeDasharray="5 5" />
-              <ReferenceLine y={standardMax} strokeDasharray="5 5" />
+              <ReferenceLine
+                y={standardMin}
+                strokeDasharray="5 5"
+                label={{
+                  value: `기준 ${standardMin}`,
+                  position: 'insideBottomLeft',
+                  fill: '#4b5563',
+                  fontSize: 12,
+                  fontWeight: 700,
+                }}
+              />
+              <ReferenceLine
+                y={standardMax}
+                strokeDasharray="5 5"
+                label={{
+                  value: `기준 ${standardMax}`,
+                  position: 'insideTopLeft',
+                  fill: '#4b5563',
+                  fontSize: 12,
+                  fontWeight: 700,
+                }}
+              />
             </>
           )}
 

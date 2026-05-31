@@ -67,8 +67,8 @@ export default function TotalNodPage() {
         yLabel="유지율(%)"
         minValue={50}
         maxValue={100}
-        standardMin={80}
-        standardMax={100}
+        standardValue={80}
+        highlightAboveValue={80}
       />
       <div style={styles.infoBox}>
         <div style={styles.infoTitle}>분석 기준</div>

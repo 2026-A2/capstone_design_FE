@@ -42,7 +42,7 @@ export default function TotalReportMenuPage() {
     },
 
     {
-      title: '고개끄떡임',
+      title: '고개 끄떡임',
       path: '/report/total/nod',
       group: 'habit',
     },
@@ -56,6 +56,14 @@ export default function TotalReportMenuPage() {
       path: '/report/total/body-shake',
       group: 'posture',
     },
+  ];
+
+  const categoryLegend = [
+    { label: '시선', group: 'visual' },
+    { label: '발화', group: 'speech' },
+    { label: '표정', group: 'expression' },
+    { label: '버릇', group: 'habit' },
+    { label: '자세', group: 'posture' },
   ];
 
   return (
@@ -72,7 +80,7 @@ export default function TotalReportMenuPage() {
 
           <div className="total-menu-heading">
             <span className="total-menu-eyebrow">Cumulative Report</span>
-            <h1>전체 분석 보기</h1>
+            <h1>누적 분석 보기</h1>
             <p className="total-menu-desc">
               누적 면접 데이터를 바탕으로 아래 순서대로 분석 결과를 확인할 수
               있습니다.
@@ -81,19 +89,17 @@ export default function TotalReportMenuPage() {
             </p>
           </div>
 
-          <div className="total-menu-summary">
-            <div>
-              <strong>{analysisItems.length}</strong>
-              <span>분석 항목</span>
-            </div>
-            <div>
-              <strong>5</strong>
-              <span>분석 영역</span>
-            </div>
-            <div>
-              <strong>01</strong>
-              <span>권장 시작점</span>
-            </div>
+          <div className="total-menu-legend" aria-label="분석 항목 색상 분류">
+            <span className="total-menu-legend-title">분류</span>
+            {categoryLegend.map((item) => (
+              <span className="total-menu-legend-item" key={item.label}>
+                <span
+                  className={`total-menu-legend-dot ${item.group}`}
+                  aria-hidden="true"
+                />
+                {item.label}
+              </span>
+            ))}
           </div>
         </div>
 
