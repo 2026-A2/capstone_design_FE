@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import './index.css';
 import App from './App.jsx';
+import ScrollToTop from './components/ScrollToTop.jsx';
 import { InterviewProvider } from './contexts/InterviewContext.jsx';
 import { getUseMock, setUseMock } from './api/reportApi';
 
@@ -18,6 +19,7 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <InterviewProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <App />
       </BrowserRouter>
     </InterviewProvider>

@@ -1,70 +1,107 @@
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getIndividualReports } from '../../../api/reportApi';
+import {
+  ANALYSIS_METRICS,
+  getItemStatus,
+  getStatusLabel,
+  getStatusTone,
+} from '../utils/reportStatus';
 import './TotalReportMenuPage.css';
+
+const totalReportPaths = {
+  eyeContactRate: '/report/total/eye-contact',
+  speechRate: '/report/total/speech-rate',
+  voiceVolume: '/report/total/voice-volume',
+  silenceCount: '/report/total/silence',
+  fillerCount: '/report/total/filler',
+  smileRate: '/report/total/smile-rate',
+  blinkCount: '/report/total/blink',
+  nodCount: '/report/total/nod',
+  shoulderTilt: '/report/total/shoulder-tilt',
+  bodyShake: '/report/total/body-shake',
+};
+
+const getComparableDate = (date) => {
+  if (!date) {
+    return 0;
+  }
+
+  const timestamp = new Date(date).getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+};
+
+const getLatestReport = (reports) => {
+  if (!Array.isArray(reports) || reports.length === 0) {
+    return null;
+  }
+
+  return [...reports].sort((a, b) => {
+    const dateA = getComparableDate(a.date);
+    const dateB = getComparableDate(b.date);
+
+    if (dateA !== dateB) {
+      return dateB - dateA;
+    }
+
+    return Number(b.session ?? b.id ?? 0) - Number(a.session ?? a.id ?? 0);
+  })[0];
+};
 
 export default function TotalReportMenuPage() {
   const navigate = useNavigate();
+  const [latestReport, setLatestReport] = useState(null);
+  const [isLoadingLatest, setIsLoadingLatest] = useState(true);
 
-  const analysisItems = [
-    {
-      title: '시선처리',
-      path: '/report/total/eye-contact',
-      group: 'visual',
-    },
-    {
-      title: '발화속도',
-      path: '/report/total/speech-rate',
-      group: 'speech-rate',
-    },
-    {
-      title: '음성크기',
-      path: '/report/total/voice-volume',
-      group: 'voice-volume',
-    },
-    {
-      title: '침묵구간',
-      path: '/report/total/silence',
-      group: 'silence',
-    },
-    {
-      title: '필러어',
-      path: '/report/total/filler',
-      group: 'filler',
-    },
-    {
-      title: '미소율',
-      path: '/report/total/smile-rate',
-      group: 'expression',
-    },
-    {
-      title: '눈 깜빡임',
-      path: '/report/total/blink',
-      group: 'habit',
-    },
+  useEffect(() => {
+    const fetchLatestReport = async () => {
+      try {
+        const reports = await getIndividualReports();
+        setLatestReport(getLatestReport(reports));
+      } catch (error) {
+        console.error('최신 리포트 조회 실패:', error);
+        setLatestReport(null);
+      } finally {
+        setIsLoadingLatest(false);
+      }
+    };
 
-    {
-      title: '고개 끄떡임',
-      path: '/report/total/nod',
-      group: 'habit',
-    },
-    {
-      title: '어깨기울기',
-      path: '/report/total/shoulder-tilt',
-      group: 'posture',
-    },
-    {
-      title: '몸통흔들림',
-      path: '/report/total/body-shake',
-      group: 'posture',
-    },
-  ];
+    fetchLatestReport();
+  }, []);
 
-  const categoryLegend = [
-    { label: '시선', group: 'visual' },
-    { label: '발화', group: 'speech' },
-    { label: '표정', group: 'expression' },
-    { label: '버릇', group: 'habit' },
-    { label: '자세', group: 'posture' },
-  ];
+  const analysisItems = useMemo(
+    () =>
+      ANALYSIS_METRICS.map((metric) => {
+        const value = latestReport?.detail?.[metric.key];
+        const status = getItemStatus(metric.key, value);
+        const tone = getStatusTone(status);
+
+        return {
+          ...metric,
+          path: totalReportPaths[metric.key],
+          value,
+          status,
+          tone,
+        };
+      }),
+    [latestReport],
+  );
+
+  const statusSummary = useMemo(
+    () =>
+      analysisItems.reduce(
+        (summary, item) => ({
+          ...summary,
+          [item.tone]: summary[item.tone] + 1,
+        }),
+        { good: 0, warning: 0, bad: 0, neutral: 0 },
+      ),
+    [analysisItems],
+  );
+
+  const latestReportLabel = latestReport?.date
+    ? `최신 리포트 ${latestReport.date} 기준`
+    : '최신 리포트 기준';
 
   return (
     <div className="total-menu-page">
@@ -82,24 +119,28 @@ export default function TotalReportMenuPage() {
             <span className="total-menu-eyebrow">Cumulative Report</span>
             <h1>누적 분석 보기</h1>
             <p className="total-menu-desc">
-              누적 면접 데이터를 바탕으로 아래 순서대로 분석 결과를 확인할 수
+              최신 면접 데이터의 상태를 기준으로 10개 분석 항목을 확인할 수
               있습니다.
               <br />각 항목을 클릭하면 해당 분석 페이지로 바로 이동할 수
               있습니다.
             </p>
           </div>
 
-          <div className="total-menu-legend" aria-label="분석 항목 색상 분류">
-            <span className="total-menu-legend-title">분류</span>
-            {categoryLegend.map((item) => (
-              <span className="total-menu-legend-item" key={item.label}>
-                <span
-                  className={`total-menu-legend-dot ${item.group}`}
-                  aria-hidden="true"
-                />
-                {item.label}
+          <div className="total-menu-summary" aria-label="최신 리포트 상태 요약">
+            <span className="total-menu-summary-date">
+              {isLoadingLatest ? '최신 리포트 확인 중' : latestReportLabel}
+            </span>
+            <div className="total-menu-summary-chips">
+              <span className="total-menu-status-chip good">
+                적정 {statusSummary.good}
               </span>
-            ))}
+              <span className="total-menu-status-chip warning">
+                주의 {statusSummary.warning}
+              </span>
+              <span className="total-menu-status-chip bad">
+                체크 필요 {statusSummary.bad}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -108,18 +149,29 @@ export default function TotalReportMenuPage() {
             <button
               type="button"
               key={item.title}
-              className={`total-menu-card ${item.group}`}
+              className={`total-menu-card status-${item.tone}`}
               onClick={() => navigate(item.path)}
             >
               <div className="total-menu-card-top">
                 <div className="total-menu-number">
                   {String(index + 1).padStart(2, '0')}
                 </div>
+                <span className="total-menu-category">{item.category}</span>
                 <span className="total-menu-arrow">→</span>
               </div>
 
-              <div>
+              <div className="total-menu-card-body">
                 <div className="total-menu-title">{item.title}</div>
+                <div className="total-menu-card-meta">
+                  <span className="total-menu-latest-value">
+                    {item.value === undefined || item.value === null
+                      ? '최신값 없음'
+                      : `최신값 ${item.value}${item.unit}`}
+                  </span>
+                  <span className={`total-menu-status-badge ${item.tone}`}>
+                    {getStatusLabel(item.status)}
+                  </span>
+                </div>
               </div>
             </button>
           ))}

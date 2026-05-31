@@ -103,7 +103,7 @@ export default function TotalShoulderTiltPage() {
                 <div style={styles.session}>{item.session}회차</div>
 
                 {index === 0 && (
-                  <div style={styles.note}>권장 자세 유지율 80% 이상</div>
+                  <div style={styles.note}>권장 자세 유지율 90% 이상</div>
                 )}
               </div>
             );

@@ -2,6 +2,7 @@ import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import './IndividualReportDetailPage.css';
 import { useEffect, useState } from 'react';
 import { getIndividualReportDetail } from '../../api/reportApi';
+import { getItemStatus, getStatusLabel } from './utils/reportStatus';
 
 export default function IndividualReportDetailPage() {
   const navigate = useNavigate();
@@ -18,8 +19,8 @@ export default function IndividualReportDetailPage() {
 
         console.log('요약 리포트 상세 응답:', detailData);
 
-        const reportData = location.state ||
-          detailData || {
+        const reportData = detailData ||
+          location.state || {
             id,
             title: '리포트 정보 없음',
             detail: {},
@@ -47,58 +48,6 @@ export default function IndividualReportDetailPage() {
   if (!report) {
     return <div>로딩 중...</div>;
   }
-
-  const getItemStatus = (key, value) => {
-    if (value === undefined || value === null) return 'neutral';
-
-    switch (key) {
-      case 'eyeContactRate':
-        return value >= 60 ? 'good' : 'bad';
-      case 'speechRate':
-        return value >= 200 && value <= 260 ? 'good' : 'bad';
-      case 'silenceCount':
-        if (value <= 3) return 'good';
-        if (value <= 6) return 'warning';
-        return 'bad';
-      case 'fillerCount':
-        if (value <= 3) return 'good';
-        if (value <= 6) return 'warning';
-        return 'bad';
-      case 'voiceVolume':
-        if (value >= -10) return 'bad';
-        if (value >= -20) return 'warning';
-        if (value >= -35) return 'good';
-        if (value >= -50) return 'warning';
-        return 'bad';
-      case 'smileRate':
-        return value >= 50 ? 'good' : 'bad';
-      case 'blinkCount':
-        return value >= 15 && value <= 20 ? 'good' : 'bad';
-      case 'endingBlurCount':
-        return value <= 25 ? 'good' : 'bad';
-      case 'nodCount':
-        return value >= 80 && value <= 100 ? 'good' : 'bad';
-      case 'shoulderTilt':
-        return value >= 80 && value <= 100 ? 'good' : 'bad';
-      case 'bodyShake':
-        return value <= 1 ? 'good' : 'bad';
-      default:
-        return 'neutral';
-    }
-  };
-
-  const getStatusLabel = (status) => {
-    switch (status) {
-      case 'good':
-        return '적정';
-      case 'warning':
-        return '주의';
-      case 'bad':
-        return '체크 필요';
-      default:
-        return '분석 없음';
-    }
-  };
 
   const itemDefinitions = [
     {
@@ -134,13 +83,6 @@ export default function IndividualReportDetailPage() {
       key: 'fillerCount',
       unit: '회',
       icon: '💬',
-      category: '발화',
-    },
-    {
-      label: '문장 끝 흐릿함',
-      key: 'endingBlurCount',
-      unit: '%',
-      icon: '📉',
       category: '발화',
     },
     {
