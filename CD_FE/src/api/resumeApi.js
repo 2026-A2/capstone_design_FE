@@ -4,13 +4,15 @@ const unwrapResume = (data) =>
   data?.resume || data?.data?.resume || data?.data || data;
 
 const unwrapResumeList = (data) => {
-  if (Array.isArray(data)) return data;
-  if (Array.isArray(data?.resumes)) return data.resumes;
-  if (Array.isArray(data?.data?.resumes)) return data.data.resumes;
-  if (Array.isArray(data?.data)) return data.data;
-  if (Array.isArray(data?.results)) return data.results;
+  let list = [];
 
-  return [];
+  if (Array.isArray(data)) list = data;
+  else if (Array.isArray(data?.resumes)) list = data.resumes;
+  else if (Array.isArray(data?.data?.resumes)) list = data.data.resumes;
+  else if (Array.isArray(data?.data)) list = data.data;
+  else if (Array.isArray(data?.results)) list = data.results;
+
+  return list.flat();
 };
 
 export const normalizeResume = (resume) => {
@@ -22,7 +24,12 @@ export const normalizeResume = (resume) => {
     title: data.title ?? '',
     content: data.content ?? '',
     createdAt: data.createdAt ?? data.created_at ?? data.created,
-    updatedAt: data.updatedAt ?? data.updated_at ?? data.modified,
+    updatedAt:
+      data.updatedAt ??
+      data.updated_at ??
+      data.modified ??
+      data.created_at ??
+      data.created,
   };
 };
 
@@ -60,10 +67,6 @@ export const createResume = async ({ title, content }) => {
     content,
   });
 
-  if (!response.data || typeof response.data !== 'object') {
-    throw new Error('Invalid resume create response');
-  }
-
   return normalizeResume(response.data);
 };
 
@@ -77,5 +80,7 @@ export const updateResume = async ({ resumeId, title, content }) => {
 };
 
 export const deleteResume = async (resumeId) => {
-  await axiosInstance.delete(`/resumes/${resumeId}/delete/`);
+  const response = await axiosInstance.delete(`/resumes/${resumeId}/delete/`);
+
+  return response.data;
 };

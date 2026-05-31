@@ -1,7 +1,10 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './IndividualReportPage.css';
-import { getIndividualReports } from '../../api/reportApi';
+import {
+  getIndividualReports,
+  deleteIndividualReport,
+} from '../../api/reportApi';
 
 const REPORT_STORAGE_KEY = 'individualReports';
 const DELETED_STORAGE_KEY = 'deletedReportsStorage';
@@ -257,14 +260,20 @@ export default function IndividualReportPage() {
     );
   };
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = async () => {
     if (selectedIds.length === 0) {
       alert('삭제할 리포트를 선택해주세요.');
       return;
     }
 
     if (!window.confirm('선택한 리포트를 삭제하시겠습니까?')) return;
-
+    try {
+      await Promise.all(selectedIds.map((id) => deleteIndividualReport(id)));
+    } catch (error) {
+      console.error('리포트 삭제 실패:', error);
+      alert('리포트 삭제 중 오류가 발생했습니다.');
+      return;
+    }
     const deletedReports = reportList.filter((report) =>
       selectedIds.includes(report.id),
     );
@@ -320,13 +329,22 @@ export default function IndividualReportPage() {
     alert('선택한 리포트가 삭제 보관함으로 이동되었습니다.');
   };
 
-  const handleDeleteAll = () => {
+  const handleDeleteAll = async () => {
     if (reportList.length === 0) {
       alert('삭제할 리포트가 없습니다.');
       return;
     }
 
     if (!window.confirm('전체 리포트를 삭제하시겠습니까?')) return;
+    try {
+      await Promise.all(
+        reportList.map((report) => deleteIndividualReport(report.id)),
+      );
+    } catch (error) {
+      console.error('전체 리포트 삭제 실패:', error);
+      alert('전체 리포트 삭제 중 오류가 발생했습니다.');
+      return;
+    }
 
     const sessionsToDelete = reportList.map(
       (report) => report.session ?? report.id,

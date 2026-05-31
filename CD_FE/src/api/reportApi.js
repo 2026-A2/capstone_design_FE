@@ -45,7 +45,7 @@ initializeMockMode();
 const REPORT_LIST_PATH = '/interviews/';
 const REPORT_TRENDS_PATH = '/interviews/trends/';
 const getReportDetailPath = (id) => `/interviews/${id}/report/`;
-
+const getReportDeletePath = (id) => `/interviews/${id}/delete/`;
 const INTERVIEW_TYPE_LABELS = {
   RESUME: '자소서 기반 면접',
   JOB: '직무 기반 면접',
@@ -322,4 +322,23 @@ export const getIndividualReportDetail = async (id) => {
 
     return trendReport;
   }
+};
+export const deleteIndividualReport = async (id) => {
+  if (getUseMock()) {
+    const deletedReportIds = JSON.parse(
+      localStorage.getItem('deletedReportIds') || '[]',
+    );
+
+    if (!deletedReportIds.includes(String(id))) {
+      localStorage.setItem(
+        'deletedReportIds',
+        JSON.stringify([...deletedReportIds, String(id)]),
+      );
+    }
+
+    return { success: true };
+  }
+
+  const response = await axiosInstance.delete(getReportDeletePath(id));
+  return response.data;
 };
