@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { createResume } from '../../api/resumeApi';
+import { createResume, getResume, updateResume } from '../../api/resumeApi';
 import { useInterview } from '../../contexts/InterviewContext.jsx';
 import './ResumeFormPage.css';
 
@@ -27,8 +27,68 @@ export default function ResumeFormPage() {
     if (uploadedContent) return String(uploadedContent).slice(0, 300);
     return '';
   });
+  const [detailState, setDetailState] = useState(
+    isEditMode && !targetResume ? 'loading' : 'success',
+  );
+  const [detailError, setDetailError] = useState('');
   const [saveState, setSaveState] = useState('idle');
   const [saveError, setSaveError] = useState('');
+
+  useEffect(() => {
+    if (!isEditMode) {
+      return undefined;
+    }
+
+    if (targetResume) {
+      return undefined;
+    }
+
+    let ignore = false;
+
+    const loadResume = async () => {
+      setDetailState('loading');
+      setDetailError('');
+
+      try {
+        const resume = await getResume(id);
+        if (!ignore) {
+          setSavedResumes((prev) => {
+            const exists = prev.some(
+              (item) => String(item.id) === String(resume.id),
+            );
+
+            if (exists) {
+              return prev.map((item) =>
+                String(item.id) === String(resume.id) ? resume : item,
+              );
+            }
+
+            return [resume, ...prev];
+          });
+          setTitle(resume.title || '');
+          setContent(resume.content || '');
+          setDetailState('success');
+        }
+      } catch (error) {
+        console.error('[resume detail:failure]', {
+          id,
+          status: error.response?.status,
+          data: error.response?.data,
+          message: error.message,
+        });
+        if (!ignore) {
+          setDetailState('error');
+          setDetailError('수정할 자소서를 불러오지 못했습니다.');
+        }
+      }
+    };
+
+    loadResume();
+
+    return () => {
+      ignore = true;
+    };
+  }, [id, isEditMode, setSavedResumes, targetResume]);
 
   const handleSave = async () => {
     if (saveState === 'loading') {
@@ -50,21 +110,37 @@ export default function ResumeFormPage() {
     setSaveError('');
 
     if (isEditMode) {
-      setSavedResumes((prev) =>
-        prev.map((resume) =>
-          String(resume.id) === String(id)
-            ? {
-                ...resume,
-                title: title.trim(),
-                content: content.trim(),
-                updatedAt: now,
-              }
-            : resume,
-        ),
-      );
+      try {
+        const updatedResume = await updateResume({
+          resumeId: id,
+          title: title.trim(),
+          content: content.trim(),
+        });
 
-      alert('자소서가 수정되었습니다.');
-      navigate('/settings/resume');
+        setSavedResumes((prev) =>
+          prev.map((resume) =>
+            String(resume.id) === String(id)
+              ? {
+                  ...resume,
+                  ...updatedResume,
+                  updatedAt: updatedResume.updatedAt ?? now,
+                }
+              : resume,
+          ),
+        );
+
+        alert('자소서가 수정되었습니다.');
+        navigate('/settings/resume');
+      } catch (error) {
+        console.error('[resume update:failure]', {
+          id,
+          status: error.response?.status,
+          data: error.response?.data,
+          message: error.message,
+        });
+        setSaveState('error');
+        setSaveError('자소서 수정에 실패했습니다. 서버 연결 상태를 확인해주세요.');
+      }
       return;
     }
 
@@ -101,7 +177,28 @@ export default function ResumeFormPage() {
     }
   };
 
-  if (isEditMode && !targetResume) {
+  if (isEditMode && detailState === 'loading') {
+    return (
+      <div className="resume-form-page">
+        <div className="resume-form-container">
+          <button
+            type="button"
+            className="resume-form-back-button"
+            onClick={() => navigate('/settings/resume')}
+          >
+            ←
+          </button>
+
+          <div className="resume-form-header">
+            <h1>자소서를 불러오는 중입니다</h1>
+            <p>잠시만 기다려주세요.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isEditMode && detailState === 'error') {
     return (
       <div className="resume-form-page">
         <div className="resume-form-container">
@@ -115,7 +212,7 @@ export default function ResumeFormPage() {
 
           <div className="resume-form-header">
             <h1>자소서를 찾을 수 없습니다</h1>
-            <p>목록으로 돌아가 다시 선택해주세요.</p>
+            <p>{detailError || '목록으로 돌아가 다시 선택해주세요.'}</p>
           </div>
         </div>
       </div>

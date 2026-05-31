@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { deleteResume, getResumes } from '../../api/resumeApi';
 import { useInterview } from '../../contexts/InterviewContext.jsx';
 import './ResumeManagePage.css';
 
@@ -9,6 +10,9 @@ export default function ResumeManagePage() {
   const { savedResumes, setSavedResumes } = useInterview();
 
   const [selectedId, setSelectedId] = useState(null);
+  const [loadState, setLoadState] = useState('idle');
+  const [loadError, setLoadError] = useState('');
+  const [deleteId, setDeleteId] = useState(null);
   const resumeList = [...savedResumes].sort(
     (a, b) =>
       new Date(b.updatedAt || b.createdAt) -
@@ -16,8 +20,38 @@ export default function ResumeManagePage() {
   );
 
   useEffect(() => {
+    let ignore = false;
+
+    const loadResumes = async () => {
+      setLoadState('loading');
+      setLoadError('');
+
+      try {
+        const resumes = await getResumes();
+        if (!ignore) {
+          setSavedResumes(resumes);
+          setLoadState('success');
+        }
+      } catch (error) {
+        console.error('[resume list:failure]', {
+          status: error.response?.status,
+          data: error.response?.data,
+          message: error.message,
+        });
+        if (!ignore) {
+          setLoadState('error');
+          setLoadError('자소서 목록을 불러오지 못했습니다.');
+        }
+      }
+    };
+
     window.scrollTo(0, 0);
-  }, []);
+    loadResumes();
+
+    return () => {
+      ignore = true;
+    };
+  }, [setSavedResumes]);
 
   const formatDate = (date) => {
     if (!date) return '-';
@@ -54,13 +88,28 @@ export default function ResumeManagePage() {
     reader.readAsText(file, 'UTF-8');
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     const confirmed = window.confirm('선택한 자소서를 삭제하시겠습니까?');
     if (!confirmed) return;
 
-    setSavedResumes((prev) => prev.filter((resume) => resume.id !== id));
+    setDeleteId(id);
 
-    alert('자소서가 삭제되었습니다.');
+    try {
+      await deleteResume(id);
+      setSavedResumes((prev) => prev.filter((resume) => resume.id !== id));
+
+      alert('자소서가 삭제되었습니다.');
+    } catch (error) {
+      console.error('[resume delete:failure]', {
+        id,
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message,
+      });
+      alert('자소서 삭제에 실패했습니다. 서버 연결 상태를 확인해주세요.');
+    } finally {
+      setDeleteId(null);
+    }
   };
 
   const handleSetDefault = (id) => {
@@ -190,7 +239,19 @@ export default function ResumeManagePage() {
             )}
           </header>
 
-          {resumeList.length === 0 ? (
+          {loadState === 'loading' && (
+            <div className="resume-tip-box">
+              <p>자소서 목록을 불러오는 중입니다.</p>
+            </div>
+          )}
+
+          {loadError && (
+            <div className="resume-tip-box">
+              <p>{loadError}</p>
+            </div>
+          )}
+
+          {loadState !== 'loading' && resumeList.length === 0 ? (
             <section className="resume-empty-box">
               <div className="empty-file-icon">📄</div>
 
@@ -222,7 +283,7 @@ export default function ResumeManagePage() {
 
               <span className="empty-guide">지원 형식 · TXT · 최대 10MB</span>
             </section>
-          ) : (
+          ) : loadState !== 'loading' ? (
             <>
               <section className="resume-summary-row">
                 <div className="summary-card">
@@ -302,12 +363,13 @@ export default function ResumeManagePage() {
                         <button
                           type="button"
                           className="danger-button"
+                          disabled={deleteId === resume.id}
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDelete(resume.id);
                           }}
                         >
-                          삭제
+                          {deleteId === resume.id ? '삭제 중' : '삭제'}
                         </button>
 
                         <button
@@ -334,7 +396,7 @@ export default function ResumeManagePage() {
                 </p>
               </div>
             </>
-          )}
+          ) : null}
         </div>
       </main>
     </div>
