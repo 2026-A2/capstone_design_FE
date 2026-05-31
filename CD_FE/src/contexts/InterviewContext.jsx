@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, useEffect } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
 import axios from 'axios';
 import { createInterviewSession } from '../api/interviewRecordingApi';
 
@@ -9,6 +9,7 @@ function InterviewProvider({ children }) {
   const [industry, setIndustry] = useState('');
   const [resumeText, setResumeTextState] = useState('');
   const [questionCount, setQuestionCount] = useState('');
+  const [savedResumes, setSavedResumes] = useState([]);
   const [interviewSession, setInterviewSession] = useState(null);
   const [finalReport, setFinalReport] = useState(null);
   const [questions, setQuestions] = useState([]);
@@ -18,16 +19,8 @@ function InterviewProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // localStorage에서 resumeText 초기화
-  useEffect(() => {
-    const savedResume = localStorage.getItem('resume') || '';
-    setResumeTextState(savedResume);
-  }, []);
-
-  // resumeText 변경 시 localStorage에 저장
   const setResumeText = (text) => {
     setResumeTextState(text);
-    localStorage.setItem('resume', text);
   };
 
   const requestInterviewQuestions = async () => {
@@ -126,6 +119,7 @@ function InterviewProvider({ children }) {
       industry,
       resumeText,
       questionCount,
+      savedResumes,
       interviewSession,
       finalReport,
       questions,
@@ -138,6 +132,7 @@ function InterviewProvider({ children }) {
       setIndustry,
       setResumeText,
       setQuestionCount,
+      setSavedResumes,
       setInterviewSession,
       setFinalReport,
       setQuestions,
@@ -154,6 +149,7 @@ function InterviewProvider({ children }) {
       industry,
       resumeText,
       questionCount,
+      savedResumes,
       interviewSession,
       finalReport,
       questions,

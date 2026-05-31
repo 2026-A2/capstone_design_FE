@@ -1,49 +1,31 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useInterview } from '../../contexts/InterviewContext.jsx';
 import './ResumeFormPage.css';
 
 export default function ResumeFormPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
+  const { savedResumes, setSavedResumes } = useInterview();
 
   const isEditMode = Boolean(id);
+  const uploadedFileName = location.state?.uploadedFileName;
+  const uploadedContent = location.state?.uploadedContent;
+  const targetResume = savedResumes.find(
+    (resume) => String(resume.id) === String(id),
+  );
 
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-
-  useEffect(() => {
-    if (isEditMode) return;
-
-    const uploadedFileName = location.state?.uploadedFileName;
-    const uploadedContent = location.state?.uploadedContent;
-
-    if (uploadedFileName) {
-      setTitle(uploadedFileName.replace('.txt', ''));
-    }
-
-    if (uploadedContent) {
-      setContent(uploadedContent.slice(0, 300));
-    }
-  }, [isEditMode, location.state]);
-
-  useEffect(() => {
-    if (!isEditMode) return;
-
-    const savedList = JSON.parse(localStorage.getItem('resumeList') || '[]');
-    const targetResume = savedList.find(
-      (resume) => String(resume.id) === String(id),
-    );
-
-    if (!targetResume) {
-      alert('수정할 자소서를 찾을 수 없습니다.');
-      navigate('/settings/resume');
-      return;
-    }
-
-    setTitle(targetResume.title || '');
-    setContent(targetResume.content || '');
-  }, [id, isEditMode, navigate]);
+  const [title, setTitle] = useState(() => {
+    if (isEditMode) return targetResume?.title || '';
+    if (uploadedFileName) return uploadedFileName.replace(/\.txt$/i, '');
+    return '';
+  });
+  const [content, setContent] = useState(() => {
+    if (isEditMode) return targetResume?.content || '';
+    if (uploadedContent) return String(uploadedContent).slice(0, 300);
+    return '';
+  });
 
   const handleSave = () => {
     if (title.trim().length === 0) {
@@ -56,22 +38,22 @@ export default function ResumeFormPage() {
       return;
     }
 
-    const savedList = JSON.parse(localStorage.getItem('resumeList') || '[]');
     const now = new Date().toISOString();
 
     if (isEditMode) {
-      const updatedList = savedList.map((resume) =>
-        String(resume.id) === String(id)
-          ? {
-              ...resume,
-              title: title.trim(),
-              content: content.trim(),
-              updatedAt: now,
-            }
-          : resume,
+      setSavedResumes((prev) =>
+        prev.map((resume) =>
+          String(resume.id) === String(id)
+            ? {
+                ...resume,
+                title: title.trim(),
+                content: content.trim(),
+                updatedAt: now,
+              }
+            : resume,
+        ),
       );
 
-      localStorage.setItem('resumeList', JSON.stringify(updatedList));
       alert('자소서가 수정되었습니다.');
       navigate('/settings/resume');
       return;
@@ -83,17 +65,35 @@ export default function ResumeFormPage() {
       content: content.trim(),
       createdAt: now,
       updatedAt: now,
-      isDefault: savedList.length === 0,
+      isDefault: savedResumes.length === 0,
     };
 
-    localStorage.setItem(
-      'resumeList',
-      JSON.stringify([newResume, ...savedList]),
-    );
+    setSavedResumes((prev) => [newResume, ...prev]);
 
     alert('자소서가 등록되었습니다.');
     navigate('/settings/resume');
   };
+
+  if (isEditMode && !targetResume) {
+    return (
+      <div className="resume-form-page">
+        <div className="resume-form-container">
+          <button
+            type="button"
+            className="resume-form-back-button"
+            onClick={() => navigate('/settings/resume')}
+          >
+            ←
+          </button>
+
+          <div className="resume-form-header">
+            <h1>자소서를 찾을 수 없습니다</h1>
+            <p>목록으로 돌아가 다시 선택해주세요.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="resume-form-page">

@@ -1,30 +1,23 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useInterview } from '../../contexts/InterviewContext.jsx';
 import './ResumeManagePage.css';
 
 export default function ResumeManagePage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { savedResumes, setSavedResumes } = useInterview();
 
-  const [resumeList, setResumeList] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
+  const resumeList = [...savedResumes].sort(
+    (a, b) =>
+      new Date(b.updatedAt || b.createdAt) -
+      new Date(a.updatedAt || a.createdAt),
+  );
 
   useEffect(() => {
-    const savedList = JSON.parse(localStorage.getItem('resumeList') || '[]');
-
-    const sortedList = [...savedList].sort(
-      (a, b) =>
-        new Date(b.updatedAt || b.createdAt) -
-        new Date(a.updatedAt || a.createdAt),
-    );
-
-    setResumeList(sortedList);
     window.scrollTo(0, 0);
   }, []);
-
-  const saveToLocalStorage = (list) => {
-    localStorage.setItem('resumeList', JSON.stringify(list));
-  };
 
   const formatDate = (date) => {
     if (!date) return '-';
@@ -65,21 +58,18 @@ export default function ResumeManagePage() {
     const confirmed = window.confirm('선택한 자소서를 삭제하시겠습니까?');
     if (!confirmed) return;
 
-    const filteredList = resumeList.filter((resume) => resume.id !== id);
-    setResumeList(filteredList);
-    saveToLocalStorage(filteredList);
+    setSavedResumes((prev) => prev.filter((resume) => resume.id !== id));
 
     alert('자소서가 삭제되었습니다.');
   };
 
   const handleSetDefault = (id) => {
-    const updatedList = resumeList.map((resume) => ({
-      ...resume,
-      isDefault: resume.id === id,
-    }));
-
-    setResumeList(updatedList);
-    saveToLocalStorage(updatedList);
+    setSavedResumes((prev) =>
+      prev.map((resume) => ({
+        ...resume,
+        isDefault: resume.id === id,
+      })),
+    );
   };
 
   return (
