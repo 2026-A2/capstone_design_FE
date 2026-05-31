@@ -31,7 +31,7 @@ export const getUseMock = () => {
   if (stored !== null) {
     return stored === 'true';
   }
-  return true;
+  return import.meta.env.VITE_USE_MOCK !== 'false';
 };
 
 export const setUseMock = (value) => {
