@@ -764,3 +764,30 @@
     width: 100%;
   }
 }
+.category-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.category-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.category-transcript-button {
+  border: none;
+  background: #eef0ff;
+  color: #37308f;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.category-transcript-button:hover {
+  background: #e0e3ff;
+}

@@ -1,0 +1,182 @@
+.transcript-page {
+  min-height: 100vh;
+  background: rgba(31, 41, 55, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.transcript-modal {
+  position: relative;
+  width: 920px;
+  min-height: 680px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
+  overflow: hidden;
+}
+
+.transcript-close {
+  position: absolute;
+  top: 22px;
+  right: 24px;
+  border: none;
+  background: #f3f4f6;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.transcript-header {
+  padding: 24px 32px 18px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.transcript-header h2 {
+  margin: 0;
+  font-size: 22px;
+  color: #1f2a44;
+}
+
+.transcript-header h2 span {
+  font-size: 12px;
+  background: #eef2ff;
+  color: #3730a3;
+  padding: 4px 8px;
+  border-radius: 999px;
+  margin-left: 8px;
+}
+
+.transcript-header p {
+  margin: 6px 0 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.transcript-tabs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  background: #fff;
+}
+
+.transcript-tabs button {
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  padding: 7px 17px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.transcript-tabs button.active {
+  background: #37308f;
+  color: white;
+}
+
+.filler-dot {
+  margin-left: auto;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.question-card {
+  margin: 18px 32px 16px;
+  padding: 22px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.question-badge {
+  width: 48px;
+  height: 48px;
+  background: #37308f;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.question-category {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.question-card h3 {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #111827;
+}
+
+.transcript-box {
+  margin: 0 32px;
+  height: 295px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 18px 22px;
+}
+
+.audio-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.audio-time {
+  background: #eef2ff;
+  color: #37308f;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.download-btn {
+  border: none;
+  background: #f8fafc;
+  padding: 8px 14px;
+  border-radius: 8px;
+  color: #475569;
+  cursor: pointer;
+}
+
+.speech-content {
+  margin-top: 24px;
+  padding-left: 70px;
+  color: #1f2937;
+  line-height: 2.6;
+  font-size: 14px;
+}
+
+.transcript-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 46px 32px 0;
+}
+
+.transcript-footer button {
+  border: none;
+  background: transparent;
+  color: #374151;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.transcript-footer .next-btn {
+  background: #37308f;
+  color: white;
+  padding: 14px 32px;
+  border-radius: 10px;
+}

@@ -662,7 +662,21 @@ export default function IndividualReportFullPage() {
 
                 return (
                   <div key={category} className="analysis-category">
-                    <h4 className="category-title">{category}</h4>
+                    <div className="category-title-row">
+                      <h4 className="category-title">{category}</h4>
+
+                      {category === '발화' && (
+                        <button
+                          type="button"
+                          className="category-transcript-button"
+                          onClick={() =>
+                            navigate(`/report/individual/${id}/transcript`)
+                          }
+                        >
+                          전사 보기
+                        </button>
+                      )}
+                    </div>
                     <div className="category-items">
                       {categoryItems.map((item) => {
                         const globalIndex = analysisItems.indexOf(item);
