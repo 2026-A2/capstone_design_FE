@@ -5,9 +5,9 @@ export const speechRateTrend = [
 ];
 
 export const voiceVolumeTrend = [
-  { session: 1, avgVoiceVolume: -15 },
-  { session: 2, avgVoiceVolume: -25 },
-  { session: 3, avgVoiceVolume: -18 },
+  { session: 1, value: -15 },
+  { session: 2, value: -25 },
+  { session: 3, value: -18 },
 ];
 
 export const silenceTrend = [
