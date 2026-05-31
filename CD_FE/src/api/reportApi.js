@@ -128,6 +128,13 @@ const normalizeReport = (data, fallbackId) => {
     interviewType,
     interviewTypeLabel: INTERVIEW_TYPE_LABELS[interviewType] || interviewType,
     date,
+    transcript:
+      reportData.analysis_result?.speech?.transcript ||
+      reportData.speech?.transcript ||
+      reportData.transcript ||
+      reportData.transcripts ||
+      reportData.detail?.transcript ||
+      {},
     detail: detailData,
     categories: reportData.categories || [],
   };
@@ -323,6 +330,7 @@ export const getIndividualReportDetail = async (id) => {
     return trendReport;
   }
 };
+
 export const deleteIndividualReport = async (id) => {
   if (getUseMock()) {
     const deletedReportIds = JSON.parse(

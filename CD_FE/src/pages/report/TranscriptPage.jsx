@@ -1,60 +1,127 @@
-import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import axiosInstance from '../../api/axiosInstance';
 import './TranscriptPage.css';
-import { getIndividualReportDetail } from '../../api/reportApi';
+
+const getTranscriptSource = (data) =>
+  data?.analysis_result?.speech?.transcript ||
+  data?.speech?.transcript ||
+  data?.transcript ||
+  data?.transcripts ||
+  {};
+
+const toTranscriptItems = (data) => {
+  const transcript = getTranscriptSource(data);
+  const entries = Array.isArray(transcript)
+    ? transcript.map((item, index) => [
+        item?.question_order ?? item?.order ?? item?.id ?? index + 1,
+        item,
+      ])
+    : Object.entries(transcript);
+
+  return entries
+    .map(([key, value]) => {
+      const order = Number(key);
+      const text =
+        typeof value === 'string'
+          ? value
+          : value?.transcript || value?.content || value?.text || '';
+
+      return {
+        id: Number.isNaN(order) ? key : order,
+        label: `Q${key}`,
+        text,
+      };
+    })
+    .filter((item) => item.text.trim().length > 0)
+    .sort((a, b) => Number(a.id) - Number(b.id));
+};
 
 export default function TranscriptPage() {
   const navigate = useNavigate();
   const { id } = useParams();
-
-  const [report, setReport] = useState(null);
-  const [currentQuestion, setCurrentQuestion] = useState(1);
+  const [reportData, setReportData] = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [loadState, setLoadState] = useState('loading');
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    const fetchTranscript = async () => {
-      const data = await getIndividualReportDetail(id);
-      setReport(data);
+    let ignore = false;
+
+    const loadTranscript = async () => {
+      setLoadState('loading');
+      setErrorMessage('');
+
+      try {
+        const response = await axiosInstance.get(`/interviews/${id}/report/`);
+
+        if (ignore) return;
+
+        setReportData(response.data);
+        setSelectedIndex(0);
+
+        if (response.data?.status === 'pending') {
+          setLoadState('empty');
+          setErrorMessage(
+            response.data?.message || '분석이 아직 진행 중입니다.',
+          );
+          return;
+        }
+
+        setLoadState('success');
+      } catch (error) {
+        console.error('[transcript:failure]', {
+          id,
+          status: error.response?.status,
+          data: error.response?.data,
+          message: error.message,
+        });
+
+        if (!ignore) {
+          setLoadState('error');
+          setErrorMessage('전사 내용을 불러오지 못했습니다.');
+        }
+      }
     };
 
-    fetchTranscript();
+    loadTranscript();
+
+    return () => {
+      ignore = true;
+    };
   }, [id]);
 
-  const questions = useMemo(() => {
-    const transcript = report?.transcript || {};
-
-    return Object.entries(transcript).map(([key, value]) => ({
-      id: Number(key),
-      label: `Q${key}`,
-      transcript: value,
-    }));
-  }, [report]);
-
-  const currentQuestionData =
-    questions.find((question) => question.id === currentQuestion) ||
-    questions[0];
-
-  const currentIndex = questions.findIndex(
-    (question) => question.id === currentQuestionData?.id,
+  const transcriptItems = useMemo(
+    () => toTranscriptItems(reportData),
+    [reportData],
   );
+  const currentItem = transcriptItems[selectedIndex];
+  const reportTitle =
+    reportData?.title ||
+    `${reportData?.interview_id ?? id}회차 결과 리포트`;
 
-  if (!report) {
+  if (loadState === 'loading') {
     return (
       <div className="transcript-page">
-        <div className="transcript-modal">
+        <div className="transcript-modal transcript-state">
           <p>전사 내용을 불러오는 중입니다.</p>
         </div>
       </div>
     );
   }
 
-  if (questions.length === 0) {
+  if (loadState === 'error' || transcriptItems.length === 0) {
     return (
       <div className="transcript-page">
-        <div className="transcript-modal">
-          <button className="transcript-close" onClick={() => navigate(-1)}>
+        <div className="transcript-modal transcript-state">
+          <button
+            type="button"
+            className="transcript-close"
+            onClick={() => navigate(-1)}
+          >
             ×
           </button>
-          <p>전사 내용이 없습니다.</p>
+          <p>{errorMessage || '전사 내용이 없습니다.'}</p>
         </div>
       </div>
     );
@@ -63,66 +130,74 @@ export default function TranscriptPage() {
   return (
     <div className="transcript-page">
       <div className="transcript-modal">
-        <button className="transcript-close" onClick={() => navigate(-1)}>
+        <button
+          type="button"
+          className="transcript-close"
+          onClick={() => navigate(-1)}
+        >
           ×
         </button>
 
         <header className="transcript-header">
           <h2>
-            발화 전사 <span>{id}회차</span>
+            발화 전사 <span>{transcriptItems.length}문항</span>
           </h2>
-          <p>문항별 전사 내용 · {questions.length}문항</p>
+          <p>{reportTitle}</p>
         </header>
 
         <div className="transcript-tabs">
-          {questions.map((question) => (
+          {transcriptItems.map((item, index) => (
             <button
-              key={question.id}
+              key={item.id}
               type="button"
-              className={question.id === currentQuestionData.id ? 'active' : ''}
-              onClick={() => setCurrentQuestion(question.id)}
+              className={index === selectedIndex ? 'active' : ''}
+              onClick={() => setSelectedIndex(index)}
             >
-              {question.label}
+              {item.label}
             </button>
           ))}
         </div>
 
         <section className="question-card">
-          <div className="question-badge">{currentQuestionData.label}</div>
+          <div className="question-badge">{currentItem.label}</div>
           <div>
-            <p className="question-category">문항별 발화 전사</p>
-            <h3>{currentQuestionData.label} 전사 내용</h3>
+            <p className="question-category">전사 내용</p>
+            <h3>{currentItem.text}</h3>
           </div>
         </section>
 
         <section className="transcript-box">
           <div className="speech-content">
-            <p>{currentQuestionData.transcript}</p>
+            <p>{currentItem.text}</p>
           </div>
         </section>
 
         <footer className="transcript-footer">
           <button
             type="button"
-            disabled={currentIndex <= 0}
-            onClick={() => {
-              const prevQuestion = questions[currentIndex - 1];
-              if (prevQuestion) setCurrentQuestion(prevQuestion.id);
-            }}
+            disabled={selectedIndex <= 0}
+            onClick={() => setSelectedIndex((prev) => Math.max(prev - 1, 0))}
           >
-            ‹ 이전 질문
+            ‹ 이전 질문 ({transcriptItems[Math.max(selectedIndex - 1, 0)]?.label})
           </button>
 
           <button
             type="button"
             className="next-btn"
-            disabled={currentIndex >= questions.length - 1}
-            onClick={() => {
-              const nextQuestion = questions[currentIndex + 1];
-              if (nextQuestion) setCurrentQuestion(nextQuestion.id);
-            }}
+            disabled={selectedIndex >= transcriptItems.length - 1}
+            onClick={() =>
+              setSelectedIndex((prev) =>
+                Math.min(prev + 1, transcriptItems.length - 1),
+              )
+            }
           >
-            다음 질문 →
+            다음 질문 (
+            {
+              transcriptItems[
+                Math.min(selectedIndex + 1, transcriptItems.length - 1)
+              ]?.label
+            }
+            ) →
           </button>
         </footer>
       </div>

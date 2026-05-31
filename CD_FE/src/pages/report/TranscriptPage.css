@@ -1,6 +1,6 @@
 .transcript-page {
   min-height: 100vh;
-  background: rgba(31, 41, 55, 0.55);
+  background: rgba(31, 41, 55, 0.58);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -9,12 +9,22 @@
 
 .transcript-modal {
   position: relative;
-  width: 920px;
+  width: min(920px, 100%);
   min-height: 680px;
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
   overflow: hidden;
+}
+
+.transcript-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 260px;
+  padding: 40px;
+  color: #1f2a44;
+  font-weight: 800;
 }
 
 .transcript-close {
@@ -62,6 +72,7 @@
   gap: 10px;
   padding: 14px 32px;
   background: #fff;
+  border-bottom: 1px solid #eef0f4;
 }
 
 .transcript-tabs button {
@@ -76,6 +87,7 @@
 .transcript-tabs button.active {
   background: #37308f;
   color: white;
+  border-color: #37308f;
 }
 
 .filler-dot {
@@ -124,39 +136,15 @@
   height: 295px;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  padding: 18px 22px;
-}
-
-.audio-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.audio-time {
-  background: #eef2ff;
-  color: #37308f;
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-weight: 700;
-}
-
-.download-btn {
-  border: none;
-  background: #f8fafc;
-  padding: 8px 14px;
-  border-radius: 8px;
-  color: #475569;
-  cursor: pointer;
+  padding: 28px 32px;
+  overflow-y: auto;
 }
 
 .speech-content {
-  margin-top: 24px;
-  padding-left: 70px;
   color: #1f2937;
-  line-height: 2.6;
-  font-size: 14px;
+  line-height: 2;
+  font-size: 15px;
+  white-space: pre-wrap;
 }
 
 .transcript-footer {
@@ -174,9 +162,19 @@
   cursor: pointer;
 }
 
+.transcript-footer button:disabled {
+  cursor: not-allowed;
+  color: #a3abb8;
+}
+
 .transcript-footer .next-btn {
   background: #37308f;
   color: white;
   padding: 14px 32px;
   border-radius: 10px;
+}
+
+.transcript-footer .next-btn:disabled {
+  background: #e5e7eb;
+  color: #a3abb8;
 }

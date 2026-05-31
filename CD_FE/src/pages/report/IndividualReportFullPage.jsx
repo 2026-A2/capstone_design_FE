@@ -542,48 +542,6 @@ export default function IndividualReportFullPage() {
     );
   };
 
-  const handleDownloadReport = () => {
-    const categories = REPORT_CATEGORIES;
-
-    let reportText = `${report.title}\n\n[분석 결과 상세]\n\n`;
-
-    categories.forEach((category) => {
-      const categoryItems = analysisItems.filter(
-        (item) => item.category === category,
-      );
-
-      if (categoryItems.length === 0) return;
-
-      reportText += `■ ${category}\n`;
-      reportText += categoryItems
-        .map(
-          (item) => `
-- ${item.label}
-  값: ${item.value !== undefined ? item.value : '-'}${item.unit}
-  상태: ${getStatusLabel(item.status)}
-  권장 기준: ${item.recommendedText}
-  상세 분석: ${item.detailContent || '상세 분석 정보가 없습니다.'}
-`,
-        )
-        .join('');
-
-      reportText += '\n';
-    });
-
-    const blob = new Blob([reportText], {
-      type: 'text/plain;charset=utf-8',
-    });
-
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${report.title || 'interview-report'}.txt`;
-    link.click();
-
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <div className="full-report-page">
       <div className="full-report-container">
@@ -813,13 +771,6 @@ export default function IndividualReportFullPage() {
               onClick={() => navigate('/report/individual')}
             >
               뒤로가기
-            </button>
-
-            <button
-              className="action-btn download-btn"
-              onClick={handleDownloadReport}
-            >
-              리포트 다운로드
             </button>
           </div>
         </div>

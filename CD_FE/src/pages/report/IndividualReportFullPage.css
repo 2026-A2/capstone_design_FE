@@ -642,18 +642,6 @@
   border-color: #b9c7fb;
 }
 
-.download-btn {
-  border: 1px solid #5368df;
-  background: #5368df;
-  color: #ffffff;
-}
-
-.download-btn:hover {
-  background: #4056c8;
-  box-shadow: 0 10px 22px rgba(64, 86, 200, 0.24);
-  transform: translateY(-1px);
-}
-
 @media (max-width: 900px) {
   .full-report-main {
     padding: 20px;
