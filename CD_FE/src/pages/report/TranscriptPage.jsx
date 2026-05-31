@@ -22,18 +22,30 @@ const toTranscriptItems = (data) => {
   return entries
     .map(([key, value]) => {
       const order = Number(key);
-      const text =
+      const fallbackText =
         typeof value === 'string'
           ? value
           : value?.transcript || value?.content || value?.text || '';
+      const question =
+        typeof value === 'string'
+          ? value
+          : value?.question || value?.question_text || fallbackText;
+      const answer =
+        typeof value === 'string'
+          ? value
+          : value?.answer || value?.answer_text || fallbackText;
 
       return {
         id: Number.isNaN(order) ? key : order,
         label: `Q${key}`,
-        text,
+        question,
+        answer,
       };
     })
-    .filter((item) => item.text.trim().length > 0)
+    .filter(
+      (item) =>
+        item.question.trim().length > 0 || item.answer.trim().length > 0,
+    )
     .sort((a, b) => Number(a.id) - Number(b.id));
 };
 
@@ -161,14 +173,15 @@ export default function TranscriptPage() {
         <section className="question-card">
           <div className="question-badge">{currentItem.label}</div>
           <div>
-            <p className="question-category">전사 내용</p>
-            <h3>{currentItem.text}</h3>
+            <p className="question-category">면접 질문</p>
+            <h3>{currentItem.question}</h3>
           </div>
         </section>
 
         <section className="transcript-box">
+          <p className="transcript-box-label">전사 내용</p>
           <div className="speech-content">
-            <p>{currentItem.text}</p>
+            <p>{currentItem.answer || '전사 내용이 없습니다.'}</p>
           </div>
         </section>
 

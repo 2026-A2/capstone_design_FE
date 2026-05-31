@@ -140,6 +140,13 @@
   overflow-y: auto;
 }
 
+.transcript-box-label {
+  margin: 0 0 14px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #6b7280;
+}
+
 .speech-content {
   color: #1f2937;
   line-height: 2;
