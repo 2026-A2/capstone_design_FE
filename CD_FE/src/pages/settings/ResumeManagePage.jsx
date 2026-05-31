@@ -295,7 +295,7 @@ export default function ResumeManagePage() {
                   <span>기본 자소서</span>
                   <strong>
                     {resumeList.find((resume) => resume.isDefault)?.title ||
-                      '프로필엔드'}
+                      '없음'}
                   </strong>
                   <p>면접 시작 시 자동 선택</p>
                 </div>
