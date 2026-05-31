@@ -1,124 +1,169 @@
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
 import { useInterview } from '../../contexts/InterviewContext.jsx'
-
-const temporaryFinalReport = {
-  status: 'success',
-  interview_id: 102,
-  report: {
-    focus_rate: 63.0,
-    left_gaze_rate: 18.5,
-    right_gaze_rate: 9.5,
-    blinks_per_min: 65,
-    nod_count: 12,
-    shoulder_stability: 65,
-    lr_sway_count: 45,
-    fb_sway_count: 12,
-    total_smile_rate: 72,
-    is_swaying: true,
-  },
-}
-
-const reportItems = [
-  { key: 'focus_rate', label: '정면 응시율', unit: '%' },
-  { key: 'left_gaze_rate', label: '좌측 시선', unit: '%' },
-  { key: 'right_gaze_rate', label: '우측 시선', unit: '%' },
-  { key: 'blinks_per_min', label: '분당 깜빡임', unit: '회' },
-  { key: 'nod_count', label: '끄덕임', unit: '회' },
-  { key: 'shoulder_stability', label: '어깨 안정도', unit: '%' },
-  { key: 'lr_sway_count', label: '좌우 흔들림', unit: '회' },
-  { key: 'fb_sway_count', label: '앞뒤 흔들림', unit: '회' },
-  { key: 'total_smile_rate', label: '전체 미소율', unit: '%' },
-  {
-    key: 'is_swaying',
-    label: '몸 흔들림 여부',
-    format: (value) => (value ? '감지됨' : '미감지'),
-  },
-]
-
-const formatValue = (value, unit = '') => {
-  if (typeof value === 'boolean') {
-    return value ? '감지됨' : '미감지'
-  }
-
-  if (typeof value === 'number') {
-    return `${Number.isInteger(value) ? value : value.toFixed(1)}${unit}`
-  }
-
-  return value === undefined || value === null ? '-' : `${value}${unit}`
-}
 
 function InterviewComplete() {
   const navigate = useNavigate()
-  const { interviewSession, finalReport, setFinalReport } = useInterview()
-  const [reportState, setReportState] = useState('idle')
-  const [reportError, setReportError] = useState('')
-
-  const currentInterviewId = interviewSession?.id
-  const report = finalReport?.report
-  const reportInterviewId = finalReport?.interview_id ?? currentInterviewId
-
-  const handleShowReport = async () => {
-    if (reportState === 'loading') {
-      return
-    }
-
-    setReportState('loading')
-    setReportError('')
-
-    setFinalReport(temporaryFinalReport)
-    setReportState('success')
-  }
+  const { questions } = useInterview()
+  const questionCount = questions.length || 5
 
   return (
-    <div className="min-h-screen bg-[#efefef] px-6 py-12">
-      <div className="mx-auto flex min-h-[70vh] w-full max-w-4xl flex-col items-center justify-center rounded-3xl bg-white p-8 text-center shadow-sm">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-600">Interview Complete</p>
-        <h1 className="mt-3 text-3xl font-bold text-gray-900">마지막 질문까지 답변 완료되었습니다.</h1>
-        <p className="mt-3 text-lg text-gray-700">모든 녹화 영상이 전송되었습니다.</p>
+    <div className="min-h-screen bg-[#f4f7fb] text-slate-900">
+      <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex h-[74px] max-w-[1640px] items-center justify-between px-6 sm:px-10 xl:px-12">
+          <div className="flex h-full items-center gap-12">
+            <button
+              type="button"
+              className="flex items-center gap-3 text-left"
+              onClick={() => navigate('/main')}
+            >
+              <span className="h-7 w-7 rounded-md bg-[#263f98]" />
+              <span className="text-xl font-extrabold text-[#1f3d91]">
+                InterviewLens
+              </span>
+            </button>
 
-        {reportError && (
-          <p className="mt-5 text-sm font-semibold text-red-600">
-            {reportError}
-          </p>
-        )}
-
-        {report && (
-          <div className="mt-8 w-full text-left">
-            <div className="rounded-2xl bg-blue-50 px-6 py-5 text-center">
-              <p className="text-sm font-semibold text-blue-700">면접 ID {reportInterviewId}</p>
-              <p className="mt-2 text-3xl font-bold text-blue-700">행동 분석 리포트</p>
-              <p className="mt-1 text-sm font-semibold text-blue-600">백엔드 분석 결과</p>
-            </div>
-
-            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {reportItems.map((item) => (
-                <div key={item.key} className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
-                  <p className="text-sm font-semibold text-gray-500">{item.label}</p>
-                  <p className="mt-2 text-2xl font-bold text-gray-900">
-                    {item.format
-                      ? item.format(report[item.key])
-                      : formatValue(report[item.key], item.unit)}
-                  </p>
-                </div>
-              ))}
-            </div>
+            <nav className="hidden h-full items-center gap-9 text-base font-bold text-slate-600 md:flex">
+              <button
+                type="button"
+                className="h-full px-1 transition hover:text-[#263f98]"
+                onClick={() => navigate('/interview')}
+              >
+                면접 연습
+              </button>
+              <button
+                type="button"
+                className="h-full px-1 transition hover:text-[#263f98]"
+                onClick={() => navigate('/report')}
+              >
+                결과 리포트
+              </button>
+              <button
+                type="button"
+                className="h-full px-1 transition hover:text-[#263f98]"
+                onClick={() => navigate('/settings/resume')}
+              >
+                내 자소서
+              </button>
+              <button
+                type="button"
+                className="h-full px-1 transition hover:text-[#263f98]"
+                onClick={() => navigate('/settings/analysis-guide')}
+              >
+                분석 기준 안내
+              </button>
+            </nav>
           </div>
-        )}
+
+          <div className="flex items-center gap-5">
+            <button
+              type="button"
+              aria-label="분석 기준 안내"
+              className="h-10 w-10 rounded-full bg-slate-100 transition hover:bg-slate-200"
+              onClick={() => navigate('/settings/analysis-guide')}
+            />
+            <button
+              type="button"
+              aria-label="내 자소서 관리"
+              className="h-11 w-11 rounded-full bg-[#5967d9] transition hover:bg-[#4b59cf]"
+              onClick={() => navigate('/settings/resume')}
+            />
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto flex min-h-[calc(100vh-74px)] max-w-[1640px] flex-col items-center px-6 py-20 text-center sm:px-10 xl:px-12">
+        <div className="flex h-36 w-36 items-center justify-center rounded-full bg-[#d8fbe6]">
+          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-[#1da36f]">
+            <svg
+              aria-hidden="true"
+              className="h-11 w-11 text-white"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <path
+                d="M5 12.5L9.4 17L19 7"
+                stroke="currentColor"
+                strokeWidth="2.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <h1 className="mt-12 text-4xl font-black text-[#1f2b4f] sm:text-5xl">
+          수고하셨습니다.
+        </h1>
+        <p className="mt-5 text-lg font-semibold leading-8 text-slate-500">
+          면접이 모두 끝났어요.
+          <br />
+          분석 완료 이후에, 결과 리포트를 확인하실 수 있어요.
+        </p>
+
+        <div className="mt-9 grid w-full max-w-[590px] gap-5 text-left sm:grid-cols-2">
+          <div className="rounded-xl border border-slate-200 bg-white px-6 py-5 shadow-sm">
+            <p className="text-sm font-bold text-slate-500">답변한 문항</p>
+            <p className="mt-2 text-3xl font-black text-[#1f2b4f]">
+              {questionCount} / {questionCount}
+            </p>
+            <p className="mt-4 text-sm font-semibold text-slate-400">
+              모든 질문 응답
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-slate-200 bg-white px-6 py-5 shadow-sm">
+            <p className="text-sm font-bold text-slate-500">분석 진행</p>
+            <p className="mt-2 flex items-center gap-2 text-2xl font-black text-[#1f2b4f]">
+              <span className="h-2.5 w-2.5 rounded-full bg-[#ff6b5f]" />
+              진행 중
+            </p>
+            <p className="mt-4 text-sm font-semibold text-slate-400">
+              n분 내 완료
+            </p>
+          </div>
+        </div>
 
         <button
           type="button"
-          onClick={report ? () => navigate('/main') : handleShowReport}
-          disabled={reportState === 'loading'}
-          className="mt-10 rounded-2xl bg-blue-500 px-6 py-4 text-lg font-semibold text-white transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+          onClick={() => navigate('/main')}
+          className="mt-16 flex w-full max-w-[335px] items-center justify-center gap-3 rounded-[28px] bg-[#ff665c] px-7 py-5 text-lg font-extrabold text-white shadow-sm transition hover:bg-[#f2554d]"
         >
-          {report
-            ? '메인으로 이동'
-            : reportState === 'loading'
-              ? '리포트 불러오는 중...'
-              : '나의 분석 보기'}
+          <svg
+            aria-hidden="true"
+            className="h-5 w-5"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M4 10.5L12 4L20 10.5"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M6.5 9.5V20H17.5V9.5"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M10 20V14H14V20"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          종료하고 메인으로
         </button>
-      </div>
+
+        <p className="mt-16 text-sm font-semibold text-slate-400">
+          분석은 백그라운드에서 계속 진행돼요. 메인으로 돌아가도 결과는
+          [결과 리포트] 탭에서 확인하실 수 있어요.
+        </p>
+      </main>
     </div>
   )
 }
