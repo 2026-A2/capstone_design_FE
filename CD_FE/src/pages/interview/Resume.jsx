@@ -1,18 +1,87 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getResumes } from '../../api/resumeApi';
 import { useInterview } from '../../contexts/InterviewContext.jsx';
 
 function Resume() {
   const navigate = useNavigate();
-  const { resumeText, setResumeText, setIndustry } = useInterview();
+  const {
+    resumeText,
+    savedResumes,
+    setResumeText,
+    setIndustry,
+    setQuestionType,
+    setSavedResumes,
+  } = useInterview();
+  const [inputMode, setInputMode] = useState('direct');
+  const [selectedResumeId, setSelectedResumeId] = useState(null);
+  const [loadState, setLoadState] = useState('idle');
+  const [loadError, setLoadError] = useState('');
+
+  useEffect(() => {
+    let ignore = false;
+
+    const loadResumes = async () => {
+      setLoadState('loading');
+      setLoadError('');
+
+      try {
+        const resumes = await getResumes();
+        if (!ignore) {
+          setSavedResumes(resumes);
+          setLoadState('success');
+        }
+      } catch (error) {
+        console.error('[resume list:failure]', {
+          status: error.response?.status,
+          data: error.response?.data,
+          message: error.message,
+        });
+        if (!ignore) {
+          setLoadState('error');
+          setLoadError('저장된 자소서를 불러오지 못했습니다.');
+        }
+      }
+    };
+
+    loadResumes();
+
+    return () => {
+      ignore = true;
+    };
+  }, [setSavedResumes]);
 
   const trimmedLength = resumeText.trim().length;
   const isValid = trimmedLength > 0 && trimmedLength <= 300;
+
+  const handleSelectResume = (resume) => {
+    setInputMode('saved');
+    setSelectedResumeId(resume.id);
+    setResumeText((resume.content || '').slice(0, 300));
+  };
+
+  const handleSavedMode = () => {
+    setInputMode('saved');
+
+    const selectedResume = savedResumes.find(
+      (resume) => resume.id === selectedResumeId,
+    );
+
+    setResumeText((selectedResume?.content || '').slice(0, 300));
+  };
+
+  const handleDirectInput = (value) => {
+    setInputMode('direct');
+    setSelectedResumeId(null);
+    setResumeText(value.slice(0, 300));
+  };
 
   const handleNext = () => {
     if (!isValid) {
       return;
     }
 
+    setQuestionType('resume');
     setIndustry('');
     navigate('/interview/question-count');
   };
@@ -84,27 +153,111 @@ function Resume() {
         </div>
 
         <section className="mt-12 w-full max-w-[980px] rounded-[24px] border border-slate-200 bg-white px-7 py-8 shadow-sm sm:px-10">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <span className="rounded-[12px] bg-[#263f98] px-8 py-3 text-base font-extrabold text-white">
-              자소서 입력
-            </span>
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-6">
+            <div className="flex rounded-[14px] bg-slate-100 p-1">
+              <button
+                type="button"
+                className={`h-11 rounded-[11px] px-5 text-sm font-extrabold transition ${
+                  inputMode === 'direct'
+                    ? 'bg-[#263f98] text-white shadow-sm'
+                    : 'text-slate-600 hover:text-[#263f98]'
+                }`}
+                onClick={() => setInputMode('direct')}
+              >
+                직접 입력
+              </button>
+              <button
+                type="button"
+                className={`h-11 rounded-[11px] px-5 text-sm font-extrabold transition ${
+                  inputMode === 'saved'
+                    ? 'bg-[#263f98] text-white shadow-sm'
+                    : 'text-slate-600 hover:text-[#263f98]'
+                }`}
+                onClick={handleSavedMode}
+              >
+                저장된 자소서
+              </button>
+            </div>
+
             <span className={`text-sm font-bold ${trimmedLength > 300 ? 'text-red-500' : 'text-slate-500'}`}>
               {trimmedLength}/300자
             </span>
           </div>
 
-          <div className="mt-7 rounded-[18px] border-2 border-dashed border-blue-500 bg-[#f7f9ff] p-4">
-            <textarea
-              value={resumeText}
-              onChange={(e) => setResumeText(e.target.value.slice(0, 300))}
-              placeholder="자소서 핵심 경험, 지원 동기, 성과를 입력해주세요."
-              rows={10}
-              className="min-h-[260px] w-full resize-none rounded-[14px] border border-transparent bg-white px-5 py-5 text-base leading-7 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-            />
-          </div>
+          {inputMode === 'saved' && (
+            <div className="mt-7">
+              {loadState === 'loading' && (
+                <div className="rounded-[16px] border border-slate-200 bg-slate-50 px-5 py-6 text-center text-sm font-bold text-slate-500">
+                  저장된 자소서를 불러오는 중입니다.
+                </div>
+              )}
+
+              {loadError && (
+                <div className="rounded-[16px] border border-red-100 bg-red-50 px-5 py-4 text-sm font-bold text-red-600">
+                  {loadError}
+                </div>
+              )}
+
+              {loadState !== 'loading' && savedResumes.length === 0 && (
+                <div className="rounded-[16px] border border-slate-200 bg-slate-50 px-5 py-6 text-center">
+                  <p className="text-sm font-bold text-slate-600">
+                    저장된 자소서가 없습니다.
+                  </p>
+                  <button
+                    type="button"
+                    className="mt-4 h-11 rounded-[12px] bg-[#263f98] px-5 text-sm font-extrabold text-white transition hover:bg-[#1f347e]"
+                    onClick={() => navigate('/settings/resume/new')}
+                  >
+                    자소서 등록하기
+                  </button>
+                </div>
+              )}
+
+              {savedResumes.length > 0 && (
+                <div className="grid gap-3">
+                  {savedResumes.map((resume) => (
+                    <button
+                      type="button"
+                      key={resume.id}
+                      className={`rounded-[16px] border px-5 py-4 text-left transition hover:border-[#263f98] hover:bg-[#f7f9ff] ${
+                        selectedResumeId === resume.id
+                          ? 'border-[#263f98] bg-[#f7f9ff] ring-4 ring-blue-100'
+                          : 'border-slate-200 bg-white'
+                      }`}
+                      onClick={() => handleSelectResume(resume)}
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <strong className="text-base font-extrabold text-slate-950">
+                          {resume.title || '제목 없는 자소서'}
+                        </strong>
+                        <span className="text-xs font-bold text-slate-400">
+                          {(resume.content || '').length}자
+                        </span>
+                      </div>
+                      <p className="mt-2 line-clamp-2 text-sm font-medium leading-6 text-slate-500">
+                        {resume.content || '내용 없음'}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {inputMode === 'direct' && (
+            <div className="mt-7 rounded-[18px] border-2 border-dashed border-blue-500 bg-[#f7f9ff] p-4">
+              <textarea
+                value={resumeText}
+                onChange={(e) => handleDirectInput(e.target.value)}
+                placeholder="자소서 핵심 경험, 지원 동기, 성과를 입력해주세요."
+                rows={10}
+                className="min-h-[260px] w-full resize-none rounded-[14px] border border-transparent bg-white px-5 py-5 text-base leading-7 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+              />
+            </div>
+          )}
 
           <p className="mt-4 text-sm font-medium text-slate-500">
-            지원 형식 · 텍스트 직접 입력 · 최대 300자
+            지원 형식 · 텍스트 직접 입력 또는 저장된 자소서 선택 · 최대 300자
           </p>
 
           <div className="mt-5 rounded-[12px] bg-blue-50 px-5 py-4 text-sm font-bold text-slate-600">
