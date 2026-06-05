@@ -528,12 +528,6 @@ export default function IndividualReportPage() {
                   전체 삭제
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => navigate('/report/individual/trash')}
-                >
-                  삭제 보관함
-                </button>
               </div>
             </div>
           </div>
