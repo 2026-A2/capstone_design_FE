@@ -1,7 +1,7 @@
-import { useNavigate } from 'react-router-dom';
-import InterviewTrendChart from './InterviewTrendChart';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getReportTrends } from '../../../api/reportApi';
+import InterviewTrendChart from './InterviewTrendChart';
 
 export default function TotalBlinkPage() {
   const navigate = useNavigate();
@@ -70,9 +70,9 @@ export default function TotalBlinkPage() {
         dataKey="value"
         yLabel="눈 깜빡임(회/분)"
         minValue={0}
-        maxValue={30}
-        standardMin={15}
-        standardMax={20}
+        maxValue={40}
+        standardMin={8}
+        standardMax={21}
       />
 
       <div style={styles.infoBox}>
@@ -80,9 +80,7 @@ export default function TotalBlinkPage() {
 
         <div style={styles.infoText}>
           눈 깜빡임은 면접 중 사용자의 긴장도와 집중 상태를 간접적으로 확인할 수
-          있는 비언어적 지표입니다. 일반적으로 분당 15~20회 정도를 자연스러운
-          범위로 보고, 이보다 지나치게 낮거나 높을 경우 긴장 또는 시선 처리
-          불안정의 신호로 해석할 수 있습니다.
+          있는 비언어적 지표입니다. 분당 8~21회를 적정 기준으로 볼 수 있습니다.
         </div>
       </div>
 

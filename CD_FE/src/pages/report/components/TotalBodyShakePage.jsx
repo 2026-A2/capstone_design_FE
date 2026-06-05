@@ -43,7 +43,7 @@ export default function TotalBodyShakePage() {
   const progressPercent = (currentStep / totalStep) * 100;
 
   const getBarColor = (value) => {
-    if (value >= 3) return '#ef4444';
+    if (value >= 5) return '#ef4444';
     if (value >= 2) return '#facc15';
     return '#22c55e';
   };
@@ -96,20 +96,28 @@ export default function TotalBodyShakePage() {
             />
 
             <YAxis
-              domain={[0, 4]}
+              domain={[0, 8]}
               label={{
-                value: '이탈횟수(회)',
+                value: '몸 흔들림(회/분)',
                 angle: -90,
                 position: 'insideLeft',
               }}
             />
 
-            <Tooltip formatter={(value) => [`${value}회`, '이탈횟수']} />
+            <Tooltip formatter={(value) => [`${value}회/분`, '몸 흔들림']} />
 
             <ReferenceLine
               y={1}
               strokeDasharray="5 5"
-              label="권장 기준 1회 이하"
+              label="적정 기준 1회 이하"
+            />
+
+            <ReferenceLine
+              y={5}
+              stroke="#ef4444"
+              strokeDasharray="5 5"
+              strokeWidth={2}
+              label="체크 필요 기준 5회 이상"
             />
 
             <Bar dataKey="value" barSize={42} radius={[8, 8, 0, 0]}>
@@ -124,8 +132,8 @@ export default function TotalBodyShakePage() {
       <div style={styles.infoBox}>
         <div style={styles.infoTitle}>분석 기준</div>
         <div style={styles.infoText}>
-          몸통 기울기 10° 이상 이탈 빈도입니다. 일반적으로 1회 이하는 안정적,
-          1회 초과는 주의, 3회 이상은 개선이 필요한 수준으로 볼 수 있습니다.
+          몸 흔들림은 분당 1회 이하를 적정, 2~4회를 주의, 5회 이상을 체크
+          필요 기준으로 볼 수 있습니다.
         </div>
       </div>
 

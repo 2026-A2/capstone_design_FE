@@ -70,15 +70,15 @@ export default function TotalGazeReportPage() {
         yLabel="카메라 응시율(%)"
         minValue={0}
         maxValue={100}
-        standardValue={60}
-        highlightAboveValue={60}
+        standardValue={85}
+        highlightAboveValue={85}
       />
 
       <div style={styles.infoBox}>
         <div style={styles.infoTitle}>분석 기준</div>
         <div style={styles.infoText}>
           카메라 응시율은 면접 중 사용자가 카메라를 바라본 비율을 의미합니다.
-          일반적으로 60% 이상을 권장 기준으로 볼 수 있습니다.
+          85% 이상을 적정 기준으로 볼 수 있습니다.
         </div>
       </div>
 

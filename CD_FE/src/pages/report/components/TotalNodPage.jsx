@@ -1,6 +1,16 @@
 import { useNavigate } from 'react-router-dom';
-import InterviewTrendChart from './InterviewTrendChart';
 import { useEffect, useState } from 'react';
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import { getReportTrends } from '../../../api/reportApi';
 
 export default function TotalNodPage() {
@@ -25,12 +35,18 @@ export default function TotalNodPage() {
     fetchData();
   }, []);
   const chartData = nodData.map((item) => ({
-    date: item.session,
+    date: item.date ?? item.session,
     value: item.value,
   }));
   const currentStep = 8;
   const totalStep = 10;
   const progressPercent = (currentStep / totalStep) * 100;
+
+  const getBarColor = (value) => {
+    if (value >= 6) return '#ef4444';
+    if (value >= 2) return '#facc15';
+    return '#22c55e';
+  };
 
   return (
     <div style={styles.page}>
@@ -61,21 +77,61 @@ export default function TotalNodPage() {
         />
       </div>
 
-      <InterviewTrendChart
-        data={chartData}
-        dataKey="value"
-        yLabel="유지율(%)"
-        minValue={50}
-        maxValue={100}
-        standardValue={80}
-        highlightAboveValue={80}
-      />
+      <div style={styles.chartBox}>
+        <ResponsiveContainer width="100%" height={320}>
+          <BarChart
+            data={chartData}
+            margin={{ top: 12, right: 20, left: 45, bottom: 16 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+
+            <XAxis
+              dataKey="date"
+              label={{
+                value: '날짜',
+                position: 'insideBottom',
+                offset: -10,
+              }}
+            />
+
+            <YAxis
+              domain={[0, 8]}
+              label={{
+                value: '고개 끄덕임(회/분)',
+                angle: -90,
+                position: 'insideLeft',
+              }}
+            />
+
+            <Tooltip formatter={(value) => [`${value}회/분`, '고개 끄덕임']} />
+
+            <ReferenceLine
+              y={1}
+              strokeDasharray="5 5"
+              label="적정 기준 1회 이하"
+            />
+
+            <ReferenceLine
+              y={6}
+              stroke="#ef4444"
+              strokeDasharray="5 5"
+              strokeWidth={2}
+              label="체크 필요 기준 6회 이상"
+            />
+
+            <Bar dataKey="value" barSize={42} radius={[8, 8, 0, 0]}>
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={getBarColor(entry.value)} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
       <div style={styles.infoBox}>
         <div style={styles.infoTitle}>분석 기준</div>
         <div style={styles.infoText}>
-          <div style={styles.infoText}>
-            초기 자세 대비 턱-어깨 수직거리 80% 이상을 유지합니다
-          </div>
+          고개 끄덕임은 분당 1회 이하를 적정, 2~5회를 주의, 6회 이상을 체크
+          필요 기준으로 볼 수 있습니다.
         </div>
       </div>
 
@@ -152,6 +208,17 @@ const styles = {
     backgroundColor: '#6366f1',
     borderRadius: '999px',
     transition: 'width 0.3s ease',
+  },
+
+  chartBox: {
+    width: '760px',
+    height: '360px',
+    backgroundColor: '#ffffff',
+    borderRadius: '16px',
+    padding: '20px',
+    margin: '0 auto',
+    boxSizing: 'border-box',
+    boxShadow: '0 6px 18px rgba(15, 23, 42, 0.08)',
   },
 
   infoBox: {
