@@ -80,8 +80,8 @@ export const getItemStatus = (key, value) => {
 
   switch (key) {
     case 'eyeContactRate':
-      if (numericValue >= 60) return 'good';
-      if (numericValue >= 50) return 'warning';
+      if (numericValue >= 85) return 'good';
+      if (numericValue >= 65) return 'warning';
       return 'bad';
     case 'speechRate':
       if (numericValue >= 250 && numericValue <= 350) return 'good';
@@ -106,16 +106,16 @@ export const getItemStatus = (key, value) => {
       if (numericValue >= -50) return 'warning';
       return 'bad';
     case 'smileRate':
-      if (numericValue >= 50) return 'good';
-      if (numericValue >= 30) return 'warning';
+      if (numericValue >= 10 && numericValue < 20) return 'good';
+      if (numericValue >= 5 && numericValue < 10) return 'warning';
       return 'bad';
     case 'blinkCount':
-      if (numericValue >= 15 && numericValue <= 20) return 'good';
-      if (numericValue >= 10 && numericValue <= 25) return 'warning';
+      if (numericValue >= 8 && numericValue <= 21) return 'good';
+      if (numericValue >= 22 && numericValue <= 35) return 'warning';
       return 'bad';
     case 'nodCount':
-      if (numericValue >= 80 && numericValue <= 100) return 'good';
-      if (numericValue >= 60 && numericValue < 80) return 'warning';
+      if (numericValue <= 1) return 'good';
+      if (numericValue <= 5) return 'warning';
       return 'bad';
     case 'shoulderTilt':
       if (numericValue >= 90) return 'good';
@@ -123,7 +123,7 @@ export const getItemStatus = (key, value) => {
       return 'bad';
     case 'bodyShake':
       if (numericValue <= 1) return 'good';
-      if (numericValue < 3) return 'warning';
+      if (numericValue <= 4) return 'warning';
       return 'bad';
     default:
       return 'neutral';

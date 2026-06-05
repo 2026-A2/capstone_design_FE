@@ -56,8 +56,8 @@ export default function IndividualReportFullPage() {
 
     switch (key) {
       case 'eyeContactRate':
-        if (value >= 60) return 'good';
-        if (value >= 50) return 'warning';
+        if (value >= 85) return 'good';
+        if (value >= 65) return 'warning';
         return 'bad';
       case 'speechRate':
         if (value >= 250 && value <= 350) return 'good';
@@ -79,16 +79,16 @@ export default function IndividualReportFullPage() {
         if (value >= -50) return 'warning';
         return 'bad';
       case 'smileRate':
-        if (value >= 50) return 'good';
-        if (value >= 30) return 'warning';
+        if (value >= 10 && value < 20) return 'good';
+        if (value >= 5 && value < 10) return 'warning';
         return 'bad';
       case 'blinkCount':
-        if (value >= 15 && value <= 20) return 'good';
-        if (value >= 10 && value <= 25) return 'warning';
+        if (value >= 8 && value <= 21) return 'good';
+        if (value >= 22 && value <= 35) return 'warning';
         return 'bad';
       case 'nodCount':
-        if (value >= 80 && value <= 100) return 'good';
-        if (value >= 60 && value < 80) return 'warning';
+        if (value <= 1) return 'good';
+        if (value <= 5) return 'warning';
         return 'bad';
       case 'shoulderTilt':
         if (value >= 90) return 'good';
@@ -96,7 +96,7 @@ export default function IndividualReportFullPage() {
         return 'bad';
       case 'bodyShake':
         if (value <= 1) return 'good';
-        if (value < 3) return 'warning';
+        if (value <= 4) return 'warning';
         return 'bad';
       default:
         return 'neutral';
@@ -142,23 +142,53 @@ export default function IndividualReportFullPage() {
     }
   };
 
+  const getItemStatusLabel = (item) => {
+    if (item.key === 'bodyShake') {
+      switch (getStatusTone(item.status)) {
+        case 'good':
+          return '안정';
+        case 'warning':
+          return '보통';
+        case 'bad':
+          return '개선필요';
+        default:
+          return '';
+      }
+    }
+
+    if (item.key === 'nodCount') {
+      switch (getStatusTone(item.status)) {
+        case 'good':
+          return '적음';
+        case 'warning':
+          return '보통';
+        case 'bad':
+          return '많음';
+        default:
+          return '';
+      }
+    }
+
+    return getStatusLabel(item.status);
+  };
+
   const getGuidelineForItem = (key) => {
     switch (key) {
       case 'eyeContactRate':
         return [
           {
             level: '적정',
-            range: '≥ 60%',
+            range: '≥ 85%',
             description: '충분한 카메라 응시율',
           },
           {
             level: '주의',
-            range: '50~59%',
+            range: '65~84%',
             description: '카메라 응시 개선 권장',
           },
           {
             level: '체크필요',
-            range: '< 50%',
+            range: '≤ 64%',
             description: '카메라 응시 개선 필요',
           },
         ];
@@ -252,11 +282,11 @@ export default function IndividualReportFullPage() {
         ];
       case 'smileRate':
         return [
-          { level: '적정', range: '≥ 50%', description: '충분한 미소율' },
-          { level: '주의', range: '30~49%', description: '미소율 개선 권장' },
+          { level: '적정', range: '10~20% 미만', description: '적절한 미소율' },
+          { level: '주의', range: '5~9%', description: '미소율 개선 권장' },
           {
             level: '체크필요',
-            range: '< 30%',
+            range: '< 5% 또는 ≥ 20%',
             description: '미소율 개선 필요',
           },
         ];
@@ -264,36 +294,36 @@ export default function IndividualReportFullPage() {
         return [
           {
             level: '적정',
-            range: '15~20회/분',
+            range: '8~21회/분',
             description: '자연스러운 눈 깜빡임',
           },
           {
             level: '주의',
-            range: '10~14 또는 21~25회/분',
+            range: '22~35회/분',
             description: '눈 깜빡임 횟수 조절 권장',
           },
           {
             level: '체크필요',
-            range: '< 10 또는 > 25회/분',
+            range: '< 8 또는 > 35회/분',
             description: '눈 깜빡임 횟수 개선 필요',
           },
         ];
       case 'nodCount':
         return [
           {
-            level: '적정',
-            range: '80~100%',
-            description: '고개 끄덕임 적정',
+            level: '적음',
+            range: '≤ 1회/분',
+            description: '고개 끄덕임 적음',
           },
           {
-            level: '주의',
-            range: '60~79%',
-            description: '고개 끄덕임 개선 권장',
+            level: '보통',
+            range: '2~5회/분',
+            description: '고개 끄덕임 보통',
           },
           {
-            level: '체크필요',
-            range: '< 60%',
-            description: '고개 끄덕임 개선 필요',
+            level: '많음',
+            range: '≥ 6회/분',
+            description: '고개 끄덕임 많음',
           },
         ];
       case 'shoulderTilt':
@@ -316,11 +346,11 @@ export default function IndividualReportFullPage() {
         ];
       case 'bodyShake':
         return [
-          { level: '적정', range: '≤ 1회', description: '안정적인 자세 유지' },
-          { level: '주의', range: '2회', description: '몸 흔들림 감소 권장' },
+          { level: '안정', range: '≤ 1회/분', description: '안정적인 자세 유지' },
+          { level: '보통', range: '2~4회/분', description: '몸 흔들림 보통' },
           {
-            level: '체크필요',
-            range: '≥ 3회',
+            level: '개선필요',
+            range: '≥ 5회/분',
             description: '몸 흔들림 개선 필요',
           },
         ];
@@ -353,7 +383,7 @@ export default function IndividualReportFullPage() {
       key: 'eyeContactRate',
       unit: '%',
       icon: '📷',
-      recommendedText: '60% 이상 권장',
+      recommendedText: '85% 이상 권장',
       category: '시선처리',
     },
     {
@@ -393,7 +423,7 @@ export default function IndividualReportFullPage() {
       key: 'smileRate',
       unit: '%',
       icon: '😊',
-      recommendedText: '50% 이상 권장, 면접시작·마무리 2회 권장',
+      recommendedText: '10~20% 미만 권장',
       category: '표정',
     },
     {
@@ -401,15 +431,15 @@ export default function IndividualReportFullPage() {
       key: 'blinkCount',
       unit: '회/분',
       icon: '👁️',
-      recommendedText: '분당 15-20회 권장',
+      recommendedText: '분당 8~21회 권장',
       category: '습관',
     },
     {
       label: '고개 끄덕임',
       key: 'nodCount',
-      unit: '%',
+      unit: '회/분',
       icon: '👤',
-      recommendedText: '80-100% 권장',
+      recommendedText: '분당 1회 이하 권장',
       category: '습관',
     },
     {
@@ -423,9 +453,9 @@ export default function IndividualReportFullPage() {
     {
       label: '몸 흔들림',
       key: 'bodyShake',
-      unit: '회',
+      unit: '회/분',
       icon: '🔄',
-      recommendedText: '1회 이하 권장',
+      recommendedText: '분당 1회 이하 권장',
       category: '자세',
     },
   ];
@@ -455,15 +485,15 @@ export default function IndividualReportFullPage() {
       case 'fillerCount':
         return { min: 0, max: 10, goodMin: 0, goodMax: 3 };
       case 'blinkCount':
-        return { min: 0, max: 30, goodMin: 15, goodMax: 20 };
+        return { min: 0, max: 40, goodMin: 8, goodMax: 21 };
       case 'bodyShake':
-        return { min: 0, max: 5, goodMin: 0, goodMax: 1 };
+        return { min: 0, max: 8, goodMin: 0, goodMax: 1 };
       case 'eyeContactRate':
-        return { min: 0, max: 100, goodMin: 60, goodMax: 100 };
+        return { min: 0, max: 100, goodMin: 85, goodMax: 100 };
       case 'smileRate':
-        return { min: 0, max: 100, goodMin: 50, goodMax: 100 };
+        return { min: 0, max: 30, goodMin: 10, goodMax: 20 };
       case 'nodCount':
-        return { min: 0, max: 100, goodMin: 80, goodMax: 100 };
+        return { min: 0, max: 8, goodMin: 0, goodMax: 1 };
       case 'shoulderTilt':
         return { min: 0, max: 100, goodMin: 90, goodMax: 100 };
       default:
@@ -673,7 +703,7 @@ export default function IndividualReportFullPage() {
                                   }}
                                 >
                                   <span className="status-text">
-                                    {getStatusLabel(item.status)}
+                                    {getItemStatusLabel(item)}
                                   </span>
                                 </div>
 

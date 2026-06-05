@@ -539,12 +539,29 @@
   background: #ffffff;
 }
 
+.guideline-item.guideline-안정,
+.guideline-item.guideline-적음 {
+  border-left-color: #4caf50;
+  background: #ffffff;
+}
+
 .guideline-item.guideline-주의 {
   border-left-color: #ffc107;
   background: #ffffff;
 }
 
+.guideline-item.guideline-보통 {
+  border-left-color: #ffc107;
+  background: #ffffff;
+}
+
 .guideline-item.guideline-체크 {
+  border-left-color: #f44336;
+  background: #ffffff;
+}
+
+.guideline-item.guideline-개선,
+.guideline-item.guideline-많음 {
   border-left-color: #f44336;
   background: #ffffff;
 }
@@ -572,12 +589,29 @@
   color: #172554;
 }
 
+.guideline-item.guideline-안정 .guideline-level,
+.guideline-item.guideline-적음 .guideline-level {
+  background: transparent;
+  color: #172554;
+}
+
 .guideline-item.guideline-주의 .guideline-level {
   background: transparent;
   color: #172554;
 }
 
+.guideline-item.guideline-보통 .guideline-level {
+  background: transparent;
+  color: #172554;
+}
+
 .guideline-item.guideline-체크 .guideline-level {
+  background: transparent;
+  color: #172554;
+}
+
+.guideline-item.guideline-개선 .guideline-level,
+.guideline-item.guideline-많음 .guideline-level {
   background: transparent;
   color: #172554;
 }
