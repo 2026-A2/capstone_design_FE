@@ -16,7 +16,8 @@ export default function TotalGazeReportPage() {
         console.log('시선 처리 추세 응답:', trends);
 
         const chartData = (trends.eyeContactTrend || []).map((item) => ({
-          session: item.date ?? item.session,
+          session: item.session,
+          date: item.date,
           value: item.value,
         }));
 

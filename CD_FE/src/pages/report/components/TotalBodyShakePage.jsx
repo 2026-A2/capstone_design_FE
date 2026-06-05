@@ -25,7 +25,8 @@ export default function TotalBodyShakePage() {
         console.log('몸 흔들림 추세 응답:', trends);
 
         const chartData = (trends.bodyShakeTrend || []).map((item) => ({
-          session: item.date ?? item.session,
+          session: item.session,
+          date: item.date,
           value: item.value,
         }));
 
@@ -104,7 +105,13 @@ export default function TotalBodyShakePage() {
               }}
             />
 
-            <Tooltip formatter={(value) => [`${value}회/분`, '몸 흔들림']} />
+            <Tooltip
+              formatter={(value) => [`${value}회/분`, '몸 흔들림']}
+              labelFormatter={(label, payload) => {
+                const row = payload?.[0]?.payload;
+                return `${label}${row?.date ? ` · ${row.date}` : ''}`;
+              }}
+            />
 
             <ReferenceLine
               y={1}

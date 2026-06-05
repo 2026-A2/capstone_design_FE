@@ -35,7 +35,8 @@ export default function TotalNodPage() {
     fetchData();
   }, []);
   const chartData = nodData.map((item) => ({
-    date: item.date ?? item.session,
+    session: item.session,
+    date: item.date,
     value: item.value,
   }));
   const currentStep = 8;
@@ -86,7 +87,7 @@ export default function TotalNodPage() {
             <CartesianGrid strokeDasharray="3 3" />
 
             <XAxis
-              dataKey="date"
+              dataKey="session"
               label={{
                 value: '날짜',
                 position: 'insideBottom',
@@ -103,7 +104,13 @@ export default function TotalNodPage() {
               }}
             />
 
-            <Tooltip formatter={(value) => [`${value}회/분`, '고개 끄덕임']} />
+            <Tooltip
+              formatter={(value) => [`${value}회/분`, '고개 끄덕임']}
+              labelFormatter={(label, payload) => {
+                const row = payload?.[0]?.payload;
+                return `${label}${row?.date ? ` · ${row.date}` : ''}`;
+              }}
+            />
 
             <ReferenceLine
               y={1}

@@ -14,7 +14,7 @@ import {
 export default function InterviewTrendChart({
   data,
   dataKey,
-  xKey = 'date',
+  xKey = 'session',
   yLabel,
   minValue = 0,
   maxValue = 100,
@@ -39,6 +39,23 @@ export default function InterviewTrendChart({
     fill: '#334155',
     fontSize: 12,
     fontWeight: 700,
+  };
+  const unitMatch = yLabel?.match(/\(([^)]+)\)/);
+  const valueUnit = unitMatch?.[1] ? ` ${unitMatch[1]}` : '';
+  const formatTooltipValue = (value) => {
+    if (value === undefined || value === null || value === '') return '-';
+
+    return `${value}${valueUnit}`;
+  };
+  const formatTooltipLabel = (label, payload) => {
+    const row = payload?.[0]?.payload;
+
+    if (!row) return label;
+
+    const sessionLabel = row.session ?? label;
+    const dateLabel = row.date ? ` · ${row.date}` : '';
+
+    return `${sessionLabel}${dateLabel}`;
   };
 
   return (
@@ -68,7 +85,10 @@ export default function InterviewTrendChart({
             }}
           />
 
-          <Tooltip />
+          <Tooltip
+            formatter={(value, name) => [formatTooltipValue(value), name]}
+            labelFormatter={formatTooltipLabel}
+          />
           {lines && <Legend verticalAlign="top" align="right" height={28} />}
 
           {highlightAboveValue !== undefined && (

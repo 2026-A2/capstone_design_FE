@@ -225,14 +225,18 @@ export const getReportTrends = async () => {
   const response = await axiosInstance.get(REPORT_TRENDS_PATH);
   const trends = getResponseTrends(response.data);
 
-  const toChartItem = (item, value, extra = {}) => ({
-    id: item.interview_id ?? item.id,
-    session: item.date,
-    date: item.date,
-    value,
-    interviewType: item.interview_type,
-    ...extra,
-  });
+  const toChartItem = (item, value, extra = {}) => {
+    const id = item.interview_id ?? item.id ?? item.session;
+
+    return {
+      id,
+      session: id ? `${id}회차` : item.date,
+      date: item.created_at ?? item.date,
+      value,
+      interviewType: item.interview_type,
+      ...extra,
+    };
+  };
 
   return {
     eyeContactTrend: filterDeletedSessions(
