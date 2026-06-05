@@ -52,8 +52,9 @@ const getItemStatus = (key, value) => {
       if (value >= 50) return 'warning';
       return 'bad';
     case 'speechRate':
-      if (value >= 200 && value <= 260) return 'good';
-      if (value >= 180 && value <= 300) return 'warning';
+      if (value >= 250 && value <= 350) return 'good';
+      if ((value >= 200 && value < 250) || (value > 350 && value <= 450))
+        return 'warning';
       return 'bad';
     case 'silenceCount':
       if (value <= 3) return 'good';

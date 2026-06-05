@@ -64,16 +64,16 @@ export default function TotalSpeechRatePage() {
         dataKey="value"
         yLabel="발화 속도(spm)"
         minValue={0}
-        maxValue={400}
-        standardMin={200}
-        standardMax={260}
-        overSpeedValue={300}
+        maxValue={500}
+        standardMin={250}
+        standardMax={350}
+        overSpeedValue={450}
       />
 
       <div style={styles.infoBox}>
         <div style={styles.infoTitle}>분석 기준</div>
         <div style={styles.infoText}>
-          발화 속도는 1분 동안 말한 음절 수를 의미합니다. 일반적으로 200~260spm
+          발화 속도는 1분 동안 말한 음절 수를 의미합니다. 일반적으로 250~350spm
           범위를 권장 기준으로 볼 수 있습니다.
         </div>
       </div>

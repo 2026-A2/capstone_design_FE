@@ -21,7 +21,7 @@ const analysisGuides = [
     items: [
       {
         title: '발화 속도',
-        standard: '200-260SPM(분당 200~260 단어) 권장',
+        standard: '250-350SPM(분당 250~350 단어) 권장',
         description:
           '말이 너무 빠르거나 느리지 않은지 확인합니다. 적절한 속도는 전달력을 높이는 데 도움이 됩니다.',
       },

@@ -60,8 +60,9 @@ export default function IndividualReportFullPage() {
         if (value >= 50) return 'warning';
         return 'bad';
       case 'speechRate':
-        if (value >= 200 && value <= 260) return 'good';
-        if (value >= 180 && value <= 300) return 'warning';
+        if (value >= 250 && value <= 350) return 'good';
+        if ((value >= 200 && value < 250) || (value > 350 && value <= 450))
+          return 'warning';
         return 'bad';
       case 'silenceCount':
         if (value <= 3) return 'good';
@@ -184,19 +185,29 @@ export default function IndividualReportFullPage() {
       case 'speechRate':
         return [
           {
-            level: '적정',
-            range: '200-260 SPM',
-            description: '적절한 발화 속도',
+            level: '체크필요',
+            range: '< 200 SPM',
+            description: '매우 느림',
           },
           {
             level: '주의',
-            range: '180-200SPM 또는 260-299 SPM',
-            description: '발화 속도 조정 권장',
+            range: '200-249 SPM',
+            description: '느림',
+          },
+          {
+            level: '적정',
+            range: '250-350 SPM',
+            description: '적정',
+          },
+          {
+            level: '주의',
+            range: '351-450 SPM',
+            description: '빠름',
           },
           {
             level: '체크필요',
-            range: '< 180 또는 ≥ 300 SPM',
-            description: '발화 속도 개선 필요',
+            range: '> 450 SPM',
+            description: '매우 빠름',
           },
         ];
       case 'voiceVolume':
@@ -361,7 +372,7 @@ export default function IndividualReportFullPage() {
       key: 'speechRate',
       unit: 'SPM',
       icon: '🎙️',
-      recommendedText: '200-260 SPM 권장',
+      recommendedText: '250-350 SPM 권장',
       category: '발화',
     },
     {
@@ -450,7 +461,7 @@ export default function IndividualReportFullPage() {
   const getMetricScale = (key) => {
     switch (key) {
       case 'speechRate':
-        return { min: 0, max: 320, goodMin: 200, goodMax: 260 };
+        return { min: 0, max: 500, goodMin: 250, goodMax: 350 };
       case 'voiceVolume':
         return { min: -60, max: 0, goodMin: -35, goodMax: -20 };
       case 'silenceCount':
