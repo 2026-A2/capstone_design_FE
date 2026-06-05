@@ -1,7 +1,16 @@
 import { useInterview } from '../../contexts/InterviewContext.jsx';
 import { useNavigate } from 'react-router-dom';
 
-const countOptions = [2, 3, 4, 5];
+const countOptions = [1, 2, 3, 4];
+const normalizeQuestionCount = (count) => {
+  const value = Number(count);
+
+  if (!Number.isInteger(value)) {
+    return 4;
+  }
+
+  return Math.min(Math.max(value, 1), 4);
+};
 
 function QuestionCount() {
   const navigate = useNavigate();
@@ -15,8 +24,8 @@ function QuestionCount() {
     error,
   } = useInterview();
 
-  const selectedCount = Number(questionCount) || 5;
-  const isValid = selectedCount >= 2 && selectedCount <= 5;
+  const selectedCount = normalizeQuestionCount(questionCount);
+  const isValid = selectedCount >= 1 && selectedCount <= 4;
   const hasValidBasis =
     questionType === 'industry'
       ? Boolean(industry)
@@ -95,7 +104,7 @@ function QuestionCount() {
           </div>
 
           <p className="mt-7 text-base font-medium text-[#687085]">
-            질문 개수는 2개부터 5개까지 선택할 수 있습니다.
+            질문 개수는 1개부터 4개까지 선택할 수 있습니다.
           </p>
         </section>
 

@@ -3,6 +3,15 @@ import axios from 'axios';
 import { createInterviewSession } from '../api/interviewRecordingApi';
 
 const InterviewContext = createContext(null);
+const normalizeQuestionCount = (count) => {
+  const value = Number(count);
+
+  if (!Number.isInteger(value)) {
+    return 4;
+  }
+
+  return Math.min(Math.max(value, 1), 4);
+};
 
 function InterviewProvider({ children }) {
   const [questionType, setQuestionType] = useState('');
@@ -34,7 +43,7 @@ function InterviewProvider({ children }) {
           questionType,
           industry,
           resumeText,
-          questionCount: Number(questionCount),
+          questionCount: normalizeQuestionCount(questionCount),
         },
       );
 

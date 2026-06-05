@@ -7,6 +7,17 @@ dotenv.config();
 
 const app = express();
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openaiModel = process.env.OPENAI_MODEL || "gpt-5.4-mini";
+const questionCountRange = { min: 1, max: 4 };
+
+const logOpenAIError = (scope, error) => {
+    console.error(`[${scope}] OpenAI request failed`, {
+        status: error?.status,
+        code: error?.code,
+        type: error?.type,
+        message: error?.message,
+    });
+};
 
 app.use(cors());
 app.use(express.json());
@@ -16,12 +27,13 @@ app.post("/api/chat", async (req, res) => {
         const { message } = req.body;
 
         const response = await client.responses.create({
-            model: "gpt-5.4",
+            model: openaiModel,
             input: message,
         });
 
         res.json({ reply: response.output_text });
     } catch (error) {
+        logOpenAIError("chat", error);
         res.status(500).json({ error: "AI 요청 실패" });
     }
 });
@@ -33,8 +45,12 @@ app.post("/api/interview/questions", async (req, res) => {
         const normalizedIndustry = String(industry).trim();
         const normalizedResumeText = String(resumeText).trim();
 
-        if (!Number.isInteger(normalizedCount) || normalizedCount < 2 || normalizedCount > 5) {
-            return res.status(400).json({ error: "questionCount(2~5)가 필요합니다." });
+        if (
+            !Number.isInteger(normalizedCount) ||
+            normalizedCount < questionCountRange.min ||
+            normalizedCount > questionCountRange.max
+        ) {
+            return res.status(400).json({ error: "questionCount(1~4)가 필요합니다." });
         }
 
         if (questionType === "industry" && !normalizedIndustry) {
@@ -63,7 +79,7 @@ ${basisLine}
 `;
 
         const response = await client.responses.create({
-            model: "gpt-5.4",
+            model: openaiModel,
             input: prompt,
         });
 
@@ -82,6 +98,7 @@ ${basisLine}
 
         res.json({ questions: questions.slice(0, normalizedCount) });
     } catch (error) {
+        logOpenAIError("interview/questions", error);
         res.status(500).json({ error: "질문 생성 실패" });
     }
 });
@@ -100,6 +117,7 @@ app.get("/health", (req, res) => {
         ok: true,
         service: "cd-ai",
         port,
+        questionCountRange,
         timestamp: new Date().toISOString(),
     });
 });

@@ -83,6 +83,16 @@ const logFinalizeFailure = ({ interviewId, url, error }) => {
 const getApiInterviewType = (questionType) =>
   questionType === 'resume' ? 'RESUME' : 'JOB';
 
+const normalizeQuestionCount = (count) => {
+  const value = Number(count);
+
+  if (!Number.isInteger(value)) {
+    return 4;
+  }
+
+  return Math.min(Math.max(value, 1), 4);
+};
+
 export const createInterviewSession = async ({
   questionType,
   questionCount,
@@ -92,9 +102,10 @@ export const createInterviewSession = async ({
 }) => {
   const formData = new FormData();
   const interviewType = getApiInterviewType(questionType);
+  const normalizedQuestionCount = normalizeQuestionCount(questionCount);
 
   formData.append('interview_type', interviewType);
-  formData.append('question_count', String(Number(questionCount) || 5));
+  formData.append('question_count', String(normalizedQuestionCount));
 
   if (interviewType === 'RESUME') {
     formData.append('resume_text', resumeText || '');
@@ -117,7 +128,7 @@ export const createInterviewSession = async ({
       url: INTERVIEW_SESSION_PATH,
       payload: {
         interview_type: interviewType,
-        question_count: Number(questionCount) || 5,
+        question_count: normalizedQuestionCount,
         resume_text: interviewType === 'RESUME' ? resumeText : undefined,
         job_category: interviewType === 'JOB' ? industry : undefined,
         video_file: calibrationRecording?.name,
@@ -134,7 +145,7 @@ export const createInterviewSession = async ({
       url: INTERVIEW_SESSION_PATH,
       payload: {
         interview_type: interviewType,
-        question_count: Number(questionCount) || 5,
+        question_count: normalizedQuestionCount,
         resume_text: interviewType === 'RESUME' ? resumeText : undefined,
         job_category: interviewType === 'JOB' ? industry : undefined,
         video_file: calibrationRecording?.name,

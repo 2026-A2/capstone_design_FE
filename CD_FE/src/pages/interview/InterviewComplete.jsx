@@ -4,7 +4,7 @@ import { useInterview } from '../../contexts/InterviewContext.jsx'
 function InterviewComplete() {
   const navigate = useNavigate()
   const { questions } = useInterview()
-  const questionCount = questions.length || 5
+  const questionCount = questions.length || 4
 
   return (
     <div className="min-h-screen bg-[#f4f7fb] text-slate-900">
