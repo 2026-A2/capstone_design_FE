@@ -350,12 +350,11 @@ export default function IndividualReportFullPage() {
       if (item) {
         return {
           description: item.description,
-          detail: item.detail,
         };
       }
     }
 
-    return { description: '', detail: '' };
+    return { description: '' };
   };
 
   const itemDefinitions = [
@@ -452,7 +451,6 @@ export default function IndividualReportFullPage() {
       value,
       status,
       description: detailInfo.description,
-      detailContent: detailInfo.detail,
     };
   });
 
@@ -755,13 +753,6 @@ export default function IndividualReportFullPage() {
                                         ),
                                       )}
                                     </div>
-                                  </div>
-                                  <div className="detail-section">
-                                    <h5>📝 상세 분석</h5>
-                                    <p>
-                                      {item.detailContent ||
-                                        '상세 분석 정보가 없습니다.'}
-                                    </p>
                                   </div>
                                 </div>
                               </div>
