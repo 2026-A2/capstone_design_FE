@@ -346,7 +346,11 @@ export default function IndividualReportFullPage() {
         ];
       case 'bodyShake':
         return [
-          { level: '안정', range: '≤ 1회/분', description: '안정적인 자세 유지' },
+          {
+            level: '안정',
+            range: '≤ 1회/분',
+            description: '안정적인 자세 유지',
+          },
           { level: '보통', range: '2~4회/분', description: '몸 흔들림 보통' },
           {
             level: '개선필요',
@@ -399,7 +403,7 @@ export default function IndividualReportFullPage() {
       key: 'voiceVolume',
       unit: 'dB',
       icon: '🔊',
-      recommendedText: '-20~-35dB 권장',
+      recommendedText: '-35~-20dB 권장',
       category: '발화',
     },
     {
