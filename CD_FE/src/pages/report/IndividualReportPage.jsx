@@ -384,7 +384,7 @@ export default function IndividualReportPage() {
     saveDeletedStorage(nextDeletedStorage);
 
     setSelectedIds([]);
-    alert('선택한 리포트가 삭제 보관함으로 이동되었습니다.');
+    alert('선택한 리포트가 삭제되었습니다.');
   };
 
   const handleDeleteAll = async () => {
@@ -446,7 +446,7 @@ export default function IndividualReportPage() {
     saveDeletedStorage(nextDeletedStorage);
 
     setSelectedIds([]);
-    alert('전체 리포트가 삭제 보관함으로 이동되었습니다.');
+    alert('전체 리포트가 삭제되었습니다.');
   };
 
   return (
