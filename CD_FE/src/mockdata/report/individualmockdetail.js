@@ -3,6 +3,7 @@ export const individualReportsDetail = [
     id: 1,
     title: '1회차 면접 리포트',
     type: 'resume',
+    created_at: '2026-06-05',
     detail: {
       eyeContactRate: 59,
       speechRate: 200,
@@ -97,6 +98,7 @@ export const individualReportsDetail = [
     id: 2,
     title: '2회차 면접 리포트',
     type: 'industry',
+    created_at: '2026-06-05',
     detail: {
       eyeContactRate: 68,
       speechRate: 230,
@@ -191,6 +193,7 @@ export const individualReportsDetail = [
     id: 3,
     title: '3회차 면접 리포트',
     type: 'resume',
+    created_at: '2026-06-05',
     detail: {
       eyeContactRate: 74,
       speechRate: 280,

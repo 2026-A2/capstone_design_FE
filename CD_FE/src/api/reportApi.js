@@ -54,8 +54,8 @@ const INTERVIEW_TYPE_LABELS = {
 
 const INTERVIEW_TYPE_FILTERS = {
   RESUME: 'resume',
-  JOB: 'industry',
-  INDUSTRY: 'industry',
+  JOB: 'job',
+  INDUSTRY: 'job',
 };
 
 const getResponseTrends = (responseData) => {
@@ -85,7 +85,8 @@ const normalizeReport = (data, fallbackId) => {
   const reportData = unwrapReportData(data);
   const id = reportData.interview_id ?? reportData.id ?? fallbackId;
   const interviewType = reportData.interview_type ?? reportData.interviewType;
-  const date = reportData.date ?? '';
+  const date =
+    reportData.created_at ?? reportData.createdAt ?? reportData.date ?? '';
   const title =
     reportData.title ||
     `${date ? `${date} ` : ''}${INTERVIEW_TYPE_LABELS[interviewType] || '면접'} 리포트`;
@@ -183,6 +184,11 @@ export const getIndividualReports = async () => {
           ...item,
           ...trendItem,
           title: item.title ?? trendItem.title,
+          created_at:
+            item.created_at ??
+            trendItem.created_at ??
+            item.createdAt ??
+            trendItem.createdAt,
           date: item.date ?? trendItem.date,
           interview_type: item.interview_type ?? trendItem.interview_type,
           detail: {

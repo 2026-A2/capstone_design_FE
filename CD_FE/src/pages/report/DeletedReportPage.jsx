@@ -31,6 +31,23 @@ const ANALYSIS_METRICS = [
   { key: 'bodyShake', label: '흔들림' },
 ];
 
+const FILTER_LABELS = {
+  resume: '자소서 기반 면접',
+  job: '직무 기반 면접',
+};
+
+const INTERVIEW_TYPE_LABELS = {
+  RESUME: '자소서 기반 면접',
+  JOB: '직무 기반 면접',
+  INDUSTRY: '직무 기반 면접',
+};
+
+const INTERVIEW_TYPE_FILTERS = {
+  RESUME: 'resume',
+  JOB: 'job',
+  INDUSTRY: 'job',
+};
+
 const getItemStatus = (key, value) => {
   if (value === undefined || value === null || Number.isNaN(value)) {
     return 'neutral';
@@ -112,9 +129,47 @@ const getCurrentReports = () => {
 const isSameReportSession = (item, sessions) =>
   sessions.some(
     (session) =>
+      String(item.interview_id) === String(session) ||
       String(item.session) === String(session) ||
       String(item.id) === String(session),
   );
+
+const getReportId = (report, fallback) =>
+  report.interview_id ?? report.id ?? report.session ?? fallback;
+
+const getReportDate = (report) =>
+  report.created_at ?? report.createdAt ?? report.date ?? '';
+
+const getReportTypeKey = (report) => {
+  const rawType = report.interview_type ?? report.interviewType;
+
+  if (INTERVIEW_TYPE_FILTERS[rawType]) {
+    return INTERVIEW_TYPE_FILTERS[rawType];
+  }
+
+  if (report.type === 'industry') {
+    return 'job';
+  }
+
+  return report.type || 'resume';
+};
+
+const getReportTypeLabel = (report) => {
+  const rawType = report.interview_type ?? report.interviewType;
+
+  return (
+    INTERVIEW_TYPE_LABELS[rawType] ||
+    report.interviewTypeLabel ||
+    FILTER_LABELS[getReportTypeKey(report)] ||
+    '면접'
+  );
+};
+
+const getReportTitle = (report, index) => {
+  const reportId = getReportId(report, index + 1);
+
+  return `${reportId}회차 ${getReportTypeLabel(report)} 리포트`;
+};
 
 export default function DeletedReportPage() {
   const navigate = useNavigate();
@@ -176,11 +231,11 @@ export default function DeletedReportPage() {
       return;
     }
 
-    const restoreReports = deletedStorage.reports.filter((report) =>
-      selectedRestoreIds.includes(report.id),
+    const restoreReports = deletedStorage.reports.filter((report, index) =>
+      selectedRestoreIds.includes(getReportId(report, index + 1)),
     );
     const restoredSessions = restoreReports.map(
-      (report) => report.session ?? report.id,
+      (report, index) => getReportId(report, index + 1),
     );
     const deletedSessions =
       JSON.parse(localStorage.getItem('deletedReportSessions')) || [];
@@ -194,17 +249,18 @@ export default function DeletedReportPage() {
       JSON.stringify(updatedDeletedSessions),
     );
     const restoreSessions = restoreReports.map(
-      (report) => report.session || report.id,
+      (report, index) => getReportId(report, index + 1),
     );
 
     const currentReports = getCurrentReports();
 
     const nextReportList = [...currentReports, ...restoreReports].sort(
-      (a, b) => (a.session || a.id) - (b.session || b.id),
+      (a, b) => Number(getReportId(a, 0)) - Number(getReportId(b, 0)),
     );
 
     const nextDeletedReports = deletedStorage.reports.filter(
-      (report) => !selectedRestoreIds.includes(report.id),
+      (report, index) =>
+        !selectedRestoreIds.includes(getReportId(report, index + 1)),
     );
 
     const nextDeletedTrends = { ...deletedStorage.trends };
@@ -301,29 +357,33 @@ export default function DeletedReportPage() {
 
               {deletedStorage.reports.map((report, index) => {
                 const analysisSummary = getReportAnalysisSummary(report);
+                const reportId = getReportId(report, index + 1);
+                const reportTitle = getReportTitle(report, index);
+                const reportDate = getReportDate(report);
 
                 return (
-                  <div key={report.id || index} className="deleted-report-card">
+                  <div key={reportId} className="deleted-report-card">
                     <div className="report-card-left">
                       <input
                         type="checkbox"
                         className="report-checkbox"
-                        checked={selectedRestoreIds.includes(report.id)}
-                        onChange={() => handleSelectRestore(report.id)}
+                        checked={selectedRestoreIds.includes(reportId)}
+                        onChange={() => handleSelectRestore(reportId)}
                         onClick={(e) => e.stopPropagation()}
                       />
 
                       <div className="report-number">
-                        {report.session ?? index + 1}
+                        {reportId}
                       </div>
 
                       <div className="report-card-content">
-                        <h2>{report.title || `${index + 1}회차 면접`}</h2>
+                        <div className="report-title-row">
+                          <h2>{reportTitle}</h2>
+                          {reportDate && (
+                            <span className="report-date">{reportDate}</span>
+                          )}
+                        </div>
                         <p>{getReportDescription(report)}</p>
-
-                        {report.date && (
-                          <div className="report-date">{report.date}</div>
-                        )}
                       </div>
                     </div>
 

@@ -25,7 +25,19 @@ const TREND_KEYS = [
 const FILTER_LABELS = {
   all: '전체',
   resume: '자소서 기반 면접',
-  industry: '산업 기반 면접',
+  job: '직무 기반 면접',
+};
+
+const INTERVIEW_TYPE_LABELS = {
+  RESUME: '자소서 기반 면접',
+  JOB: '직무 기반 면접',
+  INDUSTRY: '직무 기반 면접',
+};
+
+const INTERVIEW_TYPE_FILTERS = {
+  RESUME: 'resume',
+  JOB: 'job',
+  INDUSTRY: 'job',
 };
 
 const ANALYSIS_METRICS = [
@@ -118,9 +130,47 @@ const getDeletedSessions = () => {
 const isSameReportSession = (item, sessions) =>
   sessions.some(
     (session) =>
+      String(item.interview_id) === String(session) ||
       String(item.session) === String(session) ||
       String(item.id) === String(session),
   );
+
+const getReportId = (report, fallback) =>
+  report.interview_id ?? report.id ?? report.session ?? fallback;
+
+const getReportDate = (report) =>
+  report.created_at ?? report.createdAt ?? report.date ?? '';
+
+const getReportTypeKey = (report) => {
+  const rawType = report.interview_type ?? report.interviewType;
+
+  if (INTERVIEW_TYPE_FILTERS[rawType]) {
+    return INTERVIEW_TYPE_FILTERS[rawType];
+  }
+
+  if (report.type === 'industry') {
+    return 'job';
+  }
+
+  return report.type || 'resume';
+};
+
+const getReportTypeLabel = (report) => {
+  const rawType = report.interview_type ?? report.interviewType;
+
+  return (
+    INTERVIEW_TYPE_LABELS[rawType] ||
+    report.interviewTypeLabel ||
+    FILTER_LABELS[getReportTypeKey(report)] ||
+    '면접'
+  );
+};
+
+const getReportTitle = (report, index) => {
+  const reportId = getReportId(report, index + 1);
+
+  return `${reportId}회차 ${getReportTypeLabel(report)} 리포트`;
+};
 
 export default function IndividualReportPage() {
   const navigate = useNavigate();
@@ -148,7 +198,9 @@ export default function IndividualReportPage() {
 
         const visibleReports = reports.filter(
           (report) =>
-            !savedDeletedSessions.includes(report.session ?? report.id),
+            !savedDeletedSessions.some(
+              (session) => String(session) === String(getReportId(report)),
+            ),
         );
 
         setReportList(visibleReports);
@@ -168,20 +220,25 @@ export default function IndividualReportPage() {
     const keyword = searchText.trim().toLowerCase();
 
     return reportList.filter((report, index) => {
-      const reportSession = report.session ?? report.id;
+      const reportSession = getReportId(report);
 
-      if (deletedSessions.includes(reportSession)) {
+      if (
+        deletedSessions.some(
+          (session) => String(session) === String(reportSession),
+        )
+      ) {
         return false;
       }
 
-      const reportType = report.type || 'resume';
+      const reportType = getReportTypeKey(report);
       const typeMatched = selectedType === 'all' || reportType === selectedType;
 
-      const title = report.title || `${index + 1}회차 면접`;
-      const date = report.date || '';
+      const title = getReportTitle(report, index);
+      const date = getReportDate(report);
+      const typeLabel = getReportTypeLabel(report);
       const summary = `${report.eyeContact || ''} ${report.speechSummary || ''} ${
         report.expressionSummary || ''
-      } ${report.keyword || ''} ${report.keywords || ''}`;
+      } ${report.keyword || ''} ${report.keywords || ''} ${typeLabel}`;
 
       const searchMatched =
         keyword === '' ||
@@ -275,12 +332,12 @@ export default function IndividualReportPage() {
       alert('리포트 삭제 중 오류가 발생했습니다.');
       return;
     }
-    const deletedReports = reportList.filter((report) =>
-      selectedIds.includes(report.id),
+    const deletedReports = reportList.filter((report, index) =>
+      selectedIds.includes(getReportId(report, index + 1)),
     );
 
     const sessionsToDelete = deletedReports.map(
-      (report) => report.session ?? report.id,
+      (report, index) => getReportId(report, index + 1),
     );
 
     const updatedDeletedSessions = [
@@ -295,7 +352,7 @@ export default function IndividualReportPage() {
     setDeletedSessions(updatedDeletedSessions);
 
     const updatedReports = reportList.filter(
-      (report) => !selectedIds.includes(report.id),
+      (report, index) => !selectedIds.includes(getReportId(report, index + 1)),
     );
 
     const nextDeletedStorage = {
@@ -339,7 +396,9 @@ export default function IndividualReportPage() {
     if (!window.confirm('전체 리포트를 삭제하시겠습니까?')) return;
     try {
       await Promise.all(
-        reportList.map((report) => deleteIndividualReport(report.id)),
+        reportList.map((report, index) =>
+          deleteIndividualReport(getReportId(report, index + 1)),
+        ),
       );
     } catch (error) {
       console.error('전체 리포트 삭제 실패:', error);
@@ -348,7 +407,7 @@ export default function IndividualReportPage() {
     }
 
     const sessionsToDelete = reportList.map(
-      (report) => report.session ?? report.id,
+      (report, index) => getReportId(report, index + 1),
     );
 
     const updatedDeletedSessions = [
@@ -447,10 +506,10 @@ export default function IndividualReportPage() {
                 </button>
 
                 <button
-                  className={selectedType === 'industry' ? 'active' : ''}
-                  onClick={() => setSelectedType('industry')}
+                  className={selectedType === 'job' ? 'active' : ''}
+                  onClick={() => setSelectedType('job')}
                 >
-                  산업 기반 면접
+                  직무 기반 면접
                 </button>
               </div>
 
@@ -488,13 +547,16 @@ export default function IndividualReportPage() {
             {filteredReports.length > 0 ? (
               filteredReports.map((report, index) => {
                 const analysisSummary = getReportAnalysisSummary(report);
+                const reportId = getReportId(report, index + 1);
+                const reportTitle = getReportTitle(report, index);
+                const reportDate = getReportDate(report);
 
                 return (
                   <div
-                    key={report.id || index}
+                    key={reportId}
                     className="individual-report-card"
                     onClick={() =>
-                      navigate(`/report/individual/detail/full/${report.id}`, {
+                      navigate(`/report/individual/detail/full/${reportId}`, {
                         state: report,
                       })
                     }
@@ -503,22 +565,23 @@ export default function IndividualReportPage() {
                       <input
                         type="checkbox"
                         className="report-checkbox"
-                        checked={selectedIds.includes(report.id)}
-                        onChange={() => handleSelect(report.id)}
+                        checked={selectedIds.includes(reportId)}
+                        onChange={() => handleSelect(reportId)}
                         onClick={(e) => e.stopPropagation()}
                       />
 
                       <div className="report-number">
-                        {report.session ?? index + 1}
+                        {reportId}
                       </div>
 
                       <div className="report-card-content">
-                        <h2>{report.title || `${index + 1}회차 면접`}</h2>
+                        <div className="report-title-row">
+                          <h2>{reportTitle}</h2>
+                          {reportDate && (
+                            <span className="report-date">{reportDate}</span>
+                          )}
+                        </div>
                         <p>{getReportDescription(report)}</p>
-
-                        {report.date && (
-                          <div className="report-date">{report.date}</div>
-                        )}
                       </div>
                     </div>
 

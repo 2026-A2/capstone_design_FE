@@ -73,11 +73,11 @@ export default function IndividualReportFullPage() {
         if (value <= 6) return 'warning';
         return 'bad';
       case 'voiceVolume':
-        if (value >= -10) return 'voice-very-high';
-        if (value >= -20) return 'voice-high';
+        if (value >= -10) return 'bad';
+        if (value >= -20) return 'warning';
         if (value >= -35) return 'good';
-        if (value >= -50) return 'voice-low';
-        return 'voice-very-low';
+        if (value >= -50) return 'warning';
+        return 'bad';
       case 'smileRate':
         if (value >= 50) return 'good';
         if (value >= 30) return 'warning';
@@ -111,14 +111,6 @@ export default function IndividualReportFullPage() {
         return '#FFC107';
       case 'bad':
         return '#F44336';
-      case 'voice-very-high':
-        return '#F44336';
-      case 'voice-high':
-        return '#FFC107';
-      case 'voice-low':
-        return '#FFC107';
-      case 'voice-very-low':
-        return '#F44336';
       default:
         return '#e0e0e0';
     }
@@ -129,12 +121,8 @@ export default function IndividualReportFullPage() {
       case 'good':
         return 'good';
       case 'warning':
-      case 'voice-high':
-      case 'voice-low':
         return 'warning';
       case 'bad':
-      case 'voice-very-high':
-      case 'voice-very-low':
         return 'bad';
       default:
         return 'neutral';
@@ -149,14 +137,6 @@ export default function IndividualReportFullPage() {
         return '주의';
       case 'bad':
         return '체크 필요';
-      case 'voice-very-high':
-        return '매우 큼';
-      case 'voice-high':
-        return '큼';
-      case 'voice-low':
-        return '작음';
-      case 'voice-very-low':
-        return '매우 작음';
       default:
         return '';
     }
@@ -213,19 +193,29 @@ export default function IndividualReportFullPage() {
       case 'voiceVolume':
         return [
           {
-            level: '적정',
-            range: '-35 ~ -20 dB',
-            description: '적절한 음성 크기',
+            level: '체크필요',
+            range: '< -50 dB',
+            description: '매우 작음',
           },
           {
             level: '주의',
-            range: '-50 ~ -35 dB 또는 -20 ~ -10 dB',
-            description: '음성 크기 조정 권장',
+            range: '-50 ~ -35 dB',
+            description: '작음',
+          },
+          {
+            level: '적정',
+            range: '-35 ~ -20 dB',
+            description: '적정',
+          },
+          {
+            level: '주의',
+            range: '-20 ~ -10 dB',
+            description: '큼',
           },
           {
             level: '체크필요',
-            range: '< -50 dB 또는 ≥ -10 dB',
-            description: '음성 크기 개선 필요',
+            range: '≥ -10 dB',
+            description: '매우 큼',
           },
         ];
       case 'silenceCount':
@@ -379,8 +369,7 @@ export default function IndividualReportFullPage() {
       key: 'voiceVolume',
       unit: 'dB',
       icon: '🔊',
-      recommendedText:
-        '평균 -20~-35dB 권장, -10 이상: 매우 큼, -10~-20: 큼, -35~-50: 작음, -50 미만: 매우 작음',
+      recommendedText: '-20~-35dB 권장',
       category: '발화',
     },
     {

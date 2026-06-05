@@ -90,8 +90,10 @@ export default function ReportPage() {
               <p>특정 면접 회차의 상세 결과를 한눈에 확인합니다.</p>
               <ul className="report-feature-list blue">
                 <li>한 회차의 5개 카테고리 요약</li>
-                <li>11개 세부 항목별 권장 범위와 사용자 값</li>
-                <li>회차별 상세 분석 결과 제공</li>
+                <li>10개 세부 항목별 권장 범위와 사용자 값</li>
+                <li>
+                  주요 분석 항목의 적정·주의·체크 필요 상태를 회차별로 확인
+                </li>
               </ul>
               <button>회차 선택하러 가기</button>
             </div>
@@ -105,7 +107,7 @@ export default function ReportPage() {
               <p>여러 회차에 걸친 변화 추이를 그래프로 비교합니다.</p>
 
               <ul className="report-feature-list orange">
-                <li>11개 분석 항목의 회차별 변화</li>
+                <li>10개 분석 항목의 회차별 변화</li>
                 <li>권장 범위 밴드ㆍ임계값 점선 표시</li>
                 <li>발전ㆍ정체ㆍ후퇴 구간 한눈에 파악</li>
               </ul>
