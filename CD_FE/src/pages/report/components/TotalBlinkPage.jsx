@@ -71,9 +71,9 @@ export default function TotalBlinkPage() {
         dataKey="value"
         yLabel="눈 깜빡임(회/분)"
         minValue={0}
-        maxValue={40}
-        standardMin={8}
-        standardMax={21}
+        maxValue={80}
+        standardMin={40}
+        standardMax={60}
       />
 
       <div style={styles.infoBox}>
@@ -81,7 +81,7 @@ export default function TotalBlinkPage() {
 
         <div style={styles.infoText}>
           눈 깜빡임은 면접 중 사용자의 긴장도와 집중 상태를 간접적으로 확인할 수
-          있는 비언어적 지표입니다. 분당 8~21회를 적정 기준으로 볼 수 있습니다.
+          있는 비언어적 지표입니다. 분당 40~60회를 적정 기준으로 볼 수 있습니다.
         </div>
       </div>
 

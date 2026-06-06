@@ -44,7 +44,7 @@ export default function TotalBodyShakePage() {
   const progressPercent = (currentStep / totalStep) * 100;
 
   const getBarColor = (value) => {
-    if (value >= 5) return '#ef4444';
+    if (value >= 4) return '#ef4444';
     if (value >= 2) return '#facc15';
     return '#22c55e';
   };
@@ -120,11 +120,11 @@ export default function TotalBodyShakePage() {
             />
 
             <ReferenceLine
-              y={5}
+              y={4}
               stroke="#ef4444"
               strokeDasharray="5 5"
               strokeWidth={2}
-              label="체크 필요 기준 5회 이상"
+              label="체크 필요 기준 4회 이상"
             />
 
             <Bar dataKey="value" barSize={42} radius={[8, 8, 0, 0]}>
@@ -139,7 +139,7 @@ export default function TotalBodyShakePage() {
       <div style={styles.infoBox}>
         <div style={styles.infoTitle}>분석 기준</div>
         <div style={styles.infoText}>
-          몸 흔들림은 분당 1회 이하를 적정, 2~4회를 주의, 5회 이상을 체크
+          몸 흔들림은 분당 1회 이하를 적정, 2~3회를 주의, 4회 이상을 체크
           필요 기준으로 볼 수 있습니다.
         </div>
       </div>

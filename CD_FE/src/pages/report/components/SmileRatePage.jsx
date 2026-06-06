@@ -69,14 +69,14 @@ export default function TotalSmilePage() {
         yLabel="미소율(%)"
         minValue={0}
         maxValue={100}
-        standardMin={10}
-        standardMax={20}
+        standardMin={11}
+        standardMax={100}
       />
 
       <div style={styles.infoBox}>
         <div style={styles.infoTitle}>분석 기준</div>
         <div style={styles.infoText}>
-          미소율은 면접 중 사용자가 미소를 보인 비율을 의미합니다. 10~20%를
+          미소율은 면접 중 사용자가 미소를 보인 비율을 의미합니다. 11% 이상을
           적정 기준으로 볼 수 있습니다.
         </div>
       </div>

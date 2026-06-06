@@ -1,4 +1,28 @@
 import axiosInstance from './axiosInstance';
+import { mockResumes } from '../mockdata/resumeMock';
+
+const FORCE_MOCK_DATA = false;
+const MOCK_RESUME_STORAGE_KEY = 'mockResumes';
+
+const getStoredMockResumes = () => {
+  const stored = localStorage.getItem(MOCK_RESUME_STORAGE_KEY);
+
+  if (!stored) {
+    localStorage.setItem(MOCK_RESUME_STORAGE_KEY, JSON.stringify(mockResumes));
+    return mockResumes;
+  }
+
+  try {
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed) ? parsed : mockResumes;
+  } catch {
+    return mockResumes;
+  }
+};
+
+const setStoredMockResumes = (resumes) => {
+  localStorage.setItem(MOCK_RESUME_STORAGE_KEY, JSON.stringify(resumes));
+};
 
 const unwrapResume = (data) =>
   data?.resume || data?.data?.resume || data?.data || data;
@@ -34,12 +58,24 @@ export const normalizeResume = (resume) => {
 };
 
 export const getResume = async (resumeId) => {
+  if (FORCE_MOCK_DATA) {
+    return normalizeResume(
+      getStoredMockResumes().find(
+        (resume) => String(resume.id) === String(resumeId),
+      ),
+    );
+  }
+
   const response = await axiosInstance.get(`/resumes/${resumeId}/`);
 
   return normalizeResume(response.data);
 };
 
 export const getResumes = async () => {
+  if (FORCE_MOCK_DATA) {
+    return getStoredMockResumes().map(normalizeResume);
+  }
+
   const response = await axiosInstance.get('/resumes/');
   const resumes = unwrapResumeList(response.data).map(normalizeResume);
 
@@ -62,6 +98,22 @@ export const getResumes = async () => {
 };
 
 export const createResume = async ({ title, content }) => {
+  if (FORCE_MOCK_DATA) {
+    const now = new Date().toISOString();
+    const resumes = getStoredMockResumes();
+    const newResume = {
+      id: `mock-resume-${Date.now()}`,
+      title,
+      content,
+      createdAt: now,
+      updatedAt: now,
+      isDefault: resumes.length === 0,
+    };
+
+    setStoredMockResumes([newResume, ...resumes]);
+    return normalizeResume(newResume);
+  }
+
   const response = await axiosInstance.post('/resumes/create/', {
     title,
     content,
@@ -71,6 +123,26 @@ export const createResume = async ({ title, content }) => {
 };
 
 export const updateResume = async ({ resumeId, title, content }) => {
+  if (FORCE_MOCK_DATA) {
+    const resumes = getStoredMockResumes();
+    const now = new Date().toISOString();
+    const updatedResume = {
+      ...(resumes.find((resume) => String(resume.id) === String(resumeId)) ||
+        {}),
+      id: resumeId,
+      title,
+      content,
+      updatedAt: now,
+    };
+
+    setStoredMockResumes(
+      resumes.map((resume) =>
+        String(resume.id) === String(resumeId) ? updatedResume : resume,
+      ),
+    );
+    return normalizeResume(updatedResume);
+  }
+
   const response = await axiosInstance.put(`/resumes/${resumeId}/update/`, {
     title,
     content,
@@ -80,6 +152,15 @@ export const updateResume = async ({ resumeId, title, content }) => {
 };
 
 export const deleteResume = async (resumeId) => {
+  if (FORCE_MOCK_DATA) {
+    setStoredMockResumes(
+      getStoredMockResumes().filter(
+        (resume) => String(resume.id) !== String(resumeId),
+      ),
+    );
+    return { success: true };
+  }
+
   const response = await axiosInstance.delete(`/resumes/${resumeId}/delete/`);
 
   return response.data;

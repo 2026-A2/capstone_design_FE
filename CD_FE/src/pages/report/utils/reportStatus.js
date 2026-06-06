@@ -106,12 +106,12 @@ export const getItemStatus = (key, value) => {
       if (numericValue >= -50) return 'warning';
       return 'bad';
     case 'smileRate':
-      if (numericValue >= 10 && numericValue < 20) return 'good';
-      if (numericValue >= 5 && numericValue < 10) return 'warning';
+      if (numericValue >= 11) return 'good';
+      if (numericValue >= 5 && numericValue <= 10) return 'warning';
       return 'bad';
     case 'blinkCount':
-      if (numericValue >= 8 && numericValue <= 21) return 'good';
-      if (numericValue >= 22 && numericValue <= 35) return 'warning';
+      if (numericValue >= 40 && numericValue <= 60) return 'good';
+      if (numericValue > 60 && numericValue <= 75) return 'warning';
       return 'bad';
     case 'nodCount':
       if (numericValue <= 1) return 'good';
@@ -123,7 +123,7 @@ export const getItemStatus = (key, value) => {
       return 'bad';
     case 'bodyShake':
       if (numericValue <= 1) return 'good';
-      if (numericValue <= 4) return 'warning';
+      if (numericValue >= 2 && numericValue <= 3) return 'warning';
       return 'bad';
     default:
       return 'neutral';

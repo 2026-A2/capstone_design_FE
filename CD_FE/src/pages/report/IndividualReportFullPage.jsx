@@ -79,12 +79,12 @@ export default function IndividualReportFullPage() {
         if (value >= -50) return 'warning';
         return 'bad';
       case 'smileRate':
-        if (value >= 10 && value < 20) return 'good';
-        if (value >= 5 && value < 10) return 'warning';
+        if (value >= 11) return 'good';
+        if (value >= 5 && value <= 10) return 'warning';
         return 'bad';
       case 'blinkCount':
-        if (value >= 8 && value <= 21) return 'good';
-        if (value >= 22 && value <= 35) return 'warning';
+        if (value >= 40 && value <= 60) return 'good';
+        if (value > 60 && value <= 75) return 'warning';
         return 'bad';
       case 'nodCount':
         if (value <= 1) return 'good';
@@ -96,7 +96,7 @@ export default function IndividualReportFullPage() {
         return 'bad';
       case 'bodyShake':
         if (value <= 1) return 'good';
-        if (value <= 4) return 'warning';
+        if (value >= 2 && value <= 3) return 'warning';
         return 'bad';
       default:
         return 'neutral';
@@ -150,7 +150,7 @@ export default function IndividualReportFullPage() {
         case 'warning':
           return '보통';
         case 'bad':
-          return '개선필요';
+          return '체크 필요';
         default:
           return '';
       }
@@ -282,11 +282,11 @@ export default function IndividualReportFullPage() {
         ];
       case 'smileRate':
         return [
-          { level: '적정', range: '10~20% 미만', description: '적절한 미소율' },
-          { level: '주의', range: '5~9%', description: '미소율 개선 권장' },
+          { level: '적정', range: '11% 이상', description: '적절한 미소율' },
+          { level: '주의', range: '5~10%', description: '미소율 개선 권장' },
           {
             level: '체크필요',
-            range: '< 5% 또는 ≥ 20%',
+            range: '< 5%',
             description: '미소율 개선 필요',
           },
         ];
@@ -294,17 +294,17 @@ export default function IndividualReportFullPage() {
         return [
           {
             level: '적정',
-            range: '8~21회/분',
+            range: '40~60회/분',
             description: '자연스러운 눈 깜빡임',
           },
           {
             level: '주의',
-            range: '22~35회/분',
+            range: '60~75회/분',
             description: '눈 깜빡임 횟수 조절 권장',
           },
           {
             level: '체크필요',
-            range: '< 8 또는 > 35회/분',
+            range: '< 40 또는 > 75회/분',
             description: '눈 깜빡임 횟수 개선 필요',
           },
         ];
@@ -351,10 +351,10 @@ export default function IndividualReportFullPage() {
             range: '≤ 1회/분',
             description: '안정적인 자세 유지',
           },
-          { level: '보통', range: '2~4회/분', description: '몸 흔들림 보통' },
+          { level: '보통', range: '2~3회/분', description: '몸 흔들림 보통' },
           {
-            level: '개선필요',
-            range: '≥ 5회/분',
+            level: '체크필요',
+            range: '≥ 4회/분',
             description: '몸 흔들림 개선 필요',
           },
         ];
@@ -427,7 +427,7 @@ export default function IndividualReportFullPage() {
       key: 'smileRate',
       unit: '%',
       icon: '😊',
-      recommendedText: '10~20% 미만 권장',
+      recommendedText: '11% 이상 권장',
       category: '표정',
     },
     {
@@ -435,7 +435,7 @@ export default function IndividualReportFullPage() {
       key: 'blinkCount',
       unit: '회/분',
       icon: '👁️',
-      recommendedText: '분당 8~21회 권장',
+      recommendedText: '분당 40~60회 권장',
       category: '습관',
     },
     {
@@ -489,13 +489,13 @@ export default function IndividualReportFullPage() {
       case 'fillerCount':
         return { min: 0, max: 10, goodMin: 0, goodMax: 3 };
       case 'blinkCount':
-        return { min: 0, max: 40, goodMin: 8, goodMax: 21 };
+        return { min: 0, max: 80, goodMin: 40, goodMax: 60 };
       case 'bodyShake':
         return { min: 0, max: 8, goodMin: 0, goodMax: 1 };
       case 'eyeContactRate':
         return { min: 0, max: 100, goodMin: 85, goodMax: 100 };
       case 'smileRate':
-        return { min: 0, max: 30, goodMin: 10, goodMax: 20 };
+        return { min: 0, max: 100, goodMin: 11, goodMax: 100 };
       case 'nodCount':
         return { min: 0, max: 8, goodMin: 0, goodMax: 1 };
       case 'shoulderTilt':

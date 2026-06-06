@@ -15,23 +15,49 @@ import {
 } from '../mockdata/report/trendMock';
 
 const MOCK_STORAGE_KEY = 'USE_MOCK';
+const FORCE_MOCK_DATA = false;
+const getEnvUseMock = () => import.meta.env.VITE_USE_MOCK === 'true';
 
 // 초기값: 환경 변수에서 읽거나 true 기본값
 const initializeMockMode = () => {
+  if (FORCE_MOCK_DATA) {
+    localStorage.setItem(MOCK_STORAGE_KEY, 'true');
+    return true;
+  }
+
+  if (
+    import.meta.env.VITE_USE_MOCK === 'true' ||
+    import.meta.env.VITE_USE_MOCK === 'false'
+  ) {
+    localStorage.setItem(MOCK_STORAGE_KEY, String(getEnvUseMock()));
+    return getEnvUseMock();
+  }
+
   const stored = localStorage.getItem(MOCK_STORAGE_KEY);
   if (stored !== null) {
     return stored === 'true';
   }
   // 환경 변수에서 초기값 설정 (기본값: true)
-  return import.meta.env.VITE_USE_MOCK !== 'false';
+  return false;
 };
 
 export const getUseMock = () => {
+  if (FORCE_MOCK_DATA) {
+    return true;
+  }
+
+  if (
+    import.meta.env.VITE_USE_MOCK === 'true' ||
+    import.meta.env.VITE_USE_MOCK === 'false'
+  ) {
+    return getEnvUseMock();
+  }
+
   const stored = localStorage.getItem(MOCK_STORAGE_KEY);
   if (stored !== null) {
     return stored === 'true';
   }
-  return import.meta.env.VITE_USE_MOCK !== 'false';
+  return false;
 };
 
 export const setUseMock = (value) => {
@@ -175,6 +201,11 @@ const getTrendReportById = async (id) => {
 };
 
 export const getIndividualReportsFromApi = async () => {
+  if (FORCE_MOCK_DATA) {
+    console.log('[Mock 모드] getIndividualReportsFromApi 호출도 Mock 데이터 반환');
+    return filterDeletedSessions(individualReportsDetail);
+  }
+
   console.log('[API 모드] API에서 리포트 목록 조회 중...');
   const [listResponse, trendsResponse] = await Promise.all([
     axiosInstance.get(REPORT_LIST_PATH),
