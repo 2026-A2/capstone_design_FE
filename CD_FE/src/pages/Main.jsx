@@ -1,10 +1,76 @@
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getIndividualReportsFromApi } from '../api/reportApi';
 
-const stats = [
-  { label: '총 연습 횟수', value: '12회', detail: '+3 이번 주', tone: 'text-blue-600' },
-  { label: '이번 주 연습', value: '3회', detail: '지난 주 +1', tone: 'text-emerald-500' },
+const getReportCreatedAt = (report) =>
+  report?.created_at ??
+  report?.Created_at ??
+  report?.Created_At ??
+  report?.createdAt ??
+  report?.date ??
+  '';
+
+const parseReportDate = (dateValue) => {
+  if (!dateValue) {
+    return null;
+  }
+
+  if (dateValue instanceof Date) {
+    return Number.isNaN(dateValue.getTime()) ? null : dateValue;
+  }
+
+  if (typeof dateValue === 'string') {
+    const dateOnlyMatch = dateValue.match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+    if (dateOnlyMatch) {
+      const [, year, month, day] = dateOnlyMatch;
+      return new Date(Number(year), Number(month) - 1, Number(day));
+    }
+  }
+
+  const parsedDate = new Date(dateValue);
+  return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+};
+
+const getStartOfToday = () => {
+  const today = new Date();
+  return new Date(today.getFullYear(), today.getMonth(), today.getDate());
+};
+
+const getStartOfWeek = (date) => {
+  const start = new Date(date);
+  const day = start.getDay();
+  const mondayOffset = day === 0 ? -6 : 1 - day;
+  start.setDate(start.getDate() + mondayOffset);
+  start.setHours(0, 0, 0, 0);
+  return start;
+};
+
+const isSameDay = (date, targetDate) =>
+  date.getFullYear() === targetDate.getFullYear() &&
+  date.getMonth() === targetDate.getMonth() &&
+  date.getDate() === targetDate.getDate();
+
+const buildStats = ({ totalPracticeCount, weeklyPracticeCount, hasTodayPractice }) => [
+  {
+    label: '총 연습 횟수',
+    value: `${totalPracticeCount}회`,
+    detail: `+${weeklyPracticeCount} 이번 주`,
+    tone: 'text-blue-600',
+  },
+  {
+    label: '이번 주 연습',
+    value: `${weeklyPracticeCount}회`,
+    detail: '이번 주 생성된 리포트',
+    tone: 'text-emerald-500',
+  },
   { label: '주요 개선 항목', value: '시선 처리', detail: '3회 연속 지적', tone: 'text-amber-500' },
-  { label: '오늘의 연습', value: '미완료', detail: '지금 시작하기 ->', tone: 'text-red-500' },
+  {
+    label: '오늘의 연습',
+    value: hasTodayPractice ? '완료' : '미완료',
+    detail: hasTodayPractice ? '오늘 리포트 생성됨' : '지금 시작하기 ->',
+    tone: hasTodayPractice ? 'text-emerald-500' : 'text-red-500',
+  },
 ];
 
 const reports = [
@@ -33,6 +99,51 @@ const reports = [
 
 function Main() {
   const navigate = useNavigate();
+  const [practiceSummary, setPracticeSummary] = useState({
+    totalPracticeCount: 0,
+    weeklyPracticeCount: 0,
+    hasTodayPractice: false,
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadPracticeSummary = async () => {
+      try {
+        const reportList = await getIndividualReportsFromApi();
+        const today = getStartOfToday();
+        const weekStart = getStartOfWeek(today);
+        const nextWeekStart = new Date(weekStart);
+        nextWeekStart.setDate(weekStart.getDate() + 7);
+
+        const reportDates = reportList
+          .map((report) => parseReportDate(getReportCreatedAt(report)))
+          .filter(Boolean);
+
+        if (!isMounted) {
+          return;
+        }
+
+        setPracticeSummary({
+          totalPracticeCount: reportList.length,
+          weeklyPracticeCount: reportDates.filter(
+            (date) => date >= weekStart && date < nextWeekStart,
+          ).length,
+          hasTodayPractice: reportDates.some((date) => isSameDay(date, today)),
+        });
+      } catch (error) {
+        console.error('메인 연습 통계 조회 실패:', error);
+      }
+    };
+
+    loadPracticeSummary();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const stats = useMemo(() => buildStats(practiceSummary), [practiceSummary]);
 
   return (
     <div className="min-h-screen bg-[#f4f7fb] text-slate-900">

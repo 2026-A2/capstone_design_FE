@@ -86,7 +86,12 @@ const normalizeReport = (data, fallbackId) => {
   const id = reportData.interview_id ?? reportData.id ?? fallbackId;
   const interviewType = reportData.interview_type ?? reportData.interviewType;
   const date =
-    reportData.created_at ?? reportData.createdAt ?? reportData.date ?? '';
+    reportData.created_at ??
+    reportData.Created_at ??
+    reportData.Created_At ??
+    reportData.createdAt ??
+    reportData.date ??
+    '';
   const title =
     reportData.title ||
     `${date ? `${date} ` : ''}${INTERVIEW_TYPE_LABELS[interviewType] || '면접'} 리포트`;
@@ -155,12 +160,7 @@ const getTrendReportById = async (id) => {
   return trendItem ? normalizeReport(trendItem, id) : null;
 };
 
-export const getIndividualReports = async () => {
-  if (getUseMock()) {
-    console.log('[Mock 모드] Mock 데이터 로드');
-    return filterDeletedSessions(individualReportsDetail);
-  }
-
+export const getIndividualReportsFromApi = async () => {
   console.log('[API 모드] API에서 리포트 목록 조회 중...');
   const [listResponse, trendsResponse] = await Promise.all([
     axiosInstance.get(REPORT_LIST_PATH),
@@ -186,7 +186,11 @@ export const getIndividualReports = async () => {
           title: item.title ?? trendItem.title,
           created_at:
             item.created_at ??
+            item.Created_at ??
+            item.Created_At ??
             trendItem.created_at ??
+            trendItem.Created_at ??
+            trendItem.Created_At ??
             item.createdAt ??
             trendItem.createdAt,
           date: item.date ?? trendItem.date,
@@ -204,6 +208,15 @@ export const getIndividualReports = async () => {
   console.log('[정규화된 리포트]', normalizedReports);
 
   return filterDeletedSessions(normalizedReports);
+};
+
+export const getIndividualReports = async () => {
+  if (getUseMock()) {
+    console.log('[Mock 모드] Mock 데이터 로드');
+    return filterDeletedSessions(individualReportsDetail);
+  }
+
+  return getIndividualReportsFromApi();
 };
 
 export const getReportTrends = async () => {
