@@ -123,7 +123,7 @@ export const getItemStatus = (key, value) => {
       return 'bad';
     case 'bodyShake':
       if (numericValue <= 1) return 'good';
-      if (numericValue >= 2 && numericValue <= 3) return 'warning';
+      if (numericValue < 4) return 'warning';
       return 'bad';
     default:
       return 'neutral';

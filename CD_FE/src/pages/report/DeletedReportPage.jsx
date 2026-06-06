@@ -95,7 +95,7 @@ const getItemStatus = (key, value) => {
       return 'bad';
     case 'bodyShake':
       if (value <= 1) return 'good';
-      if (value >= 2 && value <= 3) return 'warning';
+      if (value < 4) return 'warning';
       return 'bad';
     default:
       return 'neutral';

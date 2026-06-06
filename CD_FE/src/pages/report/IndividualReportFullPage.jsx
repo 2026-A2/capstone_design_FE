@@ -96,7 +96,7 @@ export default function IndividualReportFullPage() {
         return 'bad';
       case 'bodyShake':
         if (value <= 1) return 'good';
-        if (value >= 2 && value <= 3) return 'warning';
+        if (value < 4) return 'warning';
         return 'bad';
       default:
         return 'neutral';
@@ -351,7 +351,7 @@ export default function IndividualReportFullPage() {
             range: '≤ 1회/분',
             description: '안정적인 자세 유지',
           },
-          { level: '보통', range: '2~3회/분', description: '몸 흔들림 보통' },
+          { level: '보통', range: '1회 초과~4회 미만/분', description: '몸 흔들림 보통' },
           {
             level: '체크필요',
             range: '≥ 4회/분',
