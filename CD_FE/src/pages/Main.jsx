@@ -7,7 +7,14 @@ const getReportCreatedAt = (report) =>
   report?.Created_at ??
   report?.Created_At ??
   report?.createdAt ??
-  report?.date ??
+  report?.report?.created_at ??
+  report?.report?.Created_at ??
+  report?.report?.Created_At ??
+  report?.report?.createdAt ??
+  report?.interview?.created_at ??
+  report?.interview?.Created_at ??
+  report?.interview?.Created_At ??
+  report?.interview?.createdAt ??
   '';
 
 const parseReportDate = (dateValue) => {
@@ -20,11 +27,22 @@ const parseReportDate = (dateValue) => {
   }
 
   if (typeof dateValue === 'string') {
-    const dateOnlyMatch = dateValue.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    const dateMatch = dateValue.match(
+      /^(\d{4})-(\d{2})-(\d{2})(?:[T\s](\d{2}):(\d{2})(?::(\d{2}))?)?/,
+    );
 
-    if (dateOnlyMatch) {
-      const [, year, month, day] = dateOnlyMatch;
-      return new Date(Number(year), Number(month) - 1, Number(day));
+    if (dateMatch) {
+      const [, year, month, day, hour = '0', minute = '0', second = '0'] =
+        dateMatch;
+
+      return new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day),
+        Number(hour),
+        Number(minute),
+        Number(second),
+      );
     }
   }
 
@@ -51,6 +69,103 @@ const isSameDay = (date, targetDate) =>
   date.getMonth() === targetDate.getMonth() &&
   date.getDate() === targetDate.getDate();
 
+const formatReportTime = (date) => {
+  if (!date) {
+    return '날짜 없음';
+  }
+
+  const today = getStartOfToday();
+  const reportDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const dayDiff = Math.floor((today - reportDay) / (1000 * 60 * 60 * 24));
+
+  if (dayDiff === 0) {
+    return '오늘';
+  }
+
+  if (dayDiff === 1) {
+    return '어제';
+  }
+
+  if (dayDiff > 1 && dayDiff < 7) {
+    return `${dayDiff}일 전`;
+  }
+
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(
+    2,
+    '0',
+  )}.${String(date.getDate()).padStart(2, '0')}`;
+};
+
+const feedbackRules = [
+  {
+    tag: '시선',
+    isWeak: (detail) => Number(detail?.eyeContactRate) < 85,
+  },
+  {
+    tag: '발화 속도',
+    isWeak: (detail) => {
+      const value = Number(detail?.speechRate);
+      return value > 0 && (value < 250 || value > 350);
+    },
+  },
+  {
+    tag: '음량',
+    isWeak: (detail) => {
+      const value = Number(detail?.voiceVolume);
+      return value !== 0 && (value < -35 || value > -20);
+    },
+  },
+  {
+    tag: '침묵',
+    isWeak: (detail) => Number(detail?.silenceCount) > 3,
+  },
+  {
+    tag: '필러어',
+    isWeak: (detail) => Number(detail?.fillerCount) > 3,
+  },
+  {
+    tag: '표정',
+    isWeak: (detail) => {
+      const value = Number(detail?.smileRate);
+      return value > 0 && (value < 10 || value > 20);
+    },
+  },
+  {
+    tag: '자세',
+    isWeak: (detail) =>
+      Number(detail?.bodyShake) > 0 || Number(detail?.shoulderTilt) < 90,
+  },
+];
+
+const getFeedbackTags = (detail = {}) => {
+  const tags = feedbackRules
+    .filter((rule) => rule.isWeak(detail))
+    .map((rule) => rule.tag);
+
+  return tags.length > 0 ? tags.slice(0, 2) : ['상세 분석'];
+};
+
+const formatReportCard = (report, index) => {
+  const createdAt = parseReportDate(getReportCreatedAt(report));
+  const reportId = report.id ?? report.interview_id ?? report.session;
+
+  return {
+    id: reportId,
+    sortTime: createdAt?.getTime() ?? 0,
+    round: `${reportId ?? index + 1}회차`,
+    time: formatReportTime(createdAt),
+    title:
+      report.title ||
+      report.interviewTypeLabel ||
+      report.interviewType ||
+      '면접 리포트',
+    summary: report.interviewTypeLabel
+      ? `${report.interviewTypeLabel} 분석 완료`
+      : '면접 분석 결과를 확인할 수 있습니다.',
+    tags: getFeedbackTags(report.detail),
+  };
+};
+
 const buildStats = ({ totalPracticeCount, weeklyPracticeCount, hasTodayPractice }) => [
   {
     label: '총 연습 횟수',
@@ -73,32 +188,10 @@ const buildStats = ({ totalPracticeCount, weeklyPracticeCount, hasTodayPractice 
   },
 ];
 
-const reports = [
-  {
-    round: '12회차',
-    time: '오늘 14:32',
-    title: '프론트엔드 개발자 면접',
-    summary: '필러어 줄이기 + 자세 유지에 집중',
-    tags: ['자세', '시선'],
-  },
-  {
-    round: '11회차',
-    time: '2일 전',
-    title: '프론트엔드 개발자 면접',
-    summary: '발화 속도 안정 · 표정 다소 경직',
-    tags: ['표정', '발화 속도'],
-  },
-  {
-    round: '10회차',
-    time: '1주 전',
-    title: '프론트엔드 개발자 면접',
-    summary: '전반적으로 안정 · 손동작 빈도 ↑',
-    tags: ['습관', '손동작'],
-  },
-];
-
 function Main() {
   const navigate = useNavigate();
+  const [recentReports, setRecentReports] = useState([]);
+  const [isReportLoading, setIsReportLoading] = useState(true);
   const [practiceSummary, setPracticeSummary] = useState({
     totalPracticeCount: 0,
     weeklyPracticeCount: 0,
@@ -131,8 +224,18 @@ function Main() {
           ).length,
           hasTodayPractice: reportDates.some((date) => isSameDay(date, today)),
         });
+        setRecentReports(
+          reportList
+            .map(formatReportCard)
+            .sort((a, b) => b.sortTime - a.sortTime)
+            .slice(0, 3),
+        );
       } catch (error) {
         console.error('메인 연습 통계 조회 실패:', error);
+      } finally {
+        if (isMounted) {
+          setIsReportLoading(false);
+        }
       }
     };
 
@@ -277,42 +380,61 @@ function Main() {
             </button>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-3">
-            {reports.map((report) => (
-              <button
-                type="button"
-                key={report.round}
-                className="min-h-[214px] rounded-[14px] border border-slate-200 bg-white px-6 py-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-                onClick={() => navigate('/report')}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-blue-50 px-4 py-1.5 text-sm font-extrabold text-[#263f98]">
-                    {report.round}
-                  </span>
-                  <span className="text-sm font-medium text-slate-500">{report.time}</span>
-                </div>
-
-                <p className="mt-4 text-base font-extrabold text-slate-950 sm:text-lg">{report.title}</p>
-                <p className="mt-3 text-sm font-medium text-slate-600">{report.summary}</p>
-
-                <span className="mt-6 inline-flex rounded-full bg-emerald-100 px-5 py-2 text-xs font-extrabold text-emerald-600">
-                  ✓ 완료
-                </span>
-
-                <div className="mt-5 flex flex-wrap items-center gap-7">
-                  <span className="text-sm font-bold text-slate-500">주요 피드백</span>
-                  {report.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full bg-red-100 px-4 py-2 text-sm font-bold text-[#ff675e]"
-                    >
-                      {tag}
+          {isReportLoading ? (
+            <div className="rounded-[14px] border border-slate-200 bg-white px-6 py-10 text-center text-sm font-bold text-slate-500 shadow-sm">
+              최근 리포트를 불러오는 중입니다.
+            </div>
+          ) : recentReports.length > 0 ? (
+            <div className="grid gap-6 lg:grid-cols-3">
+              {recentReports.map((report) => (
+                <button
+                  type="button"
+                  key={report.id ?? report.round}
+                  className="min-h-[214px] rounded-[14px] border border-slate-200 bg-white px-6 py-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                  onClick={() =>
+                    navigate(
+                      report.id ? `/report/individual/${report.id}` : '/report',
+                    )
+                  }
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="rounded-full bg-blue-50 px-4 py-1.5 text-sm font-extrabold text-[#263f98]">
+                      {report.round}
                     </span>
-                  ))}
-                </div>
-              </button>
-            ))}
-          </div>
+                    <span className="text-sm font-medium text-slate-500">{report.time}</span>
+                  </div>
+
+                  <p className="mt-4 text-base font-extrabold text-slate-950 sm:text-lg">{report.title}</p>
+                  <p className="mt-3 text-sm font-medium text-slate-600">{report.summary}</p>
+
+                  <span className="mt-6 inline-flex rounded-full bg-emerald-100 px-5 py-2 text-xs font-extrabold text-emerald-600">
+                    ✓ 완료
+                  </span>
+
+                  <div className="mt-5 flex flex-wrap items-center gap-7">
+                    <span className="text-sm font-bold text-slate-500">주요 피드백</span>
+                    {report.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full bg-red-100 px-4 py-2 text-sm font-bold text-[#ff675e]"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-[14px] border border-slate-200 bg-white px-6 py-10 text-center shadow-sm">
+              <p className="text-base font-extrabold text-slate-950">
+                아직 생성된 리포트가 없습니다.
+              </p>
+              <p className="mt-2 text-sm font-semibold text-slate-500">
+                면접 연습을 완료하면 최근 리포트가 표시됩니다.
+              </p>
+            </div>
+          )}
         </section>
       </main>
     </div>

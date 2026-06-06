@@ -81,17 +81,30 @@ const unwrapReportData = (responseData) =>
   responseData ||
   {};
 
+const getCreatedAt = (data) =>
+  data?.created_at ??
+  data?.Created_at ??
+  data?.Created_At ??
+  data?.createdAt ??
+  data?.report?.created_at ??
+  data?.report?.Created_at ??
+  data?.report?.Created_At ??
+  data?.report?.createdAt ??
+  data?.interview?.created_at ??
+  data?.interview?.Created_at ??
+  data?.interview?.Created_At ??
+  data?.interview?.createdAt ??
+  data?.data?.created_at ??
+  data?.data?.Created_at ??
+  data?.data?.Created_At ??
+  data?.data?.createdAt;
+
 const normalizeReport = (data, fallbackId) => {
   const reportData = unwrapReportData(data);
   const id = reportData.interview_id ?? reportData.id ?? fallbackId;
   const interviewType = reportData.interview_type ?? reportData.interviewType;
-  const date =
-    reportData.created_at ??
-    reportData.Created_at ??
-    reportData.Created_At ??
-    reportData.createdAt ??
-    reportData.date ??
-    '';
+  const createdAt = getCreatedAt(data) ?? getCreatedAt(reportData) ?? '';
+  const date = createdAt || reportData.date || '';
   const title =
     reportData.title ||
     `${date ? `${date} ` : ''}${INTERVIEW_TYPE_LABELS[interviewType] || '면접'} 리포트`;
@@ -129,6 +142,7 @@ const normalizeReport = (data, fallbackId) => {
     ...reportData,
     id,
     session: id,
+    created_at: date,
     title,
     type: reportData.type || INTERVIEW_TYPE_FILTERS[interviewType] || 'resume',
     interviewType,
@@ -184,15 +198,7 @@ export const getIndividualReportsFromApi = async () => {
           ...item,
           ...trendItem,
           title: item.title ?? trendItem.title,
-          created_at:
-            item.created_at ??
-            item.Created_at ??
-            item.Created_At ??
-            trendItem.created_at ??
-            trendItem.Created_at ??
-            trendItem.Created_At ??
-            item.createdAt ??
-            trendItem.createdAt,
+          created_at: getCreatedAt(item) ?? getCreatedAt(trendItem),
           date: item.date ?? trendItem.date,
           interview_type: item.interview_type ?? trendItem.interview_type,
           detail: {
