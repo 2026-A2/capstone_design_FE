@@ -305,7 +305,7 @@ export default function AnalysisGuidePage() {
                 className={`h-full px-1 transition ${location.pathname.startsWith('/settings/analysis-guide') ? 'border-b-[3px] border-[#263f98] text-[#263f98]' : 'hover:text-[#263f98]'}`}
                 onClick={() => navigate('/settings/analysis-guide')}
               >
-                분석 기준 안내
+                분석 기준
               </button>
             </nav>
           </div>
@@ -329,7 +329,7 @@ export default function AnalysisGuidePage() {
 
       <main className="analysis-guide-shell">
         <section className="analysis-hero">
-          <h1>{isVoice ? '음성 분석 기준 안내서' : '행동 분석 기준 안내'}</h1>
+          <h1>{isVoice ? '음성 분석 기준 안내' : '행동 분석 기준 안내'}</h1>
           <p>
             {isVoice
               ? '전사 모델과 오디오 특성 분석을 기반으로 답변 속도, 음량, 침묵, 필러어를 평가합니다.'
