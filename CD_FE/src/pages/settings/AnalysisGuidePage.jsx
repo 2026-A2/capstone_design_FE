@@ -179,7 +179,7 @@ const behaviorSummary = [
 
 function GuideCard({ guide, index, type }) {
   return (
-    <article className="analysis-card">
+    <article className="analysis-guide-card">
       <div className="analysis-card-heading">
         <span className="analysis-card-number">{index + 1}</span>
         <div>

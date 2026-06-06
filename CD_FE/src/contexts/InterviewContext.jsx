@@ -3,6 +3,10 @@ import axios from 'axios';
 import { createInterviewSession } from '../api/interviewRecordingApi';
 
 const InterviewContext = createContext(null);
+const FIXED_INTERVIEW_QUESTION =
+  '본인이 참여한 프로젝트 중 가장 기술적으로 어려웠던 점은 무엇인가요?';
+const useFixedQuestions = import.meta.env.VITE_USE_FIXED_QUESTIONS === 'true';
+
 const normalizeQuestionCount = (count) => {
   const value = Number(count);
 
@@ -37,6 +41,24 @@ function InterviewProvider({ children }) {
     setError('');
 
     try {
+      if (useFixedQuestions) {
+        const fixedQuestions = Array.from(
+          { length: normalizeQuestionCount(questionCount) },
+          (_, index) => ({
+            id: index,
+            order: index + 1,
+            question_text: FIXED_INTERVIEW_QUESTION,
+            status: 'pending',
+          }),
+        );
+
+        setQuestions(fixedQuestions);
+        setCurrentQuestionIndex(0);
+        setQuestionRecordings(new Array(fixedQuestions.length).fill(null));
+        setQuestionRetryUsed(new Array(fixedQuestions.length).fill(false));
+        return fixedQuestions;
+      }
+
       const response = await axios.post(
         `${import.meta.env.VITE_AI_BASE_URL}/api/interview/questions`,
         {
