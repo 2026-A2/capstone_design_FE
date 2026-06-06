@@ -139,7 +139,7 @@ const behaviorGuides = [
     levels: [
       { label: '적정', value: '분당 1회 이하', tone: 'green' },
       { label: '주의', value: '분당 2-5회', tone: 'blue' },
-      { label: '위험', value: '분당 6회 이상', tone: 'red' },
+      { label: '확인 필요', value: '분당 6회 이상', tone: 'red' },
     ],
     note: '적절한 끄덕임은 경청과 공감을 보여주지만 과하면 습관적 반응처럼 보일 수 있습니다. 답변 중에는 핵심 문장에 맞춰 자연스럽게 반응하세요.',
   },
