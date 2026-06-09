@@ -1,23 +1,80 @@
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { getReportTrends } from '../../../api/reportApi';
+import { useEffect, useMemo, useState } from 'react';
+import { getIndividualReports, getReportTrends } from '../../../api/reportApi';
+
+const LATEST_REPORT_LIMIT = 5;
+
+const getComparableDate = (item) => {
+  if (!item?.date) {
+    return 0;
+  }
+
+  const timestamp = new Date(item.date).getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+};
+
+const getComparableSession = (item) => {
+  const rawSession = item?.id ?? item?.session ?? 0;
+  const sessionNumber = Number(String(rawSession).match(/\d+/)?.[0] ?? 0);
+
+  return Number.isNaN(sessionNumber) ? 0 : sessionNumber;
+};
+
+const getSessionLabel = (item) => {
+  if (item?.session === undefined || item?.session === null) {
+    return item?.date || '-';
+  }
+
+  const sessionText = String(item.session);
+
+  return sessionText.includes('회차') ? sessionText : `${sessionText}회차`;
+};
+
+const getLatestReports = (items) =>
+  [...items]
+    .filter((item) => item?.value !== undefined && item?.value !== null)
+    .sort((a, b) => {
+      const dateDiff = getComparableDate(b) - getComparableDate(a);
+
+      if (dateDiff !== 0) {
+        return dateDiff;
+      }
+
+      return getComparableSession(b) - getComparableSession(a);
+    })
+    .slice(0, LATEST_REPORT_LIMIT)
+    .sort((a, b) => {
+      const dateDiff = getComparableDate(a) - getComparableDate(b);
+
+      if (dateDiff !== 0) {
+        return dateDiff;
+      }
+
+      return getComparableSession(a) - getComparableSession(b);
+    });
 
 export default function TotalShoulderTiltPage() {
   const navigate = useNavigate();
 
   const [data, setData] = useState([]);
+  const [reportTotalCount, setReportTotalCount] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const trends = await getReportTrends();
+        const [trends, reports] = await Promise.all([
+          getReportTrends(),
+          getIndividualReports(),
+        ]);
 
         console.log('어깨 기울기 추세 응답:', trends);
 
         setData(trends.shoulderTiltTrend || []);
+        setReportTotalCount(Array.isArray(reports) ? reports.length : 0);
       } catch (error) {
         console.error('어깨 기울기 추세 조회 실패:', error);
         setData([]);
+        setReportTotalCount(0);
       }
     };
 
@@ -28,10 +85,11 @@ export default function TotalShoulderTiltPage() {
   const totalStep = 10;
   const progressPercent = (currentStep / totalStep) * 100;
 
-  const chartBoxStyle = {
-    ...styles.chartBox,
-    gridTemplateColumns: `repeat(${data.length}, 130px)`,
-  };
+  const latestData = useMemo(() => getLatestReports(data), [data]);
+  const shoulderDataCount = data.filter(
+    (item) => item?.value !== undefined && item?.value !== null,
+  ).length;
+  const displayTotalCount = reportTotalCount || shoulderDataCount;
 
   return (
     <div style={styles.page}>
@@ -71,10 +129,23 @@ export default function TotalShoulderTiltPage() {
           </div>
         </div>
 
-        <div style={chartBoxStyle}>
-          <div style={styles.line} />
+        <div style={styles.recentSummary}>
+          어깨 기울기 데이터 최신 {latestData.length}개
+          {displayTotalCount > 0
+            ? ` · 전체 리포트 ${displayTotalCount}개 중 최신순 기준`
+            : ''}
+        </div>
 
-          {data.map((item, index) => {
+        <div style={styles.chartBox}>
+          {latestData.length > 0 && <div style={styles.line} />}
+
+          {latestData.length === 0 && (
+            <div style={styles.emptyState}>
+              표시할 어깨 기울기 리포트가 없습니다.
+            </div>
+          )}
+
+          {latestData.map((item, index) => {
             const status = getStatus(item.value);
 
             return (
@@ -96,11 +167,11 @@ export default function TotalShoulderTiltPage() {
                     color: status.color,
                   }}
                 >
-                  <strong>{item.value}%</strong>
+                  <strong>{Number(item.value).toFixed(1)}%</strong>
                   <span>유지</span>
                 </div>
 
-                <div style={styles.session}>{item.session}회차</div>
+                <div style={styles.session}>{getSessionLabel(item)}</div>
 
                 {index === 0 && (
                   <div style={styles.note}>권장 자세 유지율 90% 이상</div>
@@ -256,6 +327,13 @@ const styles = {
     marginTop: '2px',
   },
 
+  recentSummary: {
+    marginBottom: '12px',
+    fontSize: '13px',
+    fontWeight: '800',
+    color: '#475569',
+  },
+
   chartBox: {
     position: 'relative',
     height: '300px',
@@ -270,6 +348,16 @@ const styles = {
     boxSizing: 'border-box',
     overflowX: 'auto',
     overflowY: 'hidden',
+  },
+
+  emptyState: {
+    position: 'relative',
+    zIndex: 1,
+    width: '100%',
+    textAlign: 'center',
+    fontSize: '14px',
+    fontWeight: '700',
+    color: '#64748b',
   },
 
   line: {
