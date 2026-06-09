@@ -84,12 +84,9 @@ export const getItemStatus = (key, value) => {
       if (numericValue >= 65) return 'warning';
       return 'bad';
     case 'speechRate':
-      if (numericValue >= 250 && numericValue <= 350) return 'good';
-      if (
-        (numericValue >= 200 && numericValue < 250) ||
-        (numericValue > 350 && numericValue <= 450)
-      )
-        return 'warning';
+      if (numericValue >= 200 && numericValue <= 250) return 'good';
+      if (numericValue >= 150 && numericValue < 200) return 'warning';
+      if (numericValue > 250 && numericValue <= 300) return 'warning';
       return 'bad';
     case 'silenceCount':
       if (numericValue <= 3) return 'good';
@@ -110,8 +107,8 @@ export const getItemStatus = (key, value) => {
       if (numericValue >= 5 && numericValue <= 10) return 'warning';
       return 'bad';
     case 'blinkCount':
-      if (numericValue >= 40 && numericValue <= 60) return 'good';
-      if (numericValue > 60 && numericValue <= 75) return 'warning';
+      if (numericValue >= 20 && numericValue <= 40) return 'good';
+      if (numericValue >= 41 && numericValue <= 55) return 'warning';
       return 'bad';
     case 'nodCount':
       if (numericValue <= 1) return 'good';

@@ -60,9 +60,9 @@ export default function IndividualReportFullPage() {
         if (value >= 65) return 'warning';
         return 'bad';
       case 'speechRate':
-        if (value >= 250 && value <= 350) return 'good';
-        if ((value >= 200 && value < 250) || (value > 350 && value <= 450))
-          return 'warning';
+        if (value >= 200 && value <= 250) return 'good';
+        if (value >= 150 && value < 200) return 'warning';
+        if (value > 250 && value <= 300) return 'warning';
         return 'bad';
       case 'silenceCount':
         if (value <= 3) return 'good';
@@ -83,8 +83,8 @@ export default function IndividualReportFullPage() {
         if (value >= 5 && value <= 10) return 'warning';
         return 'bad';
       case 'blinkCount':
-        if (value >= 40 && value <= 60) return 'good';
-        if (value > 60 && value <= 75) return 'warning';
+        if (value >= 20 && value <= 40) return 'good';
+        if (value >= 41 && value <= 55) return 'warning';
         return 'bad';
       case 'nodCount':
         if (value <= 1) return 'good';
@@ -196,27 +196,27 @@ export default function IndividualReportFullPage() {
         return [
           {
             level: '체크필요',
-            range: '< 200 SPM',
+            range: '< 150 SPM',
             description: '매우 느림',
           },
           {
             level: '주의',
-            range: '200-249 SPM',
+            range: '150-199 SPM',
             description: '느림',
           },
           {
             level: '적정',
-            range: '250-350 SPM',
+            range: '200-250 SPM',
             description: '적정',
           },
           {
             level: '주의',
-            range: '351-450 SPM',
+            range: '251-300 SPM',
             description: '빠름',
           },
           {
             level: '체크필요',
-            range: '> 450 SPM',
+            range: '> 300 SPM',
             description: '매우 빠름',
           },
         ];
@@ -294,17 +294,17 @@ export default function IndividualReportFullPage() {
         return [
           {
             level: '적정',
-            range: '40~60회/분',
+            range: '20~40회/분',
             description: '자연스러운 눈 깜빡임',
           },
           {
             level: '주의',
-            range: '60~75회/분',
+            range: '41~55회/분',
             description: '눈 깜빡임 횟수 조절 권장',
           },
           {
             level: '체크필요',
-            range: '< 40 또는 > 75회/분',
+            range: '< 20 또는 > 55회/분',
             description: '눈 깜빡임 횟수 개선 필요',
           },
         ];
@@ -395,7 +395,7 @@ export default function IndividualReportFullPage() {
       key: 'speechRate',
       unit: 'SPM',
       icon: '🎙️',
-      recommendedText: '250-350 SPM 권장',
+      recommendedText: '200-250 SPM 권장',
       category: '발화',
     },
     {
@@ -435,7 +435,7 @@ export default function IndividualReportFullPage() {
       key: 'blinkCount',
       unit: '회/분',
       icon: '👁️',
-      recommendedText: '분당 40~60회 권장',
+      recommendedText: '분당 20~40회 권장',
       category: '습관',
     },
     {
@@ -482,14 +482,14 @@ export default function IndividualReportFullPage() {
   const getMetricScale = (key) => {
     switch (key) {
       case 'speechRate':
-        return { min: 0, max: 500, goodMin: 250, goodMax: 350 };
+        return { min: 0, max: 500, goodMin: 200, goodMax: 250 };
       case 'voiceVolume':
         return { min: -60, max: 0, goodMin: -35, goodMax: -20 };
       case 'silenceCount':
       case 'fillerCount':
         return { min: 0, max: 10, goodMin: 0, goodMax: 3 };
       case 'blinkCount':
-        return { min: 0, max: 80, goodMin: 40, goodMax: 60 };
+        return { min: 0, max: 80, goodMin: 20, goodMax: 40 };
       case 'bodyShake':
         return { min: 0, max: 8, goodMin: 0, goodMax: 1 };
       case 'eyeContactRate':

@@ -37,14 +37,17 @@ const getLatestReport = (reports) => {
   }
 
   return [...reports].sort((a, b) => {
-    const dateA = getComparableDate(a.date);
-    const dateB = getComparableDate(b.date);
+    const dateA = getComparableDate(a.date ?? a.created_at ?? a.createdAt);
+    const dateB = getComparableDate(b.date ?? b.created_at ?? b.createdAt);
 
     if (dateA !== dateB) {
       return dateB - dateA;
     }
 
-    return Number(b.session ?? b.id ?? 0) - Number(a.session ?? a.id ?? 0);
+    return (
+      Number(b.session ?? b.interview_id ?? b.id ?? 0) -
+      Number(a.session ?? a.interview_id ?? a.id ?? 0)
+    );
   })[0];
 };
 
@@ -56,7 +59,11 @@ export default function TotalReportMenuPage() {
   useEffect(() => {
     const fetchLatestReport = async () => {
       try {
-        const reports = await getIndividualReports();
+        const response = await getIndividualReports();
+        const reports = Array.isArray(response)
+          ? response
+          : response?.data || response?.results || response?.interviews || [];
+
         setLatestReport(getLatestReport(reports));
       } catch (error) {
         console.error('최신 리포트 조회 실패:', error);
@@ -99,8 +106,11 @@ export default function TotalReportMenuPage() {
     [analysisItems],
   );
 
-  const latestReportLabel = latestReport?.date
-    ? `최신 리포트 ${latestReport.date} 기준`
+  const latestReportDate =
+    latestReport?.date ?? latestReport?.created_at ?? latestReport?.createdAt;
+
+  const latestReportLabel = latestReportDate
+    ? `최신 리포트 ${latestReportDate} 기준`
     : '최신 리포트 기준';
 
   return (
